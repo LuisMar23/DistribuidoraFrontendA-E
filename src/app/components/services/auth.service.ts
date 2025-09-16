@@ -16,7 +16,7 @@ export class AuthService {
     return this.http.post(`${this.apiUrl}/auth/login`,data);
   }
   register(data: RegisterDto): Observable<any> {
-    return this.http.post(`${this.apiUrl}/register`, data).pipe(
+    return this.http.post(`${this.apiUrl}/auth/register`, data).pipe(
       tap((res: any) => {
         if (res.access_token) {
           this.saveTokens(res.access_token, res.refresh_token);
@@ -24,7 +24,6 @@ export class AuthService {
       })
     );
   }
-
   private saveTokens(access: string, refresh: string) {
     localStorage.setItem('access_token', access);
     localStorage.setItem('refresh_token', refresh);
