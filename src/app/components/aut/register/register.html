@@ -1,0 +1,97 @@
+<div class="flex items-center justify-center min-h-screen bg-gray-100">
+  <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+    <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Crear Cuenta</h2>
+
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="space-y-4">
+      <!-- Nombre completo -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Nombre completo</label>
+        <input
+          formControlName="fullName"
+          type="text"
+          class="w-full mt-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+          placeholder="Ej: Juan Pérez"
+        />
+      </div>
+
+      <!-- Usuario -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Usuario</label>
+        <input
+          formControlName="username"
+          type="text"
+          class="w-full mt-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+          placeholder="Ej: jperez"
+        />
+      </div>
+
+      <!-- CI -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Cédula de Identidad</label>
+        <input
+          formControlName="ci"
+          type="text"
+          class="w-full mt-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+          placeholder="Ej: 12345678"
+        />
+      </div>
+
+      <!-- Teléfono -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Teléfono</label>
+        <input
+          formControlName="telefono"
+          type="text"
+          class="w-full mt-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+          placeholder="Ej: 77777777"
+        />
+      </div>
+
+      <!-- Email -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Correo</label>
+        <input
+          formControlName="email"
+          type="email"
+          class="w-full mt-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+          placeholder="ejemplo@email.com"
+        />
+      </div>
+
+      <!-- Contraseña -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Contraseña</label>
+        <input
+          formControlName="password"
+          type="password"
+          class="w-full mt-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+          placeholder="••••••••"
+        />
+        <small class="text-gray-500 text-xs">
+          Mínimo 8 caracteres, una mayúscula, un número y un símbolo.
+        </small>
+      </div>
+
+      <!-- Error -->
+      @if(errorMessage){
+      <div contextmenu="text-red-500 text-sm">
+        {{ errorMessage }}
+      </div>
+      }
+
+      <!-- Botón -->
+      <button
+        type="submit"
+        [disabled]="isLoading || registerForm.invalid"
+        class="w-full py-2 px-4 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:bg-gray-400"
+      >
+        {{ isLoading ? 'Registrando...' : 'Registrar' }}
+      </button>
+    </form>
+
+    <p class="text-center text-sm text-gray-600 mt-4">
+      ¿Ya tienes cuenta?
+      <a routerLink="/login" class="text-indigo-600 hover:underline">Inicia sesión</a>
+    </p>
+  </div>
+</div>

@@ -1,0 +1,46 @@
+<div class="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+  <!-- Widget Ventas -->
+  <div class="bg-white shadow rounded-lg p-4 flex items-center gap-4">
+    <div class="bg-indigo-600 text-white p-3 rounded-full">
+      <fa-icon [icon]="faShoppingCart"></fa-icon>
+    </div>
+    <div>
+      <p class="text-gray-500 text-sm">Ventas Hoy</p>
+      <p class="text-xl font-semibold">{{ ventasHoy | currency }}</p>
+    </div>
+  </div>
+
+  <!-- Widget Clientes -->
+  <div class="bg-white shadow rounded-lg p-4 flex items-center gap-4">
+    <div class="bg-green-500 text-white p-3 rounded-full">
+      <fa-icon [icon]="faUsers"></fa-icon>
+    </div>
+    <div>
+      <p class="text-gray-500 text-sm">Clientes Activos</p>
+      <p class="text-xl font-semibold">{{ clientesActivos }}</p>
+    </div>
+  </div>
+
+  <!-- Widget Productos -->
+  <div class="bg-white shadow rounded-lg p-4 flex items-center gap-4">
+    <div class="bg-yellow-500 text-white p-3 rounded-full">
+      <fa-icon [icon]="faBox"></fa-icon>
+    </div>
+    <div>
+      <p class="text-gray-500 text-sm">Productos Vendidos</p>
+      <p class="text-xl font-semibold">{{ productosVendidos }}</p>
+    </div>
+  </div>
+
+  <!-- Widget Caja -->
+  <div class="bg-white shadow rounded-lg p-4 flex items-center gap-4">
+    <div class="bg-red-500 text-white p-3 rounded-full">
+      <fa-icon [icon]="faCashRegister"></fa-icon>
+    </div>
+    <div>
+      <p class="text-gray-500 text-sm">Balance Caja</p>
+      <p class="text-xl font-semibold">{{ balanceCaja | currency }}</p>
+    </div>
+  </div>
+</div>
+

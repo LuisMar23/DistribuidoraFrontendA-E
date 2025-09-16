@@ -1,15 +1,24 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { LoginComponent } from './login/login';
+import { DashboardComponent } from './dashboard/dashboard';
+import { LayoutComponent} from './layout/layout';
 
 export const routes: Routes = [
-  { path: 'login', component: LoginComponent },
   { path: '', redirectTo: '/login', pathMatch: 'full' }, // Redirige a login por defecto
-  { path: '**', redirectTo: '/login' } // Redirige a login para rutas no encontradas
+  { path: 'login', component: LoginComponent },
+  {
+    path: '',
+    component: LayoutComponent,
+    children: [
+      { path: '', component: DashboardComponent }, // dashboard inicial
+    ],
+  },
+  { path: '**', redirectTo: '/login' }, // Redirige a login para rutas no encontradas
 ];
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {}
