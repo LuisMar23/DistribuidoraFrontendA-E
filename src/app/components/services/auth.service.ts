@@ -12,7 +12,7 @@ export class AuthService {
   private apiUrl = environment.apiUrl;
   constructor(private http: HttpClient) {}
 
-  login(data:LoginDto) {
+  login(data:LoginDto): Observable<any> {
     return this.http.post(`${this.apiUrl}/auth/login`,data);
   }
   register(data: RegisterDto): Observable<any> {

@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Sidebar } from "../sidebar/sidebar";
 import { DashboardComponent } from "../dashboard/dashboard";
+import { AuthService } from '../components/services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -13,10 +14,11 @@ import { DashboardComponent } from "../dashboard/dashboard";
 })
 export class LoginComponent {
   loginForm: FormGroup;
+  _authService = inject(AuthService)
 
   constructor(private fb: FormBuilder) {
     this.loginForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
+      identifier: ['', [Validators.required]],
       password: ['', Validators.required],
       rememberMe: [false]
     });
@@ -25,6 +27,9 @@ export class LoginComponent {
   onSubmit() {
     if (this.loginForm.valid) {
       console.log('Formulario válido', this.loginForm.value);
+      const data = this.loginForm.getRawValue()
+      console.log(data)
+      this._authService.login(data).subscribe({next :()=>{console.log("prueba")}})
       // Aquí iría la lógica de autenticación
     } else {
       // Marcar todos los campos como tocados para mostrar errores
