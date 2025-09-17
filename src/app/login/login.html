@@ -15,17 +15,17 @@
         <form class="space-y-6" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
             <div class="space-y-4">
                 <div>
-                    <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Identificador</label>
-                    <input id="email" type="email" formControlName="email" class="appearance-none rounded-lg relative block w-full px-4 py-3 border border-gray-300 
+                    <label for="identifier" class="block text-sm font-medium text-gray-700 mb-1">Usuario/Correo</label>
+                    <input id="identifier" type="identifier" formControlName="identifier" class="appearance-none rounded-lg relative block w-full px-4 py-3 border border-gray-300 
             placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 
             focus:border-indigo-500 focus:z-10 sm:text-sm" placeholder="tu@email.com">
                     <p class="mt-1 text-sm text-red-600"
-                        *ngIf="loginForm.get('email')?.touched && loginForm.get('email')?.errors?.['required']">
-                        El email es requerido
+                        *ngIf="loginForm.get('identifier')?.touched && loginForm.get('identifier')?.errors?.['required']">
+                        El usuario/correo es requerido
                     </p>
                     <p class="mt-1 text-sm text-red-600"
-                        *ngIf="loginForm.get('email')?.touched && loginForm.get('email')?.errors?.['email']">
-                        Por favor ingresa un email válido
+                        *ngIf="loginForm.get('identifier')?.touched && loginForm.get('identifier')?.errors?.['identifier']">
+                        Por favor ingresa un usuario/correo válido
                     </p>
                 </div>
 

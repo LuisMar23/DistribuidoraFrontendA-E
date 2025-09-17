@@ -17,6 +17,9 @@ import {
   faChevronRight,
   faAnglesLeft,
   faAnglesRight,
+  faSun,
+  faMoon,
+  faTimes,
 } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
@@ -26,11 +29,14 @@ import {
   styleUrl: './sidebar.css',
 })
 export class Sidebar {
+    faTimes = faTimes;
   faBars = faBars;
   faChevronLeft = faChevronLeft;
   faChevronRight = faChevronRight;
   faAnglesLeft = faAnglesLeft;
   faAnglesRight = faAnglesRight;
+  faSun = faSun;
+  faMoon = faMoon;
 
   isCollapsed = false;
 
@@ -42,10 +48,28 @@ export class Sidebar {
     { label: 'Transporte', icon: faTruck, route: '/transporte' },
     { label: 'Pagos', icon: faCreditCard, route: '/pagos' },
     { label: 'Caja', icon: faCashRegister, route: '/caja' },
+     { label: 'Usuarios', icon: faCog, route: '/users' },
     { label: 'Ajustes', icon: faCog, route: '/ajustes' },
   ];
 
   toggleSidebar() {
     this.isCollapsed = !this.isCollapsed;
   }
+
+  isDarkMode = false;
+isMobileOpen = false;
+
+  toggleDarkMode() {
+    this.isDarkMode = !this.isDarkMode;
+    if (this.isDarkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }
+  toggleMobile() {
+    this.isMobileOpen = !this.isMobileOpen;
+  }
+  
+
 }

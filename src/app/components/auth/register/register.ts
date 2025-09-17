@@ -8,7 +8,7 @@ import { AuthService } from '../../services/auth.service';
   templateUrl: './register.html',
   styleUrl: './register.css',
 })
-export class Register {
+export class RegisterComponent {
   isLoading = false;
   errorMessage = '';
   registerForm: any;

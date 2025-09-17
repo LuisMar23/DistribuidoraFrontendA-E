@@ -1,13 +1,13 @@
 import { Component } from '@angular/core';
-import { Sidebar } from "../sidebar/sidebar";
-import { AppRoutingModule } from "../app.routes";
+import { RouterModule } from '@angular/router';
+import { Sidebar } from '../sidebar/sidebar';
+import { Navbar } from "../navbar/navbar";
 
 @Component({
   selector: 'app-layout',
-  imports: [Sidebar, AppRoutingModule],
+  standalone: true,
+  imports: [RouterModule, Sidebar, Navbar],
   templateUrl: './layout.html',
-  styleUrl: './layout.css'
+  styleUrls: ['./layout.css']
 })
-export class LayoutComponent {
-
-}
+export class LayoutComponent {}
