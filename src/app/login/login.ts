@@ -14,6 +14,7 @@ import { AuthService } from '../components/services/auth.service';
 })
 export class LoginComponent {
   loginForm: FormGroup;
+  showPassword: boolean = false; // Propiedad agregada
   _authService = inject(AuthService)
 
   constructor(private fb: FormBuilder) {
@@ -22,6 +23,11 @@ export class LoginComponent {
       password: ['', Validators.required],
       rememberMe: [false]
     });
+  }
+  
+  // Método agregado
+  togglePasswordVisibility(): void {
+    this.showPassword = !this.showPassword;
   }
 
   onSubmit() {

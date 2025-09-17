@@ -3,18 +3,19 @@ import { RouterModule, Routes } from '@angular/router';
 import { LoginComponent } from './login/login';
 import { DashboardComponent } from './dashboard/dashboard';
 import { LayoutComponent} from './layout/layout';
+import { ForgotPasswordComponent } from './forgot-password/forgot-password'; 
 
 export const routes: Routes = [
-  { path: '', redirectTo: '/login', pathMatch: 'full' }, // Redirige a login por defecto
+  { path: 'forgot-password', component: ForgotPasswordComponent }, // Ruta corregida
   { path: 'login', component: LoginComponent },
   {
     path: '',
     component: LayoutComponent,
     children: [
-      { path: '', component: DashboardComponent }, // dashboard inicial
+      { path: '', component: DashboardComponent }, // Ruta principal
     ],
   },
-  { path: '**', redirectTo: '/login' }, // Redirige a login para rutas no encontradas
+  { path: '**', redirectTo: '' }, // Redirige a la ruta principal
 ];
 
 @NgModule({
