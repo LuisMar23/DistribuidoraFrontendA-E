@@ -2,22 +2,28 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { LoginComponent } from './login/login';
 import { DashboardComponent } from './dashboard/dashboard';
-import { LayoutComponent} from './layout/layout';
-import { ForgotPasswordComponent } from './forgot-password/forgot-password'; 
+import { LayoutComponent } from './layout/layout';
+import { RegisterComponent } from './components/auth/register/register';
+import { UsersComponent } from './users/users';
+import { ForgotPasswordComponent } from './forgot-password/forgot-password';
+import { TransportComponent } from './transport/transport';
 
 export const routes: Routes = [
-  { path: 'forgot-password', component: ForgotPasswordComponent }, // Ruta corregida
   { path: 'login', component: LoginComponent },
+  // { path: '', component: DashboardComponent }, // prueba sin Layout
   {
     path: '',
     component: LayoutComponent,
     children: [
-      { path: '', component: DashboardComponent }, // Ruta principal
+      { path: 'dashboard', component: DashboardComponent },
+      { path: 'users', component: UsersComponent },
+      { path: 'transporte', component: TransportComponent },
     ],
   },
-  { path: '**', redirectTo: '' }, // Redirige a la ruta principal
-];
+  { path: 'forgot-password', component: ForgotPasswordComponent },
 
+  { path: '**', redirectTo: '/login' },
+];
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
   exports: [RouterModule],
