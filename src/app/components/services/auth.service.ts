@@ -17,6 +17,7 @@ export class AuthService {
     console.log(data);
     return this.http.post<LoginDto>(`${this.apiUrl}/auth/login`, data);
   }
+  
   register(data: RegisterDto): Observable<any> {
     return this.http.post(`${this.apiUrl}/auth/register`, data).pipe(
       tap((res: any) => {
@@ -26,13 +27,21 @@ export class AuthService {
       })
     );
   }
+
+  // Método para recuperación de contraseña
+  forgotPassword(email: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/forgot-password`, { email });
+  }
+
   private saveTokens(access: string, refresh: string) {
     localStorage.setItem('access_token', access);
     localStorage.setItem('refresh_token', refresh);
   }
+  
   getAccessToken(): string | null {
     return localStorage.getItem('access_token');
   }
+  
   isAuthenticated(): boolean {
     return !!this.getAccessToken();
   }

@@ -15,7 +15,8 @@ import { Router } from '@angular/router';
 })
 export class LoginComponent {
   loginForm: FormGroup;
-  _authService = inject(AuthService);
+  showPassword: boolean = false; // Propiedad agregada
+  _authService = inject(AuthService)
   
   constructor(private fb: FormBuilder,private router:Router) {
     this.loginForm = this.fb.group({
@@ -23,6 +24,11 @@ export class LoginComponent {
       password: ['', Validators.required],
       rememberMe: [false],
     });
+  }
+  
+  // Método agregado
+  togglePasswordVisibility(): void {
+    this.showPassword = !this.showPassword;
   }
 
   async onSubmit() {

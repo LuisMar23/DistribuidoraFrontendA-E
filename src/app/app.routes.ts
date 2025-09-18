@@ -6,20 +6,25 @@ import { LayoutComponent } from './layout/layout';
 import { RegisterComponent } from './components/auth/register/register';
 import { UsersComponent } from './users/users';
 import { ProveedorComponent } from './proveedor/proveedor';
+import { ForgotPasswordComponent } from './forgot-password/forgot-password';
+import { TransportComponent } from './transport/transport';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
   // { path: '', component: DashboardComponent }, // prueba sin Layout
- {
+  {
     path: '',
     component: LayoutComponent,
     children: [
       { path: 'dashboard', component: DashboardComponent },
       {path:'users',component:UsersComponent},
-      {path:'proveedores',component:ProveedorComponent}
+      {path:'proveedores',component:ProveedorComponent},
+      {path:'transporte',component:TransportComponent}
       
     ],
   },
+  { path: 'forgot-password', component: ForgotPasswordComponent },
+
   { path: '**', redirectTo: '/login' },
 ];
 @NgModule({
