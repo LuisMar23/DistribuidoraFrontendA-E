@@ -9,19 +9,22 @@ import {
 import { ProveedorService } from '../services/proveedor.service';
 import { ProveedorDto } from '../../interfaces/proveedor.interface';
 import departamentos from '../assets/departamentos.json';
-import { faBox, faBoxOpen } from '@fortawesome/free-solid-svg-icons';
+import { faBox, faBoxOpen, faEye, faPenToSquare, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 @Component({
   selector: 'app-proveedor',
-  imports: [ReactiveFormsModule, FormsModule,FontAwesomeModule],
+  imports: [ReactiveFormsModule, FormsModule, FontAwesomeModule],
   templateUrl: './proveedor.html',
   styleUrl: './proveedor.css',
 })
 export class ProveedorComponent {
-    faBox = faBox;
-    faBoxOpen=faBoxOpen
 
+  faBox = faBox;
+  faBoxOpen = faBoxOpen;
+  faEye = faEye;
+  faPenToSquare = faPenToSquare;
+  faTrash = faTrash;
 
   proveedores = signal<ProveedorDto[]>([]);
   editId = signal<number | null>(null);
@@ -31,6 +34,11 @@ export class ProveedorComponent {
   form: FormGroup;
   editMode = signal(false);
 
+  total = signal(0);
+  pageSize = signal(5);
+  currentPage = signal(1);
+  sortColumn = signal<keyof ProveedorDto>('creado_en');
+  sortDirection = signal<'asc' | 'desc'>('desc');
   constructor(private proveedorService: ProveedorService, private fb: FormBuilder) {
     this.departments = departamentos.departamentos;
 
@@ -47,7 +55,12 @@ export class ProveedorComponent {
     this.loadProveedores();
   }
   loadProveedores() {
-    this.proveedorService.getAll().subscribe((data) => this.proveedores.set(data));
+    this.proveedorService
+      .getAll(this.currentPage(), this.pageSize(), this.sortColumn(), this.sortDirection())
+      .subscribe((res) => {
+        this.proveedores.set(res.data);
+        this.total.set(res.total);
+      });
   }
   filteredProveedores = computed(() => {
     const term = this.searchTerm().toLowerCase();
@@ -103,4 +116,53 @@ export class ProveedorComponent {
       this.proveedorService.delete(id).subscribe(() => this.loadProveedores());
     }
   }
+  view(p: any) {}
+
+  //paginador
+  sort(column: keyof ProveedorDto) {
+    if (this.sortColumn() === column) {
+      this.sortDirection.set(this.sortDirection() === 'asc' ? 'desc' : 'asc');
+    } else {
+      this.sortColumn.set(column);
+      this.sortDirection.set('asc');
+    }
+    this.loadProveedores();
+  }
+
+  nextPage() {
+    if (this.currentPage() < this.totalPages()) {
+      this.currentPage.update((v) => v + 1);
+      this.loadProveedores();
+    }
+  }
+
+  prevPage() {
+    if (this.currentPage() > 1) {
+      this.currentPage.update((v) => v - 1);
+      this.loadProveedores();
+    }
+  }
+
+  goToPage(page: number) {
+    if (page >= 1 && page <= this.totalPages()) {
+      this.currentPage.set(page);
+      this.loadProveedores();
+    }
+  }
+
+  totalPages() {
+    return Math.ceil(this.total() / this.pageSize());
+  }
+  pageArray(): number[] {
+    return Array.from({ length: this.totalPages() }, (_, i) => i + 1);
+  }
+
+  rangeStart(): number {
+  return (this.currentPage() - 1) * this.pageSize() + 1;
+}
+
+rangeEnd(): number {
+  const end = this.currentPage() * this.pageSize();
+  return end > this.total() ? this.total() : end;
+}
 }
