@@ -35,24 +35,167 @@
       <table class="min-w-full">
         <thead>
           <tr class="bg-[#2196f3] text-white">
-            <th class="px-4 py-4 text-left text-xs font-bold uppercase tracking-wider">N°</th>
-            <th class="px-4 py-4 text-left text-xs font-bold uppercase tracking-wider">Estado</th>
-            <th class="px-4 py-4 text-left text-xs font-bold uppercase tracking-wider">Foto</th>
-            <th class="px-4 py-4 text-left text-xs font-bold uppercase tracking-wider">
-              Cód. Prov.
+            <!-- N° -->
+            <th
+              class="px-4 py-4 text-left text-xs font-bold uppercase tracking-wider cursor-pointer"
+              (click)="sort('id_proveedor')"
+            >
+              N°
+              <span class="inline-flex flex-col ml-1 text-xs">
+                <span
+                  [class.text-yellow-300]="
+                    sortColumn() === 'id_proveedor' && sortDirection() === 'asc'
+                  "
+                  >▲</span
+                >
+                <span
+                  [class.text-yellow-300]="
+                    sortColumn() === 'id_proveedor' && sortDirection() === 'desc'
+                  "
+                  >▼</span
+                >
+              </span>
             </th>
-            <th class="px-4 py-4 text-left text-xs font-bold uppercase tracking-wider">
+
+            <!-- Estado -->
+            <th
+              class="px-4 py-4 text-left text-xs font-bold uppercase tracking-wider cursor-pointer"
+              (click)="sort('isActive')"
+            >
+              Estado
+              <span class="inline-flex flex-col ml-1 text-xs">
+                <span
+                  [class.text-yellow-300]="sortColumn() === 'isActive' && sortDirection() === 'asc'"
+                  >▲</span
+                >
+                <span
+                  [class.text-yellow-300]="
+                    sortColumn() === 'isActive' && sortDirection() === 'desc'
+                  "
+                  >▼</span
+                >
+              </span>
+            </th>
+
+            <!-- Nombre de Proveedor -->
+            <th
+              class="px-4 py-4 text-left text-xs font-bold uppercase tracking-wider cursor-pointer"
+              (click)="sort('nombre')"
+            >
               Nombre de Proveedor
+              <span class="inline-flex flex-col ml-1 text-xs">
+                <span
+                  [class.text-yellow-300]="sortColumn() === 'nombre' && sortDirection() === 'asc'"
+                  >▲</span
+                >
+                <span
+                  [class.text-yellow-300]="sortColumn() === 'nombre' && sortDirection() === 'desc'"
+                  >▼</span
+                >
+              </span>
             </th>
-            <th class="px-4 py-4 text-left text-xs font-bold uppercase tracking-wider">NIT/CI</th>
-            <th class="px-4 py-4 text-left text-xs font-bold uppercase tracking-wider">Teléfono</th>
-            <th class="px-4 py-4 text-left text-xs font-bold uppercase tracking-wider">
+
+            <!-- NIT/CI -->
+            <th
+              class="px-4 py-4 text-left text-xs font-bold uppercase tracking-wider cursor-pointer"
+              (click)="sort('nit_ci')"
+            >
+              NIT/CI
+              <span class="inline-flex flex-col ml-1 text-xs">
+                <span
+                  [class.text-yellow-300]="sortColumn() === 'nit_ci' && sortDirection() === 'asc'"
+                  >▲</span
+                >
+                <span
+                  [class.text-yellow-300]="sortColumn() === 'nit_ci' && sortDirection() === 'desc'"
+                  >▼</span
+                >
+              </span>
+            </th>
+
+            <!-- Teléfono -->
+            <th
+              class="px-4 py-4 text-left text-xs font-bold uppercase tracking-wider cursor-pointer"
+              (click)="sort('telefono')"
+            >
+              Teléfono
+              <span class="inline-flex flex-col ml-1 text-xs">
+                <span
+                  [class.text-yellow-300]="sortColumn() === 'telefono' && sortDirection() === 'asc'"
+                  >▲</span
+                >
+                <span
+                  [class.text-yellow-300]="
+                    sortColumn() === 'telefono' && sortDirection() === 'desc'
+                  "
+                  >▼</span
+                >
+              </span>
+            </th>
+
+            <!-- Dirección -->
+            <th
+              class="px-4 py-4 text-left text-xs font-bold uppercase tracking-wider cursor-pointer"
+              (click)="sort('direccion')"
+            >
               Dirección
+              <span class="inline-flex flex-col ml-1 text-xs">
+                <span
+                  [class.text-yellow-300]="
+                    sortColumn() === 'direccion' && sortDirection() === 'asc'
+                  "
+                  >▲</span
+                >
+                <span
+                  [class.text-yellow-300]="
+                    sortColumn() === 'direccion' && sortDirection() === 'desc'
+                  "
+                  >▼</span
+                >
+              </span>
             </th>
-            <th class="px-4 py-4 text-left text-xs font-bold uppercase tracking-wider">
+
+            <!-- Departamento -->
+            <th
+              class="px-4 py-4 text-left text-xs font-bold uppercase tracking-wider cursor-pointer"
+              (click)="sort('departamento')"
+            >
               Departamento
+              <span class="inline-flex flex-col ml-1 text-xs">
+                <span
+                  [class.text-yellow-300]="
+                    sortColumn() === 'departamento' && sortDirection() === 'asc'
+                  "
+                  >▲</span
+                >
+                <span
+                  [class.text-yellow-300]="
+                    sortColumn() === 'departamento' && sortDirection() === 'desc'
+                  "
+                  >▼</span
+                >
+              </span>
             </th>
-            <th class="px-4 py-4 text-left text-xs font-bold uppercase tracking-wider">Email</th>
+
+            <!-- Email -->
+            <th
+              class="px-4 py-4 text-left text-xs font-bold uppercase tracking-wider cursor-pointer"
+              (click)="sort('email')"
+            >
+              Email
+              <span class="inline-flex flex-col ml-1 text-xs">
+                <span
+                  [class.text-yellow-300]="sortColumn() === 'email' && sortDirection() === 'asc'"
+                  >▲</span
+                >
+                <span
+                  [class.text-yellow-300]="sortColumn() === 'email' && sortDirection() === 'desc'"
+                  >▼</span
+                >
+              </span>
+            </th>
+
+            <!-- Acciones -->
             <th class="px-4 py-4 text-center text-xs font-bold uppercase tracking-wider">
               Acciones
             </th>
@@ -60,9 +203,7 @@
         </thead>
         <tbody class="divide-y divide-gray-100">
           @for (p of filteredProveedores(); track $index) {
-          <tr
-            class="hover:bg-gray-50 transition-all duration-200 border-l-4 border-transparent hover:border-purple-400"
-          >
+          <tr class="hover:bg-gray-50 transition-all duration-200 border-l-4 border-transparent">
             <!-- Número -->
             <td class="px-4 py-4">
               <span class="font-semibold text-gray-700">{{ $index + 1 }}</span>
@@ -74,24 +215,6 @@
                 class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800"
               >
                 Activo
-              </span>
-            </td>
-
-            <!-- Foto -->
-            <td class="px-4 py-4">
-              <div
-                class="w-12 h-12 bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl flex items-center justify-center shadow-inner"
-              >
-                <i class="fas fa-building text-gray-400 text-lg"></i>
-              </div>
-            </td>
-
-            <!-- Código de Proveedor -->
-            <td class="px-4 py-4">
-              <span
-                class="inline-flex items-center px-2.5 py-1.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-700"
-              >
-                PROV{{ p.id_proveedor }}
               </span>
             </td>
 
@@ -128,7 +251,7 @@
             <!-- Departamento -->
             <td class="px-4 py-4">
               <span
-                class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800"
+                class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium text-black-200"
               >
                 {{ p.departamento }}
               </span>
@@ -144,23 +267,32 @@
 
             <!-- Acciones -->
             <td class="px-4 py-4">
-              <div class="flex justify-center gap-2">
-                <!-- Botón Editar -->
+              <div class="flex justify-center gap-3">
+                <!-- Detalle -->
                 <button
-                  class="w-8 h-8 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg transition-all duration-200 flex items-center justify-center shadow-md hover:shadow-lg transform hover:scale-110"
+                  class="w-10 h-10 flex items-center justify-center rounded-2xl bg-green-500 hover:bg-green-600 text-white shadow-md transition transform hover:scale-110"
+                  title="Ver Detalle"
+                  (click)="view(p)"
+                >
+                  <fa-icon [icon]="faEye"></fa-icon>
+                </button>
+
+                <!-- Editar -->
+                <button
+                  class="w-10 h-10 flex items-center justify-center rounded-2xl bg-blue-500 hover:bg-blue-600 text-white shadow-md transition transform hover:scale-110"
                   title="Editar"
                   (click)="edit(p)"
                 >
-                  <i class="fas fa-edit text-xs"></i>
+                  <fa-icon [icon]="faPenToSquare"></fa-icon>
                 </button>
 
-                <!-- Botón Eliminar -->
+                <!-- Eliminar -->
                 <button
-                  class="w-8 h-8 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-all duration-200 flex items-center justify-center shadow-md hover:shadow-lg transform hover:scale-110"
+                  class="w-10 h-10 flex items-center justify-center rounded-2xl bg-red-500 hover:bg-red-600 text-white shadow-md transition transform hover:scale-110"
                   title="Eliminar"
                   (click)="delete(p.id_proveedor!)"
                 >
-                  <i class="fas fa-trash text-xs"></i>
+                  <fa-icon [icon]="faTrash"></fa-icon>
                 </button>
               </div>
             </td>
@@ -168,20 +300,56 @@
           }
 
           <!-- Fila vacía si no hay datos -->
-      @if (filteredProveedores().length === 0) {
-  <tr>
-    <td colspan="11" class="px-4 py-12 text-center text-gray-500">
-      <div class="flex flex-col items-center gap-3">
-        <fa-icon [icon]="faBoxOpen" class="text-5xl text-gray-300"></fa-icon>
-        <p class="text-lg font-semibold text-gray-700">No se encontraron proveedores</p>
-        <p class="text-sm text-gray-500">Agrega un nuevo proveedor para comenzar</p>
-      </div>
-    </td>
-  </tr>
-}
-
+          @if (filteredProveedores().length === 0) {
+          <tr>
+            <td colspan="11" class="px-4 py-12 text-center text-gray-500">
+              <div class="flex flex-col items-center gap-3">
+                <fa-icon [icon]="faBoxOpen" class="text-5xl text-gray-300"></fa-icon>
+                <p class="text-lg font-semibold text-gray-700">No se encontraron proveedores</p>
+                <p class="text-sm text-gray-500">Agrega un nuevo proveedor para comenzar</p>
+              </div>
+            </td>
+          </tr>
+          }
         </tbody>
       </table>
+    </div>
+  </div>
+  <div class="flex justify-between items-center mt-4 px-4">
+    <!-- Izquierda: rango de registros -->
+    <div class="text-sm text-black-600">
+      Mostrando {{ rangeStart() }} a {{ rangeEnd() }} de {{ total() }}
+    </div>
+
+    <!-- Derecha: botones -->
+    <div class="flex items-center gap-2">
+      <button
+        (click)="prevPage()"
+        [disabled]="currentPage() === 1"
+        class="px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded disabled:opacity-50"
+      >
+        Anterior
+      </button>
+
+      @for(i of pageArray();track i){
+      <button
+        (click)="goToPage(i)"
+        [class.font-bold]="currentPage() === i"
+        [class.bg-blue-500]="currentPage() === i"
+        [class.text-white]="currentPage() === i"
+        class="px-3 py-1 border rounded hover:bg-blue-200"
+      >
+        {{ i }}
+      </button>
+      }
+
+      <button
+        (click)="nextPage()"
+        [disabled]="currentPage() === totalPages()"
+        class="px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded disabled:opacity-50"
+      >
+        Siguiente
+      </button>
     </div>
   </div>
 </div>

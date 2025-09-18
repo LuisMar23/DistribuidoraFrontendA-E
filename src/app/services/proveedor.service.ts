@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { ProveedorDto } from '../../interfaces/proveedor.interface';
 import { Observable } from 'rxjs';
 
@@ -10,19 +10,30 @@ import { Observable } from 'rxjs';
 export class ProveedorService {
   apiUrl = environment.apiUrl;
   constructor(private http: HttpClient) {}
-  getAll(): Observable<ProveedorDto[]> {
-    return this.http.get<ProveedorDto[]>(this.apiUrl);
+    getAll(
+    page: number = 1,
+    pageSize: number = 5,
+    sortColumn: string = 'creado_en',
+    sortDirection: 'asc' | 'desc' = 'desc'
+  ): Observable<{ data: ProveedorDto[]; total: number }> {
+    const params = new HttpParams()
+      .set('page', page.toString())
+      .set('pageSize', pageSize.toString())
+      .set('sortColumn', sortColumn)
+      .set('sortDirection', sortDirection);
+
+    return this.http.get<{ data: ProveedorDto[]; total: number }>(`${this.apiUrl}/proveedor`, { params });
   }
   getById(id: number): Observable<ProveedorDto> {
-    return this.http.get<ProveedorDto>(`${this.apiUrl}/${id}`);
+    return this.http.get<ProveedorDto>(`${this.apiUrl}/proveedor${id}`);
   }
   create(proveedor: ProveedorDto): Observable<ProveedorDto> {
-    return this.http.post<ProveedorDto>(this.apiUrl, proveedor);
+    return this.http.post<ProveedorDto>(`${this.apiUrl}/proveedor`, proveedor);
   }
   update(id: number, proveedor: Partial<ProveedorDto>): Observable<ProveedorDto> {
-    return this.http.patch<ProveedorDto>(`${this.apiUrl}/${id}`, proveedor);
+    return this.http.patch<ProveedorDto>(`${this.apiUrl}/proveedor/${id}`, proveedor);
   }
   delete(id: number): Observable<ProveedorDto> {
-    return this.http.delete<ProveedorDto>(`${this.apiUrl}/${id}`);
+    return this.http.delete<ProveedorDto>(`${this.apiUrl}/proveedor/${id}`);
   }
 }
