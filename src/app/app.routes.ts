@@ -8,6 +8,7 @@ import { UsersComponent } from './users/users';
 import { ProveedorComponent } from './proveedor/proveedor';
 import { ForgotPasswordComponent } from './forgot-password/forgot-password';
 import { TransportComponent } from './transport/transport';
+import { ProductComponent } from './product/product';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -18,9 +19,9 @@ export const routes: Routes = [
     children: [
       { path: 'dashboard', component: DashboardComponent },
       {path:'users',component:UsersComponent},
+      {path:'productos',component:ProductComponent},
       {path:'proveedores',component:ProveedorComponent},
       {path:'transporte',component:TransportComponent}
-      
     ],
   },
   { path: 'forgot-password', component: ForgotPasswordComponent },
