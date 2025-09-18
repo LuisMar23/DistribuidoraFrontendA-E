@@ -42,13 +42,14 @@ export class Sidebar {
 
   menu: { label: string; icon: IconDefinition; route: string }[] = [
     { label: 'Dashboard', icon: faHome, route: '/dashboard' },
+    { label: 'Proveedores', icon: faShoppingCart, route: '/proveedores' },
     { label: 'Ventas', icon: faShoppingCart, route: '/ventas' },
     { label: 'Productos', icon: faBox, route: '/productos' },
     { label: 'Clientes', icon: faUsers, route: '/clientes' },
     { label: 'Transporte', icon: faTruck, route: '/transporte' },
     { label: 'Pagos', icon: faCreditCard, route: '/pagos' },
     { label: 'Caja', icon: faCashRegister, route: '/caja' },
-     { label: 'Usuarios', icon: faCog, route: '/users' },
+    { label: 'Usuarios', icon: faCog, route: '/users' },
     { label: 'Ajustes', icon: faCog, route: '/ajustes' },
   ];
 

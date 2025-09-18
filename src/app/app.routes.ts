@@ -5,6 +5,7 @@ import { DashboardComponent } from './dashboard/dashboard';
 import { LayoutComponent } from './layout/layout';
 import { RegisterComponent } from './components/auth/register/register';
 import { UsersComponent } from './users/users';
+import { ProveedorComponent } from './proveedor/proveedor';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -14,7 +15,8 @@ export const routes: Routes = [
     component: LayoutComponent,
     children: [
       { path: 'dashboard', component: DashboardComponent },
-      {path:'users',component:UsersComponent}
+      {path:'users',component:UsersComponent},
+      {path:'proveedores',component:ProveedorComponent}
     ],
   },
   { path: '**', redirectTo: '/login' },

@@ -1,0 +1,302 @@
+<div class="max-w-full mx-auto p-4 md:p-6 bg-white">
+  <!-- Header con buscador y botón -->
+  <div class="flex flex-col lg:flex-row justify-between items-center gap-4 mb-6">
+    <div class="w-full lg:w-1/3">
+      <div class="relative">
+        <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+        <input
+          type="text"
+          placeholder="Buscar proveedor..."
+          class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm"
+          [(ngModel)]="searchTerm"
+        />
+      </div>
+    </div>
+    <button
+      (click)="openModal()"
+      class="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-3 rounded-xl shadow-lg transition-all duration-200 transform hover:scale-105"
+    >
+      <i class="fas fa-plus"></i> Nuevo Proveedor
+    </button>
+  </div>
+
+  <!-- Tabla de proveedores con diseño moderno -->
+  <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="min-w-full">
+        <thead>
+          <tr class="bg-gradient-to-r from-red-400 to-red-500 text-white">
+            <th class="px-4 py-4 text-left text-xs font-bold uppercase tracking-wider">
+              N°
+            </th>
+            <th class="px-4 py-4 text-left text-xs font-bold uppercase tracking-wider">
+              Estado
+            </th>
+            <th class="px-4 py-4 text-left text-xs font-bold uppercase tracking-wider">
+              Foto
+            </th>
+            <th class="px-4 py-4 text-left text-xs font-bold uppercase tracking-wider">
+              Cód. Prov.
+            </th>
+            <th class="px-4 py-4 text-left text-xs font-bold uppercase tracking-wider">
+              Nombre de Proveedor
+            </th>
+            <th class="px-4 py-4 text-left text-xs font-bold uppercase tracking-wider">
+              NIT/CI
+            </th>
+            <th class="px-4 py-4 text-left text-xs font-bold uppercase tracking-wider">
+              Teléfono
+            </th>
+            <th class="px-4 py-4 text-left text-xs font-bold uppercase tracking-wider">
+              Dirección
+            </th>
+            <th class="px-4 py-4 text-left text-xs font-bold uppercase tracking-wider">
+              Departamento
+            </th>
+            <th class="px-4 py-4 text-left text-xs font-bold uppercase tracking-wider">
+              Email
+            </th>
+            <th class="px-4 py-4 text-center text-xs font-bold uppercase tracking-wider">
+              Acciones
+            </th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          @for (p of filteredProveedores(); track $index) {
+          <tr class="hover:bg-gray-50 transition-all duration-200 border-l-4 border-transparent hover:border-blue-400">
+            <!-- Número -->
+            <td class="px-4 py-4">
+              <span class="font-semibold text-gray-700">{{ $index + 1 }}</span>
+            </td>
+            
+            <!-- Estado -->
+            <td class="px-4 py-4">
+              <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                Activo
+              </span>
+            </td>
+            
+            <!-- Foto -->
+            <td class="px-4 py-4">
+              <div class="w-12 h-12 bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl flex items-center justify-center shadow-inner">
+                <i class="fas fa-building text-gray-400 text-lg"></i>
+              </div>
+            </td>
+            
+            <!-- Código de Proveedor -->
+            <td class="px-4 py-4">
+              <span class="inline-flex items-center px-2.5 py-1.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                PROV{{ p.id_proveedor  }}
+              </span>
+            </td>
+            
+            <!-- Nombre -->
+            <td class="px-4 py-4">
+              <div>
+                <div class="font-bold text-gray-900 text-sm">{{ p.nombre }}</div>
+                <div class="text-xs text-gray-500">ID: {{ p.id_proveedor }}</div>
+              </div>
+            </td>
+            
+            <!-- NIT/CI -->
+            <td class="px-4 py-4">
+              <span class="font-medium text-gray-700">{{ p.nit_ci }}</span>
+            </td>
+            
+            <!-- Teléfono -->
+            <td class="px-4 py-4">
+              <div class="flex items-center text-gray-700">
+                <i class="fas fa-phone text-xs mr-2 text-gray-400"></i>
+                <span class="text-sm">{{ p.telefono }}</span>
+              </div>
+            </td>
+            
+            <!-- Dirección -->
+            <td class="px-4 py-4">
+              <div class="max-w-xs">
+                <span class="text-sm text-gray-700 block truncate" [title]="p.direccion">
+                  {{ p.direccion }}
+                </span>
+              </div>
+            </td>
+            
+            <!-- Departamento -->
+            <td class="px-4 py-4">
+              <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                {{ p.departamento }}
+              </span>
+            </td>
+            
+            <!-- Email -->
+            <td class="px-4 py-4">
+              <div class="flex items-center text-gray-700">
+                <i class="fas fa-envelope text-xs mr-2 text-gray-400"></i>
+                <span class="text-sm truncate max-w-xs" [title]="p.email">{{ p.email }}</span>
+              </div>
+            </td>
+            
+            <!-- Acciones -->
+            <td class="px-4 py-4">
+              <div class="flex justify-center gap-2">
+                <!-- Botón Editar -->
+                <button 
+                  class="w-8 h-8 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-all duration-200 flex items-center justify-center shadow-md hover:shadow-lg transform hover:scale-110"
+                  title="Editar"
+                  (click)="edit(p)"
+                >
+                  <i class="fas fa-edit text-xs"></i>
+                </button>
+                
+                <!-- Botón Eliminar -->
+                <button 
+                  class="w-8 h-8 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-all duration-200 flex items-center justify-center shadow-md hover:shadow-lg transform hover:scale-110"
+                  title="Eliminar"
+                  (click)="delete(p.id_proveedor!)"
+                >
+                  <i class="fas fa-trash text-xs"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+          }
+          
+          <!-- Fila vacía si no hay datos -->
+          @if (filteredProveedores().length === 0) {
+          <tr>
+            <td colspan="11" class="px-4 py-12 text-center text-gray-500">
+              <div class="flex flex-col items-center gap-3">
+                <i class="fas fa-inbox text-4xl text-gray-300"></i>
+                <p class="text-lg font-medium">No se encontraron proveedores</p>
+                <p class="text-sm">Agrega un nuevo proveedor para comenzar</p>
+              </div>
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Proveedor Mejorado -->
+@if (showModal()) {
+<div class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
+  <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl animate-fadeIn max-h-[90vh] overflow-y-auto">
+    <!-- Header del Modal -->
+    <div class="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6 rounded-t-2xl">
+      <div class="flex justify-between items-center">
+        <h2 class="text-2xl font-bold">
+          {{ editMode() ? 'Editar Proveedor' : 'Nuevo Proveedor' }}
+        </h2>
+        <button 
+          (click)="cancelEdit()"
+          class="text-white hover:text-gray-200 transition-colors"
+        >
+          <i class="fas fa-times text-xl"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Formulario -->
+    <form [formGroup]="form" (ngSubmit)="submit()" class="p-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Nombre -->
+        <div class="md:col-span-2">
+          <label class="block text-sm font-semibold text-gray-700 mb-2">
+            <i class="fas fa-building mr-2"></i>Nombre del Proveedor
+          </label>
+          <input
+            formControlName="nombre"
+            placeholder="Ingrese el nombre del proveedor"
+            class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm transition-all"
+          />
+        </div>
+
+        <!-- NIT/CI -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-2">
+            <i class="fas fa-id-card mr-2"></i>NIT/CI
+          </label>
+          <input
+            formControlName="nit_ci"
+            placeholder="Número de identificación"
+            class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm transition-all"
+          />
+        </div>
+
+        <!-- Teléfono -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-2">
+            <i class="fas fa-phone mr-2"></i>Teléfono
+          </label>
+          <input
+            formControlName="telefono"
+            placeholder="Número de teléfono"
+            class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm transition-all"
+          />
+        </div>
+
+        <!-- Dirección -->
+        <div class="md:col-span-2">
+          <label class="block text-sm font-semibold text-gray-700 mb-2">
+            <i class="fas fa-map-marker-alt mr-2"></i>Dirección
+          </label>
+          <input
+            formControlName="direccion"
+            placeholder="Dirección completa"
+            class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm transition-all"
+          />
+        </div>
+
+        <!-- Departamento -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-2">
+            <i class="fas fa-map mr-2"></i>Departamento
+          </label>
+          <select
+            formControlName="departamento"
+            class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm transition-all appearance-none bg-white"
+          >
+            <option value="" disabled>Selecciona un departamento</option>
+            @for (d of departments; track $index) {
+            <option [value]="d">{{ d }}</option>
+            }
+          </select>
+        </div>
+
+        <!-- Email -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-2">
+            <i class="fas fa-envelope mr-2"></i>Email
+          </label>
+          <input
+            formControlName="email"
+            type="email"
+            placeholder="correo@ejemplo.com"
+            class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm transition-all"
+          />
+        </div>
+      </div>
+
+      <!-- Botones de acción -->
+      <div class="flex justify-end gap-3 mt-8 pt-6 border-t">
+        <button
+          type="button"
+          (click)="cancelEdit()"
+          class="flex items-center gap-2 bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-xl shadow-md transition-all duration-200 transform hover:scale-105"
+        >
+          <i class="fas fa-times"></i> Cancelar
+        </button>
+        <button
+          type="submit"
+          class="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-3 rounded-xl shadow-md transition-all duration-200 transform hover:scale-105"
+        >
+          <i class="fas fa-check"></i> 
+          {{ editMode() ? 'Actualizar' : 'Crear' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+}
+
