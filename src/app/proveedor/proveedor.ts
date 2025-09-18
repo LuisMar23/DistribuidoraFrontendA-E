@@ -12,10 +12,11 @@ import { faBox, faBoxOpen, faEye, faPenToSquare, faTrash } from '@fortawesome/fr
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { ProveedorDto } from '../../core/interfaces/proveedor.interface';
 import { ProveedorService } from '../../core/services/proveedor.service';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-proveedor',
-  imports: [ReactiveFormsModule, FormsModule, FontAwesomeModule],
+  imports: [ReactiveFormsModule, FormsModule, FontAwesomeModule,CommonModule],
   templateUrl: './proveedor.html',
   styleUrl: './proveedor.css',
 })
@@ -33,6 +34,18 @@ export class ProveedorComponent {
   departments: string[] = [];
   form: FormGroup;
   editMode = signal(false);
+
+  columns = [
+  { key: 'id_proveedor', label: 'N°' },
+  { key: 'isActive', label: 'Estado' },
+  { key: 'nombre', label: 'Nombre de Proveedor' },
+  { key: 'nit_ci', label: 'NIT/CI' },
+  { key: 'telefono', label: 'Teléfono' },
+  { key: 'direccion', label: 'Dirección' },
+  { key: 'departamento', label: 'Departamento' },
+  { key: 'email', label: 'Email' },
+];
+
 
   total = signal(0);
   pageSize = signal(5);
@@ -119,7 +132,7 @@ export class ProveedorComponent {
   view(p: any) {}
 
   //paginador
-  sort(column: keyof ProveedorDto) {
+  sort(column:any) {
     if (this.sortColumn() === column) {
       this.sortDirection.set(this.sortDirection() === 'asc' ? 'desc' : 'asc');
     } else {

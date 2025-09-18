@@ -33,174 +33,60 @@
   <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
     <div class="overflow-x-auto">
       <table class="min-w-full">
-        <thead>
-          <tr class="bg-[#2196f3] text-white">
-            <!-- N° -->
-            <th
-              class="px-4 py-4 text-left text-xs font-bold uppercase tracking-wider cursor-pointer"
-              (click)="sort('id_proveedor')"
-            >
-              N°
-              <span class="inline-flex flex-col ml-1 text-xs">
-                <span
-                  [class.text-yellow-300]="
-                    sortColumn() === 'id_proveedor' && sortDirection() === 'asc'
-                  "
-                  >▲</span
-                >
-                <span
-                  [class.text-yellow-300]="
-                    sortColumn() === 'id_proveedor' && sortDirection() === 'desc'
-                  "
-                  >▼</span
-                >
-              </span>
-            </th>
+  <thead>
+  <tr class="bg-[#2196f3] text-white">
+    @for (col of columns; track col) {
+    <th 
 
-            <!-- Estado -->
-            <th
-              class="px-4 py-4 text-left text-xs font-bold uppercase tracking-wider cursor-pointer"
-              (click)="sort('isActive')"
-            >
-              Estado
-              <span class="inline-flex flex-col ml-1 text-xs">
-                <span
-                  [class.text-yellow-300]="sortColumn() === 'isActive' && sortDirection() === 'asc'"
-                  >▲</span
-                >
-                <span
-                  [class.text-yellow-300]="
-                    sortColumn() === 'isActive' && sortDirection() === 'desc'
-                  "
-                  >▼</span
-                >
-              </span>
-            </th>
+      class="px-4 py-4 text-left text-xs font-bold uppercase tracking-wider cursor-pointer"
+      (click)="sort(col.key)"
+    >
+      <div class="flex items-center space-x-2">
+        <!-- Texto de la columna -->
+        <span 
+          [ngClass]="{
+            'text-black': sortColumn() === col.key,
+            'text-white': sortColumn() !== col.key
+          }"
+          class="text-sm font-medium"
+        >
+          {{ col.label }}
+        </span>
 
-            <!-- Nombre de Proveedor -->
-            <th
-              class="px-4 py-4 text-left text-xs font-bold uppercase tracking-wider cursor-pointer"
-              (click)="sort('nombre')"
-            >
-              Nombre de Proveedor
-              <span class="inline-flex flex-col ml-1 text-xs">
-                <span
-                  [class.text-yellow-300]="sortColumn() === 'nombre' && sortDirection() === 'asc'"
-                  >▲</span
-                >
-                <span
-                  [class.text-yellow-300]="sortColumn() === 'nombre' && sortDirection() === 'desc'"
-                  >▼</span
-                >
-              </span>
-            </th>
+        <!-- Flechas de orden -->
+        <div class="flex flex-col justify-center h-4">
+          <span 
+            [ngClass]="{
+              'text-black': sortColumn() === col.key && sortDirection() === 'asc',
+              'text-white': !(sortColumn() === col.key && sortDirection() === 'asc')
+            }"
+            class="text-[10px] leading-none"
+          >
+            ▲
+          </span>
+          <span 
+            [ngClass]="{
+              'text-black': sortColumn() === col.key && sortDirection() === 'desc',
+              'text-white': !(sortColumn() === col.key && sortDirection() === 'desc')
+            }"
+            class="text-[10px] leading-none"
+          >
+            ▼
+          </span>
+        </div>
+      </div>
+    </th>
+    }
 
-            <!-- NIT/CI -->
-            <th
-              class="px-4 py-4 text-left text-xs font-bold uppercase tracking-wider cursor-pointer"
-              (click)="sort('nit_ci')"
-            >
-              NIT/CI
-              <span class="inline-flex flex-col ml-1 text-xs">
-                <span
-                  [class.text-yellow-300]="sortColumn() === 'nit_ci' && sortDirection() === 'asc'"
-                  >▲</span
-                >
-                <span
-                  [class.text-yellow-300]="sortColumn() === 'nit_ci' && sortDirection() === 'desc'"
-                  >▼</span
-                >
-              </span>
-            </th>
 
-            <!-- Teléfono -->
-            <th
-              class="px-4 py-4 text-left text-xs font-bold uppercase tracking-wider cursor-pointer"
-              (click)="sort('telefono')"
-            >
-              Teléfono
-              <span class="inline-flex flex-col ml-1 text-xs">
-                <span
-                  [class.text-yellow-300]="sortColumn() === 'telefono' && sortDirection() === 'asc'"
-                  >▲</span
-                >
-                <span
-                  [class.text-yellow-300]="
-                    sortColumn() === 'telefono' && sortDirection() === 'desc'
-                  "
-                  >▼</span
-                >
-              </span>
-            </th>
+    <!-- Acciones siempre al final -->
+    <th class="px-4 py-4 text-center text-xs font-bold uppercase tracking-wider">
+      Acciones
+    </th>
+  </tr>
+</thead>
 
-            <!-- Dirección -->
-            <th
-              class="px-4 py-4 text-left text-xs font-bold uppercase tracking-wider cursor-pointer"
-              (click)="sort('direccion')"
-            >
-              Dirección
-              <span class="inline-flex flex-col ml-1 text-xs">
-                <span
-                  [class.text-yellow-300]="
-                    sortColumn() === 'direccion' && sortDirection() === 'asc'
-                  "
-                  >▲</span
-                >
-                <span
-                  [class.text-yellow-300]="
-                    sortColumn() === 'direccion' && sortDirection() === 'desc'
-                  "
-                  >▼</span
-                >
-              </span>
-            </th>
 
-            <!-- Departamento -->
-            <th
-              class="px-4 py-4 text-left text-xs font-bold uppercase tracking-wider cursor-pointer"
-              (click)="sort('departamento')"
-            >
-              Departamento
-              <span class="inline-flex flex-col ml-1 text-xs">
-                <span
-                  [class.text-yellow-300]="
-                    sortColumn() === 'departamento' && sortDirection() === 'asc'
-                  "
-                  >▲</span
-                >
-                <span
-                  [class.text-yellow-300]="
-                    sortColumn() === 'departamento' && sortDirection() === 'desc'
-                  "
-                  >▼</span
-                >
-              </span>
-            </th>
-
-            <!-- Email -->
-            <th
-              class="px-4 py-4 text-left text-xs font-bold uppercase tracking-wider cursor-pointer"
-              (click)="sort('email')"
-            >
-              Email
-              <span class="inline-flex flex-col ml-1 text-xs">
-                <span
-                  [class.text-yellow-300]="sortColumn() === 'email' && sortDirection() === 'asc'"
-                  >▲</span
-                >
-                <span
-                  [class.text-yellow-300]="sortColumn() === 'email' && sortDirection() === 'desc'"
-                  >▼</span
-                >
-              </span>
-            </th>
-
-            <!-- Acciones -->
-            <th class="px-4 py-4 text-center text-xs font-bold uppercase tracking-wider">
-              Acciones
-            </th>
-          </tr>
-        </thead>
         <tbody class="divide-y divide-gray-100">
           @for (p of filteredProveedores(); track $index) {
           <tr class="hover:bg-gray-50 transition-all duration-200 border-l-4 border-transparent">
@@ -353,7 +239,6 @@
     </div>
   </div>
 </div>
-
 
 @if (showModal()) {
 <div class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
