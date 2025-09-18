@@ -17,6 +17,7 @@ export const routes: Routes = [
       { path: 'dashboard', component: DashboardComponent },
       {path:'users',component:UsersComponent},
       {path:'proveedores',component:ProveedorComponent}
+      
     ],
   },
   { path: '**', redirectTo: '/login' },

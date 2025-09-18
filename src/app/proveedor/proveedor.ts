@@ -1,20 +1,32 @@
 import { Component, computed, OnInit, signal } from '@angular/core';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { ProveedorService } from '../services/proveedor.service';
 import { ProveedorDto } from '../../interfaces/proveedor.interface';
 import departamentos from '../assets/departamentos.json';
+import { faBox, faBoxOpen } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 @Component({
   selector: 'app-proveedor',
-  imports: [ReactiveFormsModule,FormsModule],
+  imports: [ReactiveFormsModule, FormsModule,FontAwesomeModule],
   templateUrl: './proveedor.html',
   styleUrl: './proveedor.css',
 })
 export class ProveedorComponent {
+    faBox = faBox;
+    faBoxOpen=faBoxOpen
+
+
   proveedores = signal<ProveedorDto[]>([]);
   editId = signal<number | null>(null);
-    searchTerm = signal('');
-    showModal = signal(false);
+  searchTerm = signal('');
+  showModal = signal(false);
   departments: string[] = [];
   form: FormGroup;
   editMode = signal(false);
@@ -39,13 +51,14 @@ export class ProveedorComponent {
   }
   filteredProveedores = computed(() => {
     const term = this.searchTerm().toLowerCase();
-    return this.proveedores().filter(p =>
-      p.nombre.toLowerCase().includes(term) ||
-      p.nit_ci.toLowerCase().includes(term) ||
-      p.telefono.toLowerCase().includes(term)
+    return this.proveedores().filter(
+      (p) =>
+        p.nombre.toLowerCase().includes(term) ||
+        p.nit_ci.toLowerCase().includes(term) ||
+        p.telefono.toLowerCase().includes(term)
     );
   });
-    submit() {
+  submit() {
     if (this.form.invalid) return;
 
     const data = this.form.value;
@@ -65,13 +78,13 @@ export class ProveedorComponent {
       });
     }
   }
- edit(proveedor: ProveedorDto) {
+  edit(proveedor: ProveedorDto) {
     this.showModal.set(true);
     this.editMode.set(true);
     this.editId.set(proveedor.id_proveedor!);
     this.form.patchValue(proveedor);
   }
- openModal() {
+  openModal() {
     this.showModal.set(true);
     this.editMode.set(false);
     this.form.reset();
@@ -84,12 +97,10 @@ export class ProveedorComponent {
     this.form.reset();
   }
 
-
   // Eliminar proveedor
   delete(id: number) {
     if (confirm('¿Desea eliminar este proveedor?')) {
       this.proveedorService.delete(id).subscribe(() => this.loadProveedores());
     }
   }
-
 }
