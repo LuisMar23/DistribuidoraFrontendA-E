@@ -2,8 +2,9 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { RegisterDto } from '../../../interfaces/register.interface';
-import { LoginDto } from '../../../interfaces/login.interface';
+import { LoginDto } from '../../../core/interfaces/login.interface';
+import { RegisterDto } from '../../../core/interfaces/register.interface';
+
 
 @Injectable({
   providedIn: 'root',
@@ -12,9 +13,9 @@ export class AuthService {
   private apiUrl = environment.apiUrl;
   constructor(private http: HttpClient) {}
 
-  login(data:LoginDto): Observable<LoginDto> {
-    console.log(data)
-    return this.http.post<LoginDto>(`${this.apiUrl}/auth/login`,data);
+  login(data: LoginDto): Observable<LoginDto> {
+    console.log(data);
+    return this.http.post<LoginDto>(`${this.apiUrl}/auth/login`, data);
   }
   register(data: RegisterDto): Observable<any> {
     return this.http.post(`${this.apiUrl}/auth/register`, data).pipe(

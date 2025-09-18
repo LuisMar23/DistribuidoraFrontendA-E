@@ -1,20 +1,37 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faBell, faChevronDown, faSignOutAlt, faUserCircle } from '@fortawesome/free-solid-svg-icons';
+import {
+  faBell,
+  faChevronDown,
+  faCog,
+  faLayerGroup,
+  faSearch,
+  faShieldAlt,
+  faSignOutAlt,
+  faUser,
+  faUserCircle,
+  faUsers,
+} from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-navbar',
-  imports: [FontAwesomeModule,CommonModule],
+  imports: [FontAwesomeModule, CommonModule],
   templateUrl: './navbar.html',
-  styleUrl: './navbar.css'
+  styleUrl: './navbar.css',
 })
 export class Navbar {
   faBell = faBell;
   faUserCircle = faUserCircle;
   faChevronDown = faChevronDown;
   faSignOutAlt = faSignOutAlt;
- isUserMenuOpen: boolean = false;
+  faUser = faUser;
+  faShieldAlt=faShieldAlt;
+  faLayerGroup=faLayerGroup;
+  faSearch=faSearch;
+  faCog=faCog
+
+  isUserMenuOpen: boolean = false;
 
   currentUser = {
     username: 'Admin',

@@ -29,7 +29,7 @@ import {
   styleUrl: './sidebar.css',
 })
 export class Sidebar {
-    faTimes = faTimes;
+  faTimes = faTimes;
   faBars = faBars;
   faChevronLeft = faChevronLeft;
   faChevronRight = faChevronRight;
@@ -37,7 +37,10 @@ export class Sidebar {
   faAnglesRight = faAnglesRight;
   faSun = faSun;
   faMoon = faMoon;
-
+  imagen:string=''
+  constructor(){
+    this.imagen='assets/logoAE.png'
+  }
   isCollapsed = false;
 
   menu: { label: string; icon: IconDefinition; route: string }[] = [
@@ -58,7 +61,7 @@ export class Sidebar {
   }
 
   isDarkMode = false;
-isMobileOpen = false;
+  isMobileOpen = false;
 
   toggleDarkMode() {
     this.isDarkMode = !this.isDarkMode;
@@ -71,6 +74,4 @@ isMobileOpen = false;
   toggleMobile() {
     this.isMobileOpen = !this.isMobileOpen;
   }
-  
-
 }

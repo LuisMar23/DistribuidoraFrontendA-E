@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faShoppingCart, faUsers, faBox, faCashRegister } from '@fortawesome/free-solid-svg-icons';
+import { faShoppingCart, faUsers, faBox, faCashRegister, faTruck, faUserShield } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-dashboard',
@@ -14,10 +14,14 @@ export class DashboardComponent {
   faUsers = faUsers;
   faBox = faBox;
   faCashRegister = faCashRegister;
+  faTruck=faTruck;
+  faUserShield=faUserShield
 
   // Datos simulados, luego los reemplazas por tu API
   ventasHoy = 12345;
   clientesActivos = 245;
   productosVendidos = 1234;
   balanceCaja = 5678;
+  proveedores=123123
+  usuarios=2
 }

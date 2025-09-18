@@ -6,11 +6,12 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { ProveedorService } from '../services/proveedor.service';
-import { ProveedorDto } from '../../interfaces/proveedor.interface';
-import departamentos from '../assets/departamentos.json';
+
+import departamentos from '../../assets/departamentos.json';
 import { faBox, faBoxOpen, faEye, faPenToSquare, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { ProveedorDto } from '../../core/interfaces/proveedor.interface';
+import { ProveedorService } from '../../core/services/proveedor.service';
 
 @Component({
   selector: 'app-proveedor',
@@ -19,7 +20,6 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
   styleUrl: './proveedor.css',
 })
 export class ProveedorComponent {
-
   faBox = faBox;
   faBoxOpen = faBoxOpen;
   faEye = faEye;
@@ -158,11 +158,11 @@ export class ProveedorComponent {
   }
 
   rangeStart(): number {
-  return (this.currentPage() - 1) * this.pageSize() + 1;
-}
+    return (this.currentPage() - 1) * this.pageSize() + 1;
+  }
 
-rangeEnd(): number {
-  const end = this.currentPage() * this.pageSize();
-  return end > this.total() ? this.total() : end;
-}
+  rangeEnd(): number {
+    const end = this.currentPage() * this.pageSize();
+    return end > this.total() ? this.total() : end;
+  }
 }

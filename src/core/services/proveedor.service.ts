@@ -1,8 +1,10 @@
 import { Injectable } from '@angular/core';
-import { environment } from '../../environments/environment';
+
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { ProveedorDto } from '../../interfaces/proveedor.interface';
+
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
+import { ProveedorDto } from '../interfaces/proveedor.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -10,7 +12,7 @@ import { Observable } from 'rxjs';
 export class ProveedorService {
   apiUrl = environment.apiUrl;
   constructor(private http: HttpClient) {}
-    getAll(
+  getAll(
     page: number = 1,
     pageSize: number = 5,
     sortColumn: string = 'creado_en',
@@ -22,7 +24,9 @@ export class ProveedorService {
       .set('sortColumn', sortColumn)
       .set('sortDirection', sortDirection);
 
-    return this.http.get<{ data: ProveedorDto[]; total: number }>(`${this.apiUrl}/proveedor`, { params });
+    return this.http.get<{ data: ProveedorDto[]; total: number }>(`${this.apiUrl}/proveedor`, {
+      params,
+    });
   }
   getById(id: number): Observable<ProveedorDto> {
     return this.http.get<ProveedorDto>(`${this.apiUrl}/proveedor${id}`);

@@ -1,47 +1,67 @@
-
-<div class="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+<div class="p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
   <!-- Widget Ventas -->
-  <div class="bg-white shadow rounded-lg p-4 flex items-center gap-4">
-    <div class="bg-indigo-600 text-white p-3 rounded-full">
-      <fa-icon [icon]="faShoppingCart"></fa-icon>
+  <div class="bg-gradient-to-r from-indigo-500 to-indigo-700 text-white shadow-lg rounded-2xl p-8 flex items-center gap-4 transform hover:scale-105 transition duration-300">
+    <div class="bg-white/20 p-3 rounded-full">
+      <fa-icon [icon]="faShoppingCart" class="text-white text-xl"></fa-icon>
     </div>
     <div>
-      <p class="text-gray-500 text-sm">Ventas Hoy</p>
-      <p class="text-xl font-semibold">{{ ventasHoy | currency }}</p>
+      <p class="text-sm opacity-80">Ventas Hoy</p>
+      <p class="text-2xl font-bold">{{ ventasHoy | currency }}</p>
     </div>
   </div>
 
   <!-- Widget Clientes -->
-  <div class="bg-white shadow rounded-lg p-4 flex items-center gap-4">
-    <div class="bg-green-500 text-white p-3 rounded-full">
-      <fa-icon [icon]="faUsers"></fa-icon>
+  <div class="bg-gradient-to-r from-green-400 to-green-600 text-white shadow-lg rounded-2xl p-8 flex items-center gap-4 transform hover:scale-105 transition duration-300">
+    <div class="bg-white/20 p-3 rounded-full">
+      <fa-icon [icon]="faUsers" class="text-white text-xl"></fa-icon>
     </div>
     <div>
-      <p class="text-gray-500 text-sm">Clientes Activos</p>
-      <p class="text-xl font-semibold">{{ clientesActivos }}</p>
+      <p class="text-sm opacity-80">Clientes Activos</p>
+      <p class="text-2xl font-bold">{{ clientesActivos }}</p>
     </div>
   </div>
 
   <!-- Widget Productos -->
-  <div class="bg-white shadow rounded-lg p-4 flex items-center gap-4">
-    <div class="bg-yellow-500 text-white p-3 rounded-full">
-      <fa-icon [icon]="faBox"></fa-icon>
+  <div class="bg-gradient-to-r from-yellow-400 to-yellow-600 text-white shadow-lg rounded-2xl p-8 flex items-center gap-4 transform hover:scale-105 transition duration-300">
+    <div class="bg-white/20 p-3 rounded-full">
+      <fa-icon [icon]="faBox" class="text-white text-xl"></fa-icon>
     </div>
     <div>
-      <p class="text-gray-500 text-sm">Productos Vendidos</p>
-      <p class="text-xl font-semibold">{{ productosVendidos }}</p>
+      <p class="text-sm opacity-80">Productos Vendidos</p>
+      <p class="text-2xl font-bold">{{ productosVendidos }}</p>
     </div>
   </div>
 
   <!-- Widget Caja -->
-  <div class="bg-white shadow rounded-lg p-4 flex items-center gap-4">
-    <div class="bg-red-500 text-white p-3 rounded-full">
-      <fa-icon [icon]="faCashRegister"></fa-icon>
+  <div class="bg-gradient-to-r from-red-400 to-red-600 text-white shadow-lg rounded-2xl p-8 flex items-center gap-4 transform hover:scale-105 transition duration-300">
+    <div class="bg-white/20 p-3 rounded-full">
+      <fa-icon [icon]="faCashRegister" class="text-white text-xl"></fa-icon>
     </div>
     <div>
-      <p class="text-gray-500 text-sm">Balance Caja</p>
-      <p class="text-xl font-semibold">{{ balanceCaja | currency }}</p>
+      <p class="text-sm opacity-80">Balance Caja</p>
+      <p class="text-2xl font-bold">{{ balanceCaja | currency }}</p>
+    </div>
+  </div>
+
+  <!-- Widget Proveedores -->
+  <div class="bg-gradient-to-r from-purple-500 to-purple-700 text-white shadow-lg rounded-2xl p-8 flex items-center gap-4 transform hover:scale-105 transition duration-300">
+    <div class="bg-white/20 p-3 rounded-full">
+      <fa-icon [icon]="faTruck" class="text-white text-xl"></fa-icon>
+    </div>
+    <div>
+      <p class="text-sm opacity-80">Proveedores</p>
+      <p class="text-2xl font-bold">{{ proveedores }}</p>
+    </div>
+  </div>
+
+  <!-- Widget Usuarios -->
+  <div class="bg-gradient-to-r from-pink-500 to-pink-700 text-white shadow-lg rounded-2xl p-8 flex items-center gap-4 transform hover:scale-105 transition duration-300">
+    <div class="bg-white/20 p-3 rounded-full">
+      <fa-icon [icon]="faUserShield" class="text-white text-xl"></fa-icon>
+    </div>
+    <div>
+      <p class="text-sm opacity-80">Usuarios</p>
+      <p class="text-2xl font-bold">{{ usuarios }}</p>
     </div>
   </div>
 </div>
-

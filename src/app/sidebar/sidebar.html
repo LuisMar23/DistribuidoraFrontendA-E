@@ -1,39 +1,89 @@
 <!-- Desktop Sidebar -->
 <aside
-  class="hidden md:flex flex-col h-screen transition-all duration-300 border-r bg-gray-50 dark:bg-gray-200 text-gray-700 dark:text-gray-900 shadow-xl"
-  [class.w-64]="!isCollapsed"
-  [class.w-20]="isCollapsed"
+  class="hidden md:flex flex-col h-screen transition-all duration-300 ease-in-out bg-white dark:bg-gray-900 border-r border-gray-100 dark:border-gray-800"
+  [class.w-72]="!isCollapsed"
+  [class.w-16]="isCollapsed"
 >
   <!-- Header -->
-  <div class="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-400">
-    <div class="flex items-center gap-3">
-   
-      @if(!isCollapsed){
-        <span class="font-semibold text-lg tracking-wide">Ventas</span>
+  <div class="flex items-center justify-between border-b border-gray-50 dark:border-gray-800" [class.p-6]="!isCollapsed" [class.p-4]="isCollapsed">
+    <div class="flex items-center gap-3 overflow-hidden" [class.justify-center]="isCollapsed" [class.w-full]="isCollapsed">
+      @if(isCollapsed){
+        <!-- Solo imagen cuando está contraído -->
+        <div class="w-8 h-8 rounded-full overflow-hidden shadow-sm border-2 border-white dark:border-gray-700">
+          <img 
+            src="assets/logoAE.png" alt="Logo"
+      
+            class="w-full h-full object-cover"
+          />
+        </div>
+      } @else {
+        <!-- Diseño completo cuando está expandido -->
+        <div class="w-10 h-10 rounded-full overflow-hidden shadow-sm border-2 border-white dark:border-gray-700">
+          <img 
+            src="assets/images/logo.png" 
+            alt="Logo" 
+            class="w-full h-full object-cover"
+          />
+        </div>
+        <div class="transition-opacity duration-200">
+          <h1 class="text-lg font-semibold text-gray-900 dark:text-white">Sistema Ventas</h1>
+        </div>
       }
     </div>
 
-    <!-- Toggle sidebar -->
-    <button
-      (click)="toggleSidebar()"
-      class="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-500 dark:hover:bg-gray-400 shadow-sm transition-all hover:scale-110"
-    >
-      <fa-icon [icon]="isCollapsed ? faChevronRight : faChevronLeft" class="text-gray-600 dark:text-gray-100 text-lg"></fa-icon>
-    </button>
+    <!-- Toggle Button -->
+    @if(!isCollapsed){
+      <button
+        (click)="toggleSidebar()"
+        class="flex items-center justify-center w-8 h-8 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200 group"
+      >
+        <fa-icon 
+          [icon]="faChevronLeft" 
+          class="text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300 text-sm transition-colors"
+        ></fa-icon>
+      </button>
+    }
   </div>
 
-  <!-- Menu -->
-  <nav class="flex-1 overflow-y-auto mt-2">
-    <ul class="space-y-2">
+  <!-- Toggle Button para modo contraído -->
+  @if(isCollapsed){
+    <div class="flex justify-center p-2">
+      <button
+        (click)="toggleSidebar()"
+        class="flex items-center justify-center w-8 h-8 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200 group"
+      >
+        <fa-icon 
+          [icon]="faChevronRight" 
+          class="text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300 text-xs transition-colors"
+        ></fa-icon>
+      </button>
+    </div>
+  }
+
+  <!-- Navigation -->
+  <nav class="flex-1 py-6" [class.px-4]="!isCollapsed" [class.px-2]="isCollapsed">
+    <ul class="space-y-1">
       @for(item of menu; track item){
         <li>
           <a
             [routerLink]="item.route"
-            class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 dark:text-gray-900 hover:bg-gray-200 dark:hover:bg-gray-400 hover:shadow-md transition-all duration-300"
+            routerLinkActive="bg-blue-50 dark:bg-gray-800 text-blue-700 dark:text-blue-400"
+            [class]="isCollapsed ? 'flex items-center justify-center p-2.5 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-200 transition-all duration-200 group relative' : 'flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-200 transition-all duration-200 group relative border-r-2 border-transparent'"
           >
-            <fa-icon [icon]="item.icon" class="text-indigo-600 dark:text-indigo-700 text-lg"></fa-icon>
+            <fa-icon 
+              [icon]="item.icon" 
+              class="text-lg transition-colors flex-shrink-0"
+              [class.text-base]="isCollapsed"
+            ></fa-icon>
             @if(!isCollapsed){
-              <span class="text-sm font-medium">{{ item.label }}</span>
+              <span class="text-sm font-medium truncate">{{ item.label }}</span>
+            } @else {
+              <!-- Tooltip para modo colapsado -->
+              <div class="absolute left-full ml-3 px-3 py-2 bg-gray-900 dark:bg-gray-700 text-white dark:text-gray-200 text-xs rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50 shadow-lg">
+                {{ item.label }}
+                <!-- Flecha del tooltip -->
+                <div class="absolute top-1/2 left-0 transform -translate-y-1/2 -translate-x-1 w-2 h-2 bg-gray-900 dark:bg-gray-700 rotate-45"></div>
+              </div>
             }
           </a>
         </li>
@@ -41,67 +91,82 @@
     </ul>
   </nav>
 
-  <!-- Dark Mode Toggle -->
-
-
   <!-- Footer -->
   @if(!isCollapsed){
-    <div class="p-3 text-xs text-gray-500 dark:text-gray-700 border-t border-gray-200 dark:border-gray-400 mt-auto text-center">
-      v1.0 - 2025
+    <div class="px-6 py-4 border-t border-gray-50 dark:border-gray-800">
+      <div class="text-xs text-gray-400 dark:text-gray-500 text-center">
+        <span class="font-medium">v1.0.0</span> • 2025
+      </div>
     </div>
   }
 </aside>
 
 <!-- Mobile Sidebar -->
 <div class="md:hidden">
-  <!-- Botón para abrir sidebar -->
+  <!-- Menu Button -->
   <button
     (click)="isMobileOpen = !isMobileOpen"
-    class="fixed top-4 left-4 z-50 p-3 bg-gray-200 dark:bg-gray-500 rounded-lg shadow-lg hover:scale-110 transition-transform"
+    class="fixed top-4 left-4 z-50 flex items-center justify-center w-12 h-12 bg-white dark:bg-gray-900 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all duration-200"
   >
-    <fa-icon [icon]="faBars" class="text-gray-700 dark:text-gray-100 text-xl"></fa-icon>
+    <fa-icon 
+      [icon]="faBars" 
+      class="text-gray-600 dark:text-gray-400 text-lg"
+    ></fa-icon>
   </button>
 
-  <!-- Overlay -->
+  <!-- Backdrop -->
   @if(isMobileOpen){
-    <div class="fixed inset-0 z-40 bg-black bg-opacity-40 backdrop-blur-sm" (click)="isMobileOpen = false"></div>
+    <div 
+      class="fixed inset-0 z-40 bg-black/20 backdrop-blur-sm transition-opacity duration-300" 
+      (click)="isMobileOpen = false"
+    ></div>
   }
 
-  <!-- Drawer -->
+  <!-- Mobile Drawer -->
   <aside
-    class="fixed inset-y-0 left-0 w-64 bg-gray-50 dark:bg-gray-200 text-gray-700 dark:text-gray-900 shadow-xl z-50 transform transition-transform duration-300 rounded-r-lg"
+    class="fixed inset-y-0 left-0 w-72 bg-white dark:bg-gray-900 shadow-2xl z-50 transform transition-transform duration-300 ease-out"
     [class.translate-x-0]="isMobileOpen"
     [class.-translate-x-full]="!isMobileOpen"
   >
-    <!-- Header -->
-    <div class="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-400">
+    <!-- Mobile Header -->
+    <div class="flex items-center justify-between p-6 border-b border-gray-100 dark:border-gray-800">
       <div class="flex items-center gap-3">
-        <div
-          class="flex items-center justify-center bg-gradient-to-br from-indigo-500 to-purple-500 text-white font-bold rounded-xl h-12 w-12 shadow-md"
-        >
-          SV
+        <div class="w-10 h-10 rounded-full overflow-hidden shadow-sm border-2 border-white dark:border-gray-700">
+          <img 
+            src="assets/images/logo.png" 
+            alt="Logo" 
+            class="w-full h-full object-cover"
+          />
         </div>
-        <span class="font-semibold text-lg tracking-wide">Ventas</span>
+        <h1 class="text-lg font-semibold text-gray-900 dark:text-white">Sistema Ventas</h1>
       </div>
+      
       <button
         (click)="isMobileOpen = false"
-        class="p-2 rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-500 dark:hover:bg-gray-400 shadow-sm transition-all"
+        class="flex items-center justify-center w-8 h-8 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
       >
-        <fa-icon [icon]="faTimes" class="text-gray-600 dark:text-gray-100 text-lg"></fa-icon>
+        <fa-icon 
+          [icon]="faTimes" 
+          class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-sm"
+        ></fa-icon>
       </button>
     </div>
 
-    <!-- Menu -->
-    <nav class="flex-1 overflow-y-auto mt-2">
-      <ul class="space-y-2">
+    <!-- Mobile Navigation -->
+    <nav class="flex-1 px-4 py-6 overflow-y-auto">
+      <ul class="space-y-1">
         @for(item of menu; track item){
           <li>
             <a
               [routerLink]="item.route"
               (click)="isMobileOpen = false"
-              class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 dark:text-gray-900 hover:bg-gray-200 dark:hover:bg-gray-400 hover:shadow-md transition-all duration-300"
+              routerLinkActive="bg-blue-50 dark:bg-gray-800 text-blue-700 dark:text-blue-400 border-r-2 border-blue-500"
+              class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-200 transition-all duration-200"
             >
-              <fa-icon [icon]="item.icon" class="text-indigo-600 dark:text-indigo-700 text-lg"></fa-icon>
+              <fa-icon 
+                [icon]="item.icon" 
+                class="text-lg transition-colors flex-shrink-0"
+              ></fa-icon>
               <span class="text-sm font-medium">{{ item.label }}</span>
             </a>
           </li>
@@ -109,7 +174,11 @@
       </ul>
     </nav>
 
-    <!-- Dark Mode Toggle -->
-
+    <!-- Mobile Footer -->
+    <div class="px-6 py-4 border-t border-gray-100 dark:border-gray-800">
+      <div class="text-xs text-gray-400 dark:text-gray-500 text-center">
+        <span class="font-medium">v1.0.0</span> • 2025
+      </div>
+    </div>
   </aside>
 </div>
