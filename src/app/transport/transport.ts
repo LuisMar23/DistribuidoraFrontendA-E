@@ -1,72 +1,85 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-
-interface Transporte {
-  id_transporte: number;
-  id_compra: number;
-  transportista: string;
-  vehiculo: string;
-  costo_local: number;
-  costo_departamental: number;
-  fecha_salida: string;
-  fecha_llegada: string;
-  estado: string;
-}
+import { faBox, faBoxOpen } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { TransportService, TransportDto } from '../services/transport.service';
 
 @Component({
   selector: 'app-transport',
-  standalone: true,           // importante
-  imports: [CommonModule, FormsModule],  // <- necesario para pipes y ngModel
+  standalone: true,
+  imports: [CommonModule, FormsModule, FontAwesomeModule],
   templateUrl: './transport.html',
   styleUrls: ['./transport.css']
 })
-export class TransportComponent {
-  transportes: Transporte[] = [
-    {
-      id_transporte: 1,
-      id_compra: 101,
-      transportista: 'Juan Pérez',
-      vehiculo: 'Camión Volvo FH',
-      costo_local: 150.5,
-      costo_departamental: 320.75,
-      fecha_salida: '2025-09-20T08:30:00.000Z',
-      fecha_llegada: '2025-09-21T18:45:00.000Z',
-      estado: 'en_camino'
-    },
-    {
-      id_transporte: 2,
-      id_compra: 102,
-      transportista: 'María Gómez',
-      vehiculo: 'Camión Scania',
-      costo_local: 200,
-      costo_departamental: 400,
-      fecha_salida: '2025-09-21T09:00:00.000Z',
-      fecha_llegada: '2025-09-22T19:00:00.000Z',
-      estado: 'en_camino'
-    }
-  ];
+export class TransportComponent implements OnInit {
+  faBox = faBox;
+  faBoxOpen = faBoxOpen;
 
+  transportes: TransportDto[] = [];
   showModal = false;
-  newTransporte: Partial<Transporte> = {};
+  searchTerm = '';
 
-  toggleModal() {
+  // ✅ Inicializamos con tipos válidos según TransportDto
+  newTransporte: Partial<TransportDto> = {
+    id_compra: 0,
+    transportista: '',
+    vehiculo: '',
+    costo_local: 0,
+    costo_departamental: 0,
+    fecha_salida: '',
+    fecha_llegada: '',
+    estado: 'en_camino' // literal permitido
+  };
+
+  constructor(private transportService: TransportService) {}
+
+  ngOnInit(): void {
+    this.loadTransportes();
+  }
+
+  loadTransportes(): void {
+    this.transportService.getAll().subscribe({
+      next: (data) => (this.transportes = data),
+      error: (err) => console.error('Error al cargar transportes', err),
+    });
+  }
+
+  toggleModal(): void {
     this.showModal = !this.showModal;
   }
 
-  addTransporte() {
-    if (
-      this.newTransporte.id_compra &&
-      this.newTransporte.transportista &&
-      this.newTransporte.vehiculo &&
-      this.newTransporte.fecha_salida &&
-      this.newTransporte.fecha_llegada
-    ) {
-      this.newTransporte.id_transporte = this.transportes.length + 1;
-      this.newTransporte.estado = 'en_camino';
-      this.transportes.push(this.newTransporte as Transporte);
-      this.newTransporte = {};
-      this.toggleModal();
-    }
+  addTransporte(): void {
+    // Convertimos fechas a ISO antes de enviar al backend
+    const payload: Partial<TransportDto> = {
+      ...this.newTransporte,
+      fecha_salida: this.newTransporte.fecha_salida
+        ? new Date(this.newTransporte.fecha_salida as string).toISOString()
+        : undefined,
+      fecha_llegada: this.newTransporte.fecha_llegada
+        ? new Date(this.newTransporte.fecha_llegada as string).toISOString()
+        : undefined,
+    };
+
+    this.transportService.create(payload).subscribe({
+      next: (created) => {
+        this.transportes.push(created);
+        // Resetear formulario
+        this.newTransporte = {
+          id_compra: 0,
+          transportista: '',
+          vehiculo: '',
+          costo_local: 0,
+          costo_departamental: 0,
+          fecha_salida: '',
+          fecha_llegada: '',
+          estado: 'en_camino'
+        };
+        this.toggleModal();
+      },
+      error: (err) => {
+        console.error('Error al agregar transporte', err);
+      },
+    });
   }
 }

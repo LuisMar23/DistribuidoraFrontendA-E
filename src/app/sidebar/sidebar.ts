@@ -42,6 +42,7 @@ export class Sidebar {
 
   menu: { label: string; icon: IconDefinition; route: string }[] = [
     { label: 'Dashboard', icon: faHome, route: '/dashboard' },
+    { label: 'Proveedores', icon: faShoppingCart, route: '/proveedores' },
     { label: 'Ventas', icon: faShoppingCart, route: '/ventas' },
     { label: 'Productos', icon: faBox, route: '/productos' },
     { label: 'Clientes', icon: faUsers, route: '/clientes' },

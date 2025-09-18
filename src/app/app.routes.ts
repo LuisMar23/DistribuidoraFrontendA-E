@@ -5,6 +5,7 @@ import { DashboardComponent } from './dashboard/dashboard';
 import { LayoutComponent } from './layout/layout';
 import { RegisterComponent } from './components/auth/register/register';
 import { UsersComponent } from './users/users';
+import { ProveedorComponent } from './proveedor/proveedor';
 import { ForgotPasswordComponent } from './forgot-password/forgot-password';
 import { TransportComponent } from './transport/transport';
 
@@ -16,8 +17,10 @@ export const routes: Routes = [
     component: LayoutComponent,
     children: [
       { path: 'dashboard', component: DashboardComponent },
-      { path: 'users', component: UsersComponent },
-      { path: 'transporte', component: TransportComponent },
+      {path:'users',component:UsersComponent},
+      {path:'proveedores',component:ProveedorComponent},
+      {path:'transporte',component:TransportComponent}
+      
     ],
   },
   { path: 'forgot-password', component: ForgotPasswordComponent },
