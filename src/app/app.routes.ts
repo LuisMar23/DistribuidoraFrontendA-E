@@ -9,6 +9,7 @@ import { ProveedorComponent } from './proveedor/proveedor';
 import { ForgotPasswordComponent } from './forgot-password/forgot-password';
 import { TransportComponent } from './transport/transport';
 import { ProductComponent } from './product/product';
+import { ClientComponent } from './client/client';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -19,6 +20,7 @@ export const routes: Routes = [
     children: [
       { path: 'dashboard', component: DashboardComponent },
       {path:'users',component:UsersComponent},
+      {path:'clientes',component:ClientComponent},
       {path:'productos',component:ProductComponent},
       {path:'proveedores',component:ProveedorComponent},
       {path:'transporte',component:TransportComponent}
