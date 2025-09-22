@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
   faBell,
@@ -13,6 +13,7 @@ import {
   faUserCircle,
   faUsers,
 } from '@fortawesome/free-solid-svg-icons';
+import { AuthService } from '../components/services/auth.service';
 
 @Component({
   selector: 'app-navbar',
@@ -33,6 +34,8 @@ export class Navbar {
 
   isUserMenuOpen: boolean = false;
 
+
+  _authService=inject(AuthService)
   currentUser = {
     username: 'Admin',
   };
@@ -47,7 +50,6 @@ export class Navbar {
   }
 
   logout() {
-    console.log('Cerrar sesión');
-    // Aquí va tu lógica de logout
+    this._authService.logout()
   }
 }

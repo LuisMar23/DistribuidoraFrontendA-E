@@ -16,8 +16,8 @@ import { AuthService } from '../components/services/auth.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { UserDto } from '../../core/interfaces/user.interface';
-import { UserService } from '../../core/services/users.service';
+import { UserDto } from '../core/interfaces/user.interface';
+import { UserService } from '../core/services/users.service';
 
 @Component({
   selector: 'app-users',

@@ -10,6 +10,7 @@ import { ForgotPasswordComponent } from './forgot-password/forgot-password';
 import { TransportComponent } from './transport/transport';
 import { ProductComponent } from './product/product';
 import { ClientComponent } from './client/client';
+import { AuthGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -17,13 +18,15 @@ export const routes: Routes = [
   {
     path: '',
     component: LayoutComponent,
+    canActivate: [AuthGuard],
+    canActivateChild: [AuthGuard],
     children: [
       { path: 'dashboard', component: DashboardComponent },
-      {path:'users',component:UsersComponent},
-      {path:'clientes',component:ClientComponent},
-      {path:'productos',component:ProductComponent},
-      {path:'proveedores',component:ProveedorComponent},
-      {path:'transporte',component:TransportComponent}
+      { path: 'users', component: UsersComponent },
+      { path: 'clientes', component: ClientComponent },
+      { path: 'productos', component: ProductComponent },
+      { path: 'proveedores', component: ProveedorComponent },
+      { path: 'transporte', component: TransportComponent },
     ],
   },
   { path: 'forgot-password', component: ForgotPasswordComponent },

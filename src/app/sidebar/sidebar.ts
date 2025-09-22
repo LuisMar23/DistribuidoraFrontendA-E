@@ -66,14 +66,6 @@ export class Sidebar {
   isDarkMode = false;
   isMobileOpen = false;
 
-  toggleDarkMode() {
-    this.isDarkMode = !this.isDarkMode;
-    if (this.isDarkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }
   toggleMobile() {
     this.isMobileOpen = !this.isMobileOpen;
   }

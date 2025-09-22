@@ -8,9 +8,9 @@ import {
 } from '@angular/forms';
 import { faBox, faBoxOpen, faEye, faPenToSquare, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { ProductService } from '../../core/services/product.service';
+import { ProductService } from '../core/services/product.service';
 import { CommonModule } from '@angular/common';
-import { ProductDto } from '../../core/interfaces/product.interface';
+import { ProductDto } from '../core/interfaces/product.interface';
 
 @Component({
   selector: 'app-product',

@@ -8,9 +8,9 @@ import {
 } from '@angular/forms';
 import { faBox, faBoxOpen, faEye, faPenToSquare, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { TransportService } from '../../core/services/transport.service';
+import { TransportService } from '../core/services/transport.service';
 import { CommonModule } from '@angular/common';
-import { TransportDto } from '../../core/interfaces/transport.interface';
+import { TransportDto } from '../core/interfaces/transport.interface';
 
 @Component({
   selector: 'app-transport',

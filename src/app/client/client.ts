@@ -8,9 +8,9 @@ import {
 } from '@angular/forms';
 import { faUser, faUsers, faEye, faPenToSquare, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { ClientService } from '../../core/services/client.service';
+import { ClientService } from '../core/services/client.service';
 import { CommonModule } from '@angular/common';
-import { ClientDto } from '../../core/interfaces/client.interface';
+import { ClientDto } from '../core/interfaces/client.interface';
 
 @Component({
   selector: 'app-client',

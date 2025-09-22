@@ -1,19 +1,25 @@
 import { Component, inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { Sidebar } from '../sidebar/sidebar';
-import { DashboardComponent } from '../dashboard/dashboard';
 import { AuthService } from '../components/services/auth.service';
 import { Router } from '@angular/router';
+import { faEye, faEyeSlash, faLock, faUser } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule,FontAwesomeModule],
   templateUrl: './login.html',
   styleUrls: ['./login.css'],
 })
 export class LoginComponent {
+  faUser = faUser;
+  faLock = faLock;
+  faEye = faEye;
+  faEyeSlash = faEyeSlash;
+
+
   loginForm: FormGroup;
   showPassword: boolean = false; // Propiedad agregada
   _authService = inject(AuthService)
@@ -45,7 +51,6 @@ export class LoginComponent {
         }
       });
     } else {
-      // Marcar todos los campos como tocados para mostrar errores
       Object.keys(this.loginForm.controls).forEach((key) => {
         this.loginForm.get(key)?.markAsTouched();
       });

@@ -1,4 +1,4 @@
-import { Component, computed, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -10,13 +10,14 @@ import {
 import departamentos from '../../assets/departamentos.json';
 import { faBox, faBoxOpen, faEye, faPenToSquare, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { ProveedorDto } from '../../core/interfaces/proveedor.interface';
-import { ProveedorService } from '../../core/services/proveedor.service';
+import { ProveedorDto } from '../core/interfaces/proveedor.interface';
+import { ProveedorService } from '../core/services/proveedor.service';
 import { CommonModule } from '@angular/common';
+import { NotificationService } from '../core/services/notification.service';
 
 @Component({
   selector: 'app-proveedor',
-  imports: [ReactiveFormsModule, FormsModule, FontAwesomeModule,CommonModule],
+  imports: [ReactiveFormsModule, FormsModule, FontAwesomeModule, CommonModule],
   templateUrl: './proveedor.html',
   styleUrl: './proveedor.css',
 })
@@ -36,22 +37,23 @@ export class ProveedorComponent {
   editMode = signal(false);
 
   columns = [
-  { key: 'id_proveedor', label: 'N°' },
-  { key: 'isActive', label: 'Estado' },
-  { key: 'nombre', label: 'Nombre de Proveedor' },
-  { key: 'nit_ci', label: 'NIT/CI' },
-  { key: 'telefono', label: 'Teléfono' },
-  { key: 'direccion', label: 'Dirección' },
-  { key: 'departamento', label: 'Departamento' },
-  { key: 'email', label: 'Email' },
-];
-
+    { key: 'id_proveedor', label: 'N°' },
+    { key: 'isActive', label: 'Estado' },
+    { key: 'nombre', label: 'Nombre de Proveedor' },
+    { key: 'nit_ci', label: 'NIT/CI' },
+    { key: 'telefono', label: 'Teléfono' },
+    { key: 'direccion', label: 'Dirección' },
+    { key: 'departamento', label: 'Departamento' },
+    { key: 'email', label: 'Email' },
+  ];
 
   total = signal(0);
   pageSize = signal(5);
   currentPage = signal(1);
   sortColumn = signal<keyof ProveedorDto>('creado_en');
   sortDirection = signal<'asc' | 'desc'>('desc');
+
+  _notificationService = inject(NotificationService);
   constructor(private proveedorService: ProveedorService, private fb: FormBuilder) {
     this.departments = departamentos.departamentos;
 
@@ -93,12 +95,14 @@ export class ProveedorComponent {
       const id = this.editId();
       if (id != null) {
         this.proveedorService.update(id, data).subscribe(() => {
+          this._notificationService.showSuccess(`Se ha actualizado al proveedor`);
           this.loadProveedores();
           this.cancelEdit();
         });
       }
     } else {
       this.proveedorService.create(data).subscribe(() => {
+        this._notificationService.showSuccess(`Se ha creado al proveedor ${data.nombre}`);
         this.loadProveedores();
         this.cancelEdit();
       });
@@ -124,15 +128,24 @@ export class ProveedorComponent {
   }
 
   // Eliminar proveedor
-  delete(id: number) {
-    if (confirm('¿Desea eliminar este proveedor?')) {
-      this.proveedorService.delete(id).subscribe(() => this.loadProveedores());
-    }
+  delete(data: any) {
+    this._notificationService
+      .confirmDelete(`Se eliminara al proveedor ${data.nombre}`)
+      .then((result) => {
+        if (result.isConfirmed) {
+          // Aquí eliminas el registro
+          this._notificationService.showSuccess('Eliminado correctamente');
+          this.proveedorService.delete(data.id_proveedor).subscribe(() => this.loadProveedores());
+        }
+      });
+    // if (confirm('¿Desea eliminar este proveedor?')) {
+    //   this.proveedorService.delete(id).subscribe(() => this.loadProveedores());
+    // }
   }
   view(p: any) {}
 
   //paginador
-  sort(column:any) {
+  sort(column: any) {
     if (this.sortColumn() === column) {
       this.sortDirection.set(this.sortDirection() === 'asc' ? 'desc' : 'asc');
     } else {
