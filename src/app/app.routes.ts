@@ -11,6 +11,7 @@ import { TransportComponent } from './transport/transport';
 import { ProductComponent } from './product/product';
 import { ClientComponent } from './client/client';
 import { AuthGuard } from './core/guards/auth.guard';
+import { VentaComponent } from './venta/venta';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -27,6 +28,7 @@ export const routes: Routes = [
       { path: 'productos', component: ProductComponent },
       { path: 'proveedores', component: ProveedorComponent },
       { path: 'transporte', component: TransportComponent },
+      {path: 'ventas', component: VentaComponent},
     ],
   },
   { path: 'forgot-password', component: ForgotPasswordComponent },
