@@ -4,9 +4,8 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 
 import { Observable } from 'rxjs';
 
-
 import { environment } from '../../../../environments/environment';
-import { ProveedorDto } from '../../../core/interfaces/proveedor.interface';
+import { CountResponse, ProveedorDto } from '../../../core/interfaces/proveedor.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -41,5 +40,9 @@ export class ProveedorService {
   }
   delete(id: number): Observable<ProveedorDto> {
     return this.http.delete<ProveedorDto>(`${this.apiUrl}/proveedor/${id}`);
+  }
+
+  count(): Observable<CountResponse> {
+    return this.http.get<CountResponse>(`${this.apiUrl}/proveedor/count`);
   }
 }

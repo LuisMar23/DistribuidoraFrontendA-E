@@ -26,8 +26,32 @@
   }
 }
 
+/* Control de tabla responsiva para evitar scroll horizontal */
+@media (min-width: 1024px) and (max-width: 1279px) {
+  /* Para pantallas entre lg y xl, usar tabla pero más compacta */
+  .table-compact td {
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+  }
+  
+  .table-compact th {
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+  }
+  
+  /* Reducir font-size ligeramente */
+  .table-compact {
+    font-size: 0.875rem;
+  }
+  
+  /* Limitar anchos máximos */
+  .table-compact .max-w-xs {
+    max-width: 120px;
+  }
+}
+
 /* Mejoras para scroll horizontal en tablas pequeñas */
-@media (max-width: 1023px) {
+@media (max-width: 1279px) {
   .overflow-x-auto {
     scrollbar-width: thin;
     scrollbar-color: #cbd5e0 #f7fafc;
@@ -75,5 +99,17 @@
 @media (max-width: 640px) {
   input, select, textarea {
     font-size: 16px; /* Previene zoom en iOS */
+  }
+}
+
+/* Asegurar que la tabla no se desborde */
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+}
+
+@media (min-width: 1280px) {
+  .table-container {
+    overflow-x: visible;
   }
 }

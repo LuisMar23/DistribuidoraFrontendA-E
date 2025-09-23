@@ -102,13 +102,13 @@ export class TransportComponent {
     this.showModal.set(true);
     this.editMode.set(true);
     this.editId.set(transporte.id_transporte!);
-    
+
     const formData = {
       ...transporte,
       fecha_salida: this.formatDateForInput(transporte.fecha_salida),
-      fecha_llegada: this.formatDateForInput(transporte.fecha_llegada)
+      fecha_llegada: this.formatDateForInput(transporte.fecha_llegada),
     };
-    
+
     this.form.patchValue(formData);
   }
 
@@ -122,7 +122,7 @@ export class TransportComponent {
     this.showModal.set(true);
     this.editMode.set(false);
     this.form.reset({
-      estado: 'en_camino'
+      estado: 'en_camino',
     });
   }
 
@@ -131,7 +131,7 @@ export class TransportComponent {
     this.editMode.set(false);
     this.editId.set(null);
     this.form.reset({
-      estado: 'en_camino'
+      estado: 'en_camino',
     });
   }
 
@@ -140,10 +140,7 @@ export class TransportComponent {
       this.transportService.delete(id).subscribe(() => this.loadTransportes());
     }
   }
-
-  view(t: TransportDto) {
-  }
-
+  view(t: TransportDto) {}
   sort(column: keyof TransportDto) {
     if (this.sortColumn() === column) {
       this.sortDirection.set(this.sortDirection() === 'asc' ? 'desc' : 'asc');
@@ -152,7 +149,6 @@ export class TransportComponent {
       this.sortDirection.set('asc');
     }
   }
-
   nextPage() {
     if (this.currentPage() < this.totalPages()) {
       this.currentPage.update((v) => v + 1);

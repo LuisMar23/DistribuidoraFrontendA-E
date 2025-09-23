@@ -50,7 +50,7 @@
     </div>
     <div>
       <p class="text-sm text-gray-500">Proveedores</p>
-      <p class="text-xl font-semibold text-gray-800">{{ proveedores }}</p>
+      <p class="text-xl font-semibold text-gray-800">       {{ (proveedores$ | async)?.total ?? 0 }}</p>
     </div>
   </div>
 

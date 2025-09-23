@@ -35,15 +35,15 @@
   </div>
 
   <!-- Vista Desktop/Tablet - Tabla -->
-  <div class="hidden lg:block">
+  <div class="hidden xl:block">
     <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
-      <div class="overflow-x-auto">
-        <table class="min-w-full">
+      <div class="overflow-x-auto table-container">
+        <table class="min-w-full table-compact">
           <thead>
             <tr class="bg-[#2196f3] text-white">
               @for (col of columns; track col) {
               <th 
-                class="px-4 py-4 text-left text-xs font-bold uppercase tracking-wider cursor-pointer"
+                class="px-2 xl:px-4 py-4 text-left text-xs font-bold uppercase tracking-wider cursor-pointer"
                 (click)="sort(col.key)"
               >
                 <div class="flex items-center space-x-2">
@@ -79,7 +79,7 @@
                 </div>
               </th>
               }
-              <th class="px-4 py-4 text-center text-xs font-bold uppercase tracking-wider">
+              <th class="px-2 xl:px-4 py-4 text-center text-xs font-bold uppercase tracking-wider">
                 Acciones
               </th>
             </tr>
@@ -87,48 +87,48 @@
           <tbody class="divide-y divide-gray-100">
             @for (p of filteredProveedores(); track $index) {
             <tr class="hover:bg-gray-50 transition-all duration-200 border-l-4 border-transparent">
-              <td class="px-4 py-4">
+              <td class="px-2 xl:px-4 py-4">
                 <span class="font-semibold text-gray-700">{{ $index + 1 }}</span>
               </td>
-              <td class="px-4 py-4">
+              <td class="px-2 xl:px-4 py-4">
                 <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
                   Activo
                 </span>
               </td>
-              <td class="px-4 py-4">
+              <td class="px-2 xl:px-4 py-4">
                 <div>
                   <div class="font-bold text-gray-900 text-sm">{{ p.nombre }}</div>
                   <div class="text-xs text-gray-500">ID: {{ p.id_proveedor }}</div>
                 </div>
               </td>
-              <td class="px-4 py-4">
-                <span class="font-medium text-gray-700">{{ p.nit_ci }}</span>
+              <td class="px-2 xl:px-4 py-4">
+                <span class="font-medium text-gray-700 text-sm">{{ p.nit_ci }}</span>
               </td>
-              <td class="px-4 py-4">
+              <td class="px-2 xl:px-4 py-4">
                 <div class="flex items-center text-gray-700">
-                  <i class="fas fa-phone text-xs mr-2 text-gray-400"></i>
+                  <i class="fas fa-phone text-xs mr-1 xl:mr-2 text-gray-400"></i>
                   <span class="text-sm">{{ p.telefono }}</span>
                 </div>
               </td>
-              <td class="px-4 py-4">
-                <div class="max-w-xs">
+              <td class="px-2 xl:px-4 py-4">
+                <div class="max-w-[120px] xl:max-w-xs">
                   <span class="text-sm text-gray-700 block truncate" [title]="p.direccion">
                     {{ p.direccion }}
                   </span>
                 </div>
               </td>
-              <td class="px-4 py-4">
-                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium text-blue-800 bg-blue-100">
+              <td class="px-2 xl:px-4 py-4">
+                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium text-blue-800 bg-blue-100">
                   {{ p.departamento }}
                 </span>
               </td>
-              <td class="px-4 py-4">
+              <td class="px-2 xl:px-4 py-4">
                 <div class="flex items-center text-gray-700">
-                  <i class="fas fa-envelope text-xs mr-2 text-gray-400"></i>
-                  <span class="text-sm truncate max-w-xs" [title]="p.email">{{ p.email }}</span>
+                  <i class="fas fa-envelope text-xs mr-1 xl:mr-2 text-gray-400"></i>
+                  <span class="text-sm truncate max-w-[100px] xl:max-w-xs" [title]="p.email">{{ p.email }}</span>
                 </div>
               </td>
-              <td class="px-4 py-4">
+              <td class="px-2 xl:px-4 py-4">
                 <div class="flex justify-center gap-2">
                   <a
                     [routerLink]="['/proveedores/detalle', p.id_proveedor]"
@@ -157,7 +157,7 @@
             }
             @if (filteredProveedores().length === 0) {
             <tr>
-              <td colspan="9" class="px-4 py-12 text-center text-gray-500">
+              <td colspan="9" class="px-2 xl:px-4 py-12 text-center text-gray-500">
                 <div class="flex flex-col items-center gap-3">
                   <fa-icon [icon]="faBoxOpen" class="text-5xl text-gray-300"></fa-icon>
                   <p class="text-lg font-semibold text-gray-700">No se encontraron proveedores</p>
@@ -172,8 +172,8 @@
     </div>
   </div>
 
-  <!-- Vista Mobile - Cards -->
-  <div class="lg:hidden space-y-4">
+  <!-- Vista Mobile/Tablet - Cards -->
+  <div class="xl:hidden space-y-4">
     @for (p of filteredProveedores(); track $index) {
     <div class="bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden">
       <!-- Header de la card -->
