@@ -3,8 +3,10 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 
 import { Observable } from 'rxjs';
-import { environment } from '../../../environments/environment';
-import { ProveedorDto } from '../interfaces/proveedor.interface';
+
+
+import { environment } from '../../../../environments/environment';
+import { ProveedorDto } from '../../../core/interfaces/proveedor.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -29,7 +31,7 @@ export class ProveedorService {
     });
   }
   getById(id: number): Observable<ProveedorDto> {
-    return this.http.get<ProveedorDto>(`${this.apiUrl}/proveedor${id}`);
+    return this.http.get<ProveedorDto>(`${this.apiUrl}/proveedor/${id}`);
   }
   create(proveedor: ProveedorDto): Observable<ProveedorDto> {
     return this.http.post<ProveedorDto>(`${this.apiUrl}/proveedor`, proveedor);
