@@ -5,7 +5,7 @@ import { DashboardComponent } from './dashboard/dashboard';
 import { LayoutComponent } from './layout/layout';
 import { RegisterComponent } from './components/auth/register/register';
 import { UsersComponent } from './users/users';
-import { ProveedorComponent } from './proveedor/proveedor';
+import { ProveedorComponent } from './features/proveedor/components/proveedor-list/proveedor';
 import { ForgotPasswordComponent } from './forgot-password/forgot-password';
 import { TransportComponent } from './transport/transport';
 import { ProductComponent } from './product/product';
@@ -21,11 +21,17 @@ export const routes: Routes = [
     canActivate: [AuthGuard],
     canActivateChild: [AuthGuard],
     children: [
-      { path: 'dashboard', component: DashboardComponent },
+      { path: 'dashboard',
+         component: DashboardComponent 
+        },
       { path: 'users', component: UsersComponent },
       { path: 'clientes', component: ClientComponent },
       { path: 'productos', component: ProductComponent },
-      { path: 'proveedores', component: ProveedorComponent },
+      { 
+        path: 'proveedores',
+        loadChildren:()=>import('./features/proveedor/proveedor.routes').then(r=>r.ProveedoresRoutingModule)
+
+      },
       { path: 'transporte', component: TransportComponent },
     ],
   },

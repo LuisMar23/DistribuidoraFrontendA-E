@@ -7,17 +7,20 @@ import {
   Validators,
 } from '@angular/forms';
 
-import departamentos from '../../assets/departamentos.json';
-import { faBox, faBoxOpen, faEye, faPenToSquare, faTrash } from '@fortawesome/free-solid-svg-icons';
+import departamentos from '../../../../../assets/departamentos.json';
+import { faBox, faBoxOpen, faEye, faPenToSquare, faSearch, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { ProveedorDto } from '../core/interfaces/proveedor.interface';
-import { ProveedorService } from '../core/services/proveedor.service';
+import { ProveedorDto } from '../../../../core/interfaces/proveedor.interface';
+
 import { CommonModule } from '@angular/common';
-import { NotificationService } from '../core/services/notification.service';
+import { NotificationService } from '../../../../core/services/notification.service';
+import { ProveedorService } from '../../services/proveedor.service';
+import {  RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-proveedor',
-  imports: [ReactiveFormsModule, FormsModule, FontAwesomeModule, CommonModule],
+  standalone:true,
+  imports: [ReactiveFormsModule, FormsModule, FontAwesomeModule, CommonModule,RouterModule],
   templateUrl: './proveedor.html',
   styleUrl: './proveedor.css',
 })
@@ -27,7 +30,7 @@ export class ProveedorComponent {
   faEye = faEye;
   faPenToSquare = faPenToSquare;
   faTrash = faTrash;
-
+  faSearch=faSearch;
   proveedores = signal<ProveedorDto[]>([]);
   editId = signal<number | null>(null);
   searchTerm = signal('');
@@ -133,14 +136,10 @@ export class ProveedorComponent {
       .confirmDelete(`Se eliminara al proveedor ${data.nombre}`)
       .then((result) => {
         if (result.isConfirmed) {
-          // Aquí eliminas el registro
           this._notificationService.showSuccess('Eliminado correctamente');
           this.proveedorService.delete(data.id_proveedor).subscribe(() => this.loadProveedores());
         }
       });
-    // if (confirm('¿Desea eliminar este proveedor?')) {
-    //   this.proveedorService.delete(id).subscribe(() => this.loadProveedores());
-    // }
   }
   view(p: any) {}
 

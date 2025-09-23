@@ -1,0 +1,115 @@
+@if ( loading() ) {
+<div class="flex flex-col items-center justify-center p-10">
+  <fa-icon [icon]="faSpinner" class="text-4xl text-blue-500 spin mb-4"></fa-icon>
+  <span class="text-lg text-gray-600">Cargando proveedor...</span>
+</div>
+}
+<nav class="flex text-gray-500 text-sm mb-6" aria-label="Breadcrumb">
+  <ol class="inline-flex items-center space-x-1 md:space-x-3">
+    <!-- Inicio -->
+    <li class="inline-flex items-center">
+      <a routerLink="" class="inline-flex items-center text-gray-500 hover:text-blue-500">
+        <fa-icon [icon]="faHome"></fa-icon> Inicio
+      </a>
+    </li>
+
+    <!-- Proveedores -->
+    <li class="inline-flex items-center">
+      <span class="mx-2 text-gray-400">/</span>
+      <a
+        [routerLink]="['/proveedores']"
+        class="inline-flex items-center text-gray-500 hover:text-blue-500"
+      >
+        <fa-icon [icon]="faShop"></fa-icon> Proveedores
+      </a>
+    </li>
+
+    <!-- Detalle de proveedor -->
+    @if (proveedor()) {
+    <li class="inline-flex items-center">
+      <span class="mx-2 text-gray-400">/</span>
+      <span class="inline-flex items-center text-gray-700">
+         <fa-icon [icon]="faUserTie" ></fa-icon>{{ proveedor()?.nombre }}
+      </span>
+    </li>
+    }
+  </ol>
+</nav>
+
+@if(!loading() && proveedor()){
+<div class="max-w-8xl mx-auto bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
+  <!-- Cabecera -->
+  <div class="bg-gradient-to-r from-blue-500 to-blue-300 text-white p-6 flex items-center justify-between">
+    <div class="flex items-center gap-4">
+      <fa-icon [icon]="faUserTie" class="text-3xl"></fa-icon>
+      <h2 class="text-2xl font-semibold">{{ proveedor()?.nombre }}</h2>
+    </div>
+  
+  </div>
+
+  <!-- Contenido -->
+  <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6 text-gray-700">
+    <div class="flex items-center gap-3 bg-gray-50 p-4 rounded-lg shadow-sm">
+      <fa-icon [icon]="faIdCard" class="text-blue-500 text-xl"></fa-icon>
+      <div>
+        <p class="text-sm font-medium text-gray-500">NIT/CI</p>
+        <p class="font-semibold text-gray-800">{{ proveedor()?.nit_ci }}</p>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-3 bg-gray-50 p-4 rounded-lg shadow-sm">
+      <fa-icon [icon]="faPhoneAlt" class="text-green-500 text-xl"></fa-icon>
+      <div>
+        <p class="text-sm font-medium text-gray-500">Teléfono</p>
+        <p class="font-semibold text-gray-800">{{ proveedor()?.telefono }}</p>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-3 bg-gray-50 p-4 rounded-lg shadow-sm">
+      <fa-icon [icon]="faMapMarkerAlt" class="text-red-500 text-xl"></fa-icon>
+      <div>
+        <p class="text-sm font-medium text-gray-500">Dirección</p>
+        <p class="font-semibold text-gray-800">{{ proveedor()?.direccion }}</p>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-3 bg-gray-50 p-4 rounded-lg shadow-sm">
+      <fa-icon [icon]="faBuilding" class="text-purple-500 text-xl"></fa-icon>
+      <div>
+        <p class="text-sm font-medium text-gray-500">Departamento</p>
+        <p class="font-semibold text-gray-800">{{ proveedor()?.departamento }}</p>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-3 bg-gray-50 p-4 rounded-lg shadow-sm">
+      <fa-icon [icon]="faEnvelope" class="text-yellow-500 text-xl"></fa-icon>
+      <div>
+        <p class="text-sm font-medium text-gray-500">Email</p>
+        <p class="font-semibold text-gray-800">{{ proveedor()?.email }}</p>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-3 bg-gray-50 p-4 rounded-lg shadow-sm">
+      <fa-icon [icon]="faToggleOn" class="text-green-500 text-xl"></fa-icon>
+      <div>
+        <p class="text-sm font-medium text-gray-500">Activo</p>
+        <p class="font-semibold text-gray-800">{{ proveedor()?.isActive ? 'Sí' : 'No' }}</p>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-3 bg-gray-50 p-4 rounded-lg shadow-sm col-span-full md:col-span-2">
+      <fa-icon [icon]="faCalendarAlt" class="text-gray-400 text-xl"></fa-icon>
+      <div>
+        <p class="text-sm font-medium text-gray-500">Creado en</p>
+        <p class="font-semibold text-gray-800">{{ proveedor()?.creado_en | date:'short' }}</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+} @if(!loading() && !proveedor()){
+<div class="flex flex-col items-center justify-center p-10 text-red-500">
+  <fa-icon [icon]="faExclamationTriangle" class="text-4xl mb-4"></fa-icon>
+  <span class="text-lg">No se encontró el proveedor.</span>
+</div>
+}
