@@ -1,0 +1,414 @@
+<!-- Header -->
+<div class="bg-white rounded-2xl p-4 md:p-6 mb-6 flex items-center gap-4 shadow-sm">
+    <div class="bg-blue-100 text-blue-600 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full">
+        <fa-icon [icon]="faTruck" class="text-lg md:text-xl"></fa-icon>
+    </div>
+    <h2 class="text-lg md:text-xl font-bold font-sans text-gray-800">Transportes</h2>
+</div>
+
+<div class="max-w-full mx-auto p-2 md:p-5 bg-white rounded-2xl shadow-xl">
+    <!-- Header con buscador y botón -->
+    <div class="flex flex-col lg:flex-row justify-between items-center gap-4 mb-6">
+        <!-- Buscador -->
+        <div class="w-full lg:w-1/3">
+            <div class="relative">
+                <fa-icon [icon]="faSearch"
+                    class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg"></fa-icon>
+                <input type="text" placeholder="Buscar transporte..."
+                    class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-transparent shadow-sm"
+                    [(ngModel)]="searchTerm" (input)="onSearchChange()" />
+            </div>
+        </div>
+
+        <!-- Botón nuevo transporte -->
+        <button (click)="openModal()"
+            class="flex items-center gap-2 bg-[#2196f3] hover:bg-blue-700 text-white px-6 py-3 rounded-xl shadow-lg transition-all duration-200 transform hover:scale-105 w-full lg:w-auto justify-center lg:justify-start">
+            <i class="fas fa-plus"></i> Nuevo Transporte
+        </button>
+    </div>
+
+    <!-- Vista Desktop/Tablet - Tabla -->
+    <div class="hidden lg:block">
+        <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="min-w-full">
+                    <thead>
+                        <tr class="bg-[#2196f3] text-white">
+                            @for (col of columns; track col) {
+                            <th class="px-4 py-4 text-left text-xs font-bold uppercase tracking-wider cursor-pointer"
+                                (click)="sort(col.key)">
+                                <div class="flex items-center space-x-2">
+                                    <span [ngClass]="{
+                      'text-yellow-300': sortColumn() === col.key,
+                      'text-white': sortColumn() !== col.key
+                    }" class="text-sm font-medium">
+                                        {{ col.label }}
+                                    </span>
+                                    <div class="flex flex-col justify-center h-4">
+                                        <span [ngClass]="{
+                        'text-yellow-300': sortColumn() === col.key && sortDirection() === 'asc',
+                        'text-white': !(sortColumn() === col.key && sortDirection() === 'asc')
+                      }" class="text-[10px] leading-none">
+                                            ▲
+                                        </span>
+                                        <span [ngClass]="{
+                        'text-yellow-300': sortColumn() === col.key && sortDirection() === 'desc',
+                        'text-white': !(sortColumn() === col.key && sortDirection() === 'desc')
+                      }" class="text-[10px] leading-none">
+                                            ▼
+                                        </span>
+                                    </div>
+                                </div>
+                            </th>
+                            }
+                            <th class="px-4 py-4 text-center text-xs font-bold uppercase tracking-wider">
+                                Acciones
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        @for (t of transportes(); track $index) {
+                        <tr class="hover:bg-gray-50 transition-all duration-200 border-l-4 border-transparent">
+                            <td class="px-4 py-4">
+                                <span class="font-semibold text-gray-700">{{ $index + 1 }}</span>
+                            </td>
+                            <td class="px-4 py-4">
+                                <span [class]="getEstadoClass(t.estado)"
+                                    class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium capitalize">
+                                    {{ (t.estado || 'N/A').replace('_', ' ') }}
+                                </span>
+                            </td>
+                            <td class="px-4 py-4">
+                                <div>
+                                    <div class="font-bold text-gray-900 text-sm">{{ t.transportista || 'N/A' }}</div>
+                                    <div class="text-xs text-gray-500">ID: {{ t.id_transporte }}</div>
+                                </div>
+                            </td>
+                            <td class="px-4 py-4">
+                                <span class="font-medium text-gray-700">{{ t.vehiculo || 'N/A' }}</span>
+                            </td>
+                            <td class="px-4 py-4">
+                                <span class="font-medium text-gray-700">{{ formatCurrency(t.costo_local) }}</span>
+                            </td>
+                            <td class="px-4 py-4">
+                                <span class="font-medium text-gray-700">{{ formatCurrency(t.costo_departamental)
+                                    }}</span>
+                            </td>
+                            <td class="px-4 py-4">
+                                <div class="flex items-center text-gray-700">
+                                    <i class="fas fa-calendar text-xs mr-2 text-gray-400"></i>
+                                    <span class="text-sm">{{ t.fecha_salida | date:'short' }}</span>
+                                </div>
+                            </td>
+                            <td class="px-4 py-4">
+                                <div class="flex items-center text-gray-700">
+                                    <i class="fas fa-calendar text-xs mr-2 text-gray-400"></i>
+                                    <span class="text-sm">{{ t.fecha_llegada | date:'short' }}</span>
+                                </div>
+                            </td>
+                            <td class="px-4 py-4">
+                                <div class="flex justify-center gap-2">
+                                    <a [routerLink]="['detalle', t.id_transporte]"
+                                        class="w-8 h-8 flex items-center justify-center rounded-lg bg-green-500 hover:bg-green-600 text-white shadow-md transition transform hover:scale-110"
+                                        title="Ver Detalle">
+                                        <fa-icon [icon]="faEye" class="text-xs"></fa-icon>
+                                    </a>
+                                    <button
+                                        class="w-8 h-8 flex items-center justify-center rounded-lg bg-blue-500 hover:bg-blue-600 text-white shadow-md transition transform hover:scale-110"
+                                        title="Editar" (click)="edit(t)">
+                                        <fa-icon [icon]="faPenToSquare" class="text-xs"></fa-icon>
+                                    </button>
+                                    <button
+                                        class="w-8 h-8 flex items-center justify-center rounded-lg bg-red-500 hover:bg-red-600 text-white shadow-md transition transform hover:scale-110"
+                                        title="Eliminar" (click)="delete(t)">
+                                        <fa-icon [icon]="faTrash" class="text-xs"></fa-icon>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        }
+                        @if (transportes().length === 0) {
+                        <tr>
+                            <td colspan="9" class="px-4 py-12 text-center text-gray-500">
+                                <div class="flex flex-col items-center gap-3">
+                                    <fa-icon [icon]="faBoxOpen" class="text-5xl text-gray-300"></fa-icon>
+                                    <p class="text-lg font-semibold text-gray-700">No se encontraron transportes</p>
+                                    <p class="text-sm text-gray-500">Agrega un nuevo transporte para comenzar</p>
+                                </div>
+                            </td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Vista Mobile - Cards -->
+    <div class="lg:hidden space-y-4">
+        @for (t of transportes(); track $index) {
+        <div
+            class="bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden">
+            <!-- Header de la card -->
+            <div class="bg-gradient-to-r from-blue-500 to-blue-600 p-4">
+                <div class="flex justify-between items-start">
+                    <div class="flex-1">
+                        <h3 class="font-bold text-white text-lg leading-tight">{{ t.transportista || 'N/A' }}</h3>
+                        <p class="text-blue-100 text-sm mt-1">ID: {{ t.id_transporte }}</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span [class]="getEstadoClass(t.estado)"
+                            class="text-xs px-2 py-1 rounded-full font-medium capitalize">
+                            {{ (t.estado || 'N/A').replace('_', ' ') }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contenido de la card -->
+            <div class="p-4 space-y-3">
+                <!-- Fila 1: Vehículo y Costo Local -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <div class="flex items-center text-gray-600 mb-1">
+                            <i class="fas fa-truck text-xs mr-2"></i>
+                            <span class="text-xs font-medium uppercase tracking-wide">Vehículo</span>
+                        </div>
+                        <p class="font-semibold text-gray-800 text-sm">{{ t.vehiculo || 'N/A' }}</p>
+                    </div>
+                    <div>
+                        <div class="flex items-center text-gray-600 mb-1">
+                            <i class="fas fa-dollar-sign text-xs mr-2"></i>
+                            <span class="text-xs font-medium uppercase tracking-wide">Costo Local</span>
+                        </div>
+                        <p class="font-semibold text-gray-800 text-sm">{{ formatCurrency(t.costo_local) }}</p>
+                    </div>
+                </div>
+
+                <!-- Fila 2: Costo Departamental -->
+                <div>
+                    <div class="flex items-center text-gray-600 mb-1">
+                        <i class="fas fa-dollar-sign text-xs mr-2"></i>
+                        <span class="text-xs font-medium uppercase tracking-wide">Costo Departamental</span>
+                    </div>
+                    <p class="font-semibold text-gray-800 text-sm">{{ formatCurrency(t.costo_departamental) }}</p>
+                </div>
+
+                <!-- Fila 3: Fechas -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <div class="flex items-center text-gray-600 mb-1">
+                            <i class="fas fa-calendar text-xs mr-2"></i>
+                            <span class="text-xs font-medium uppercase tracking-wide">Salida</span>
+                        </div>
+                        <p class="text-gray-800 text-sm">{{ t.fecha_salida | date:'short' }}</p>
+                    </div>
+                    <div>
+                        <div class="flex items-center text-gray-600 mb-1">
+                            <i class="fas fa-calendar text-xs mr-2"></i>
+                            <span class="text-xs font-medium uppercase tracking-wide">Llegada</span>
+                        </div>
+                        <p class="text-gray-800 text-sm">{{ t.fecha_llegada | date:'short' }}</p>
+                    </div>
+                </div>
+
+                <!-- Fila 4: ID Compra -->
+                <div>
+                    <div class="flex items-center text-gray-600 mb-1">
+                        <i class="fas fa-shopping-cart text-xs mr-2"></i>
+                        <span class="text-xs font-medium uppercase tracking-wide">ID Compra</span>
+                    </div>
+                    <p class="font-semibold text-gray-800 text-sm">{{ t.id_compra || 'N/A' }}</p>
+                </div>
+
+                <!-- Botones de acción -->
+                <div class="pt-3 border-t border-gray-100">
+                    <div class="grid grid-cols-3 gap-2">
+                        <a [routerLink]="['detalle', t.id_transporte]"
+                            class="flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white px-3 py-2.5 rounded-lg text-sm font-medium shadow-sm transition-all duration-200 transform hover:scale-105">
+                            <fa-icon [icon]="faEye" class="text-xs"></fa-icon>
+                            <span class="hidden sm:inline">Detalle</span>
+                        </a>
+                        <button
+                            class="flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-600 text-white px-3 py-2.5 rounded-lg text-sm font-medium shadow-sm transition-all duration-200 transform hover:scale-105"
+                            (click)="edit(t)">
+                            <fa-icon [icon]="faPenToSquare" class="text-xs"></fa-icon>
+                            <span class="hidden sm:inline">Editar</span>
+                        </button>
+                        <button
+                            class="flex items-center justify-center gap-2 bg-red-500 hover:bg-red-600 text-white px-3 py-2.5 rounded-lg text-sm font-medium shadow-sm transition-all duration-200 transform hover:scale-105"
+                            (click)="delete(t)">
+                            <fa-icon [icon]="faTrash" class="text-xs"></fa-icon>
+                            <span class="hidden sm:inline">Eliminar</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        }
+
+        <!-- Mensaje cuando no hay datos -->
+        @if (transportes().length === 0) {
+        <div class="bg-white rounded-xl p-8 text-center">
+            <fa-icon [icon]="faBoxOpen" class="text-5xl text-gray-300 mb-4"></fa-icon>
+            <p class="text-lg font-semibold text-gray-700 mb-2">No se encontraron transportes</p>
+            <p class="text-sm text-gray-500">Agrega un nuevo transporte para comenzar</p>
+        </div>
+        }
+    </div>
+
+    <!-- Paginación -->
+    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mt-6 gap-4 px-2">
+        <!-- Información de registros -->
+        <div class="text-sm text-gray-600 text-center sm:text-left">
+            Mostrando {{ rangeStart() }} a {{ rangeEnd() }} de {{ total() }}
+        </div>
+
+        <!-- Botones de paginación -->
+        <div class="flex items-center justify-center gap-1 sm:gap-2 flex-wrap">
+            <button (click)="prevPage()" [disabled]="currentPage() === 1"
+                class="px-3 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg disabled:opacity-50 text-sm font-medium transition-colors">
+                <i class="fas fa-chevron-left sm:hidden"></i>
+                <span class="hidden sm:inline">Anterior</span>
+            </button>
+
+            @for(i of pageArray();track i){
+            <button (click)="goToPage(i)" [class.font-bold]="currentPage() === i"
+                [class.bg-blue-500]="currentPage() === i" [class.text-white]="currentPage() === i"
+                [class.shadow-md]="currentPage() === i"
+                class="px-3 py-2 border rounded-lg hover:bg-blue-100 text-sm font-medium transition-all min-w-[40px]">
+                {{ i }}
+            </button>
+            }
+
+            <button (click)="nextPage()" [disabled]="currentPage() === totalPages()"
+                class="px-3 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg disabled:opacity-50 text-sm font-medium transition-colors">
+                <i class="fas fa-chevron-right sm:hidden"></i>
+                <span class="hidden sm:inline">Siguiente</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+@if (showModal()) {
+<div class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
+    <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl animate-fadeIn max-h-[95vh] overflow-y-auto">
+        <!-- Header del Modal -->
+        <div class="bg-[#2196f3] text-white p-4 md:p-6 rounded-t-2xl">
+            <div class="flex justify-between items-center">
+                <h2 class="text-xl md:text-2xl font-bold">
+                    {{ editMode() ? 'Editar Transporte' : 'Nuevo Transporte' }}
+                </h2>
+                <button (click)="cancelEdit()" class="text-white hover:text-gray-200 transition-colors p-2">
+                    <i class="fas fa-times text-lg"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Formulario -->
+        <form [formGroup]="form" (ngSubmit)="submit()" class="p-4 md:p-6">
+            <div class="space-y-4 md:space-y-6">
+                <!-- Transportista -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        <i class="fas fa-user mr-2 text-[#2196f3]"></i>Transportista
+                    </label>
+                    <input formControlName="transportista" placeholder="Nombre del transportista"
+                        class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#2196f3] focus:border-transparent shadow-sm transition-all" />
+                </div>
+
+                <!-- Grid para campos pequeños -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                    <!-- ID Compra -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            <i class="fas fa-shopping-cart mr-2 text-[#2196f3]"></i>ID Compra
+                        </label>
+                        <input formControlName="id_compra" type="number" placeholder="ID de la compra"
+                            class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#2196f3] focus:border-transparent shadow-sm transition-all" />
+                    </div>
+
+                    <!-- Vehículo -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            <i class="fas fa-truck mr-2 text-[#2196f3]"></i>Vehículo
+                        </label>
+                        <input formControlName="vehiculo" placeholder="Tipo de vehículo"
+                            class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#2196f3] focus:border-transparent shadow-sm transition-all" />
+                    </div>
+                </div>
+
+                <!-- Grid para costos -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                    <!-- Costo Local -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            <i class="fas fa-dollar-sign mr-2 text-[#2196f3]"></i>Costo Local
+                        </label>
+                        <input formControlName="costo_local" type="number" placeholder="Costo local"
+                            class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#2196f3] focus:border-transparent shadow-sm transition-all" />
+                    </div>
+
+                    <!-- Costo Departamental -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            <i class="fas fa-dollar-sign mr-2 text-[#2196f3]"></i>Costo Departamental
+                        </label>
+                        <input formControlName="costo_departamental" type="number" placeholder="Costo departamental"
+                            class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#2196f3] focus:border-transparent shadow-sm transition-all" />
+                    </div>
+                </div>
+
+                <!-- Grid para fechas -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                    <!-- Fecha Salida -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            <i class="fas fa-calendar mr-2 text-[#2196f3]"></i>Fecha Salida
+                        </label>
+                        <input formControlName="fecha_salida" type="datetime-local"
+                            class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#2196f3] focus:border-transparent shadow-sm transition-all" />
+                    </div>
+
+                    <!-- Fecha Llegada -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            <i class="fas fa-calendar mr-2 text-[#2196f3]"></i>Fecha Llegada
+                        </label>
+                        <input formControlName="fecha_llegada" type="datetime-local"
+                            class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#2196f3] focus:border-transparent shadow-sm transition-all" />
+                    </div>
+                </div>
+
+                <!-- Estado -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        <i class="fas fa-check-circle mr-2 text-[#2196f3]"></i>Estado
+                    </label>
+                    <select formControlName="estado"
+                        class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#2196f3] focus:border-transparent shadow-sm appearance-none bg-white">
+                        <option value="" disabled>Selecciona un estado</option>
+                        <option value="en_camino">En camino</option>
+                        <option value="recibido">Recibido</option>
+                        <option value="cancelado">Cancelado</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Botones -->
+            <div class="flex flex-col sm:flex-row justify-end gap-3 mt-6 md:mt-8 pt-4 md:pt-6 border-t">
+                <button type="button" (click)="cancelEdit()"
+                    class="flex items-center justify-center gap-2 bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-xl shadow-md transition-all duration-200 transform hover:scale-105 order-2 sm:order-1">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+                <button type="submit"
+                    class="flex items-center justify-center gap-2 bg-[#2196f3] hover:bg-blue-700 text-white px-8 py-3 rounded-xl shadow-md transition-all duration-200 transform hover:scale-105 order-1 sm:order-2">
+                    <i class="fas fa-check"></i>
+                    {{ editMode() ? 'Actualizar' : 'Crear' }}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+}
