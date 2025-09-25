@@ -9,3 +9,7 @@ export interface ProveedorDto {
   isActive?: boolean;
   creado_en?: string;
 }
+
+export interface CountResponse {
+  total: number;
+}

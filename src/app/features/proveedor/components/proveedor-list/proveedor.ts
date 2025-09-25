@@ -8,19 +8,26 @@ import {
 } from '@angular/forms';
 
 import departamentos from '../../../../../assets/departamentos.json';
-import { faBox, faBoxOpen, faEye, faPenToSquare, faSearch, faTrash } from '@fortawesome/free-solid-svg-icons';
+import {
+  faBox,
+  faBoxOpen,
+  faEye,
+  faPenToSquare,
+  faSearch,
+  faTrash,
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { ProveedorDto } from '../../../../core/interfaces/proveedor.interface';
 
 import { CommonModule } from '@angular/common';
 import { NotificationService } from '../../../../core/services/notification.service';
 import { ProveedorService } from '../../services/proveedor.service';
-import {  RouterModule } from '@angular/router';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-proveedor',
-  standalone:true,
-  imports: [ReactiveFormsModule, FormsModule, FontAwesomeModule, CommonModule,RouterModule],
+  standalone: true,
+  imports: [ReactiveFormsModule, FormsModule, FontAwesomeModule, CommonModule, RouterModule],
   templateUrl: './proveedor.html',
   styleUrl: './proveedor.css',
 })
@@ -30,7 +37,7 @@ export class ProveedorComponent {
   faEye = faEye;
   faPenToSquare = faPenToSquare;
   faTrash = faTrash;
-  faSearch=faSearch;
+  faSearch = faSearch;
   proveedores = signal<ProveedorDto[]>([]);
   editId = signal<number | null>(null);
   searchTerm = signal('');
@@ -51,10 +58,10 @@ export class ProveedorComponent {
   ];
 
   total = signal(0);
-  pageSize = signal(5);
+  pageSize = signal(10);
   currentPage = signal(1);
-  sortColumn = signal<keyof ProveedorDto>('creado_en');
-  sortDirection = signal<'asc' | 'desc'>('desc');
+  sortColumn = signal<string>('');
+  sortDirection = signal<'asc' | 'desc'>('asc');
 
   _notificationService = inject(NotificationService);
   constructor(private proveedorService: ProveedorService, private fb: FormBuilder) {
@@ -73,13 +80,15 @@ export class ProveedorComponent {
     this.loadProveedores();
   }
   loadProveedores() {
-    this.proveedorService
-      .getAll(this.currentPage(), this.pageSize(), this.sortColumn(), this.sortDirection())
-      .subscribe((res) => {
-        this.proveedores.set(res.data);
-        this.total.set(res.total);
-      });
+    this.proveedorService.getAll(this.currentPage(), this.pageSize()).subscribe((res) => {
+      this.proveedores.set(res.data);
+      this.total.set(res.total);
+
+      // aplicar sort si ya hay columna seleccionada
+      if (this.sortColumn()) this.ordenarProveedores();
+    });
   }
+
   filteredProveedores = computed(() => {
     const term = this.searchTerm().toLowerCase();
     return this.proveedores().filter(
@@ -142,16 +151,41 @@ export class ProveedorComponent {
       });
   }
   view(p: any) {}
+  ordenarProveedores() {
+    const col = this.sortColumn();
+    const dir = this.sortDirection(); 
+    if (!col) return;
+
+    const arr = [...this.proveedores()];
+
+    arr.sort((a, b) => {
+      const valA = a[col as keyof ProveedorDto];
+      const valB = b[col as keyof ProveedorDto];
+
+      if (valA == null) return 1;
+      if (valB == null) return -1;
+
+      if (typeof valA === 'string' && typeof valB === 'string') {
+        return dir === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
+      }
+
+      return dir === 'asc' ? (valA < valB ? -1 : 1) : valA < valB ? 1 : -1;
+    });
+
+    this.proveedores.set(arr);
+  }
 
   //paginador
-  sort(column: any) {
+  sort(column: string) {
     if (this.sortColumn() === column) {
       this.sortDirection.set(this.sortDirection() === 'asc' ? 'desc' : 'asc');
     } else {
       this.sortColumn.set(column);
       this.sortDirection.set('asc');
     }
-    this.loadProveedores();
+
+    // Ordenar localmente, sin recargar desde backend
+    this.ordenarProveedores();
   }
 
   nextPage() {
