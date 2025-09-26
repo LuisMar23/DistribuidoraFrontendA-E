@@ -77,31 +77,22 @@ export class VentaCreateComponent implements OnInit {
 
   // Computed values
   detallesLength = computed(() => this.detalles.length);
-  subtotalTotal = computed(() => {
-    return this.detalles.controls.reduce((total, detalle) => {
-      return total + (detalle.get('subtotal')?.value || 0);
-    }, 0);
-  });
-
-  totalGeneral = computed(() => {
-    const descuento = this.form.get('descuento')?.value || 0;
-    return Math.max(0, this.subtotalTotal() - descuento);
-  });
 
   constructor() {
     this.form = this._fb.group({
       id_cliente: ['', Validators.required],
       id_usuario: ['', Validators.required],
       fecha_venta: ['', Validators.required],
-      subtotal: [0, [Validators.required, Validators.min(0)]],
-      descuento: [0, [Validators.min(0)]],
-      total: [0, [Validators.required, Validators.min(0)]],
+      subtotal: [0],
+      descuento: [0],
+      total: [0],
       metodo_pago: ['efectivo', Validators.required],
       estado: ['pendiente', Validators.required],
-      detalles: this._fb.array([], Validators.required),
+      detalles: this._fb.array([]),
     });
 
     this.setCurrentDateTime();
+    this.agregarDetalle();
   }
 
   ngOnInit() {
@@ -120,7 +111,7 @@ export class VentaCreateComponent implements OnInit {
 
       this.usuarioActual.set(usuarioOption);
       this.form.patchValue({
-        id_usuario: usuarioOption.id_usuario.toString(),
+        id_usuario: usuarioOption.id_usuario,
       });
     } else {
       console.warn('No se encontró usuario autenticado');
@@ -173,6 +164,25 @@ export class VentaCreateComponent implements OnInit {
     return this.form.get('detalles') as FormArray;
   }
 
+  // Calcular subtotal total de todos los productos
+  calcularSubtotalTotal(): number {
+    let total = 0;
+    for (let i = 0; i < this.detalles.length; i++) {
+      const detalle = this.detalles.at(i);
+      const cantidad = Number(detalle.get('cantidad')?.value) || 0;
+      const precioUnitario = Number(detalle.get('precio_unitario')?.value) || 0;
+      total += cantidad * precioUnitario;
+    }
+    return total;
+  }
+
+  // Calcular total general
+  calcularTotalGeneral(): number {
+    const subtotal = this.calcularSubtotalTotal();
+    const descuento = Number(this.form.get('descuento')?.value) || 0;
+    return Math.max(0, subtotal - descuento);
+  }
+
   // Agregar detalle
   agregarDetalle() {
     const detalleForm = this._fb.group({
@@ -188,7 +198,7 @@ export class VentaCreateComponent implements OnInit {
   // Eliminar detalle
   eliminarDetalle(index: number) {
     this.detalles.removeAt(index);
-    this.calcularTotales();
+    this.actualizarTotales();
   }
 
   // Cuando se selecciona un producto, cargar su precio
@@ -229,53 +239,69 @@ export class VentaCreateComponent implements OnInit {
 
   // Calcular subtotal de un detalle
   calcularSubtotalDetalle(index: number) {
-    if (!this.validarStock(index)) return;
+    if (index < 0 || index >= this.detalles.length) return;
 
     const detalle = this.detalles.at(index);
-    const cantidad = detalle.get('cantidad')?.value || 0;
-    const precioUnitario = detalle.get('precio_unitario')?.value || 0;
+    const cantidad = Number(detalle.get('cantidad')?.value) || 0;
+    const precioUnitario = Number(detalle.get('precio_unitario')?.value) || 0;
     const subtotal = cantidad * precioUnitario;
 
-    detalle.patchValue({ subtotal: subtotal });
-    this.calcularTotales();
+    detalle.patchValue({ subtotal: subtotal }, { emitEvent: false });
+    this.actualizarTotales();
   }
 
-  // Calcular totales generales
-  calcularTotales() {
+  // Actualizar totales
+  actualizarTotales() {
+    const subtotal = this.calcularSubtotalTotal();
+    const total = this.calcularTotalGeneral();
+
     this.form.patchValue({
-      subtotal: this.subtotalTotal(),
-      total: this.totalGeneral(),
+      subtotal: subtotal,
+      total: total
     });
+  }
+
+  onDescuentoChange() {
+    this.actualizarTotales();
   }
 
   private setCurrentDateTime() {
     const now = new Date();
-    const formattedDate = now.toISOString().slice(0, 19);
+    const formattedDate = now.toISOString().slice(0, 16);
     this.form.patchValue({
       fecha_venta: formattedDate,
     });
   }
 
-  // Función para formatear la fecha correctamente para Prisma
-  private formatDateForPrisma(dateString: string): string {
-    if (dateString.includes(':')) {
-      if (dateString.split(':').length === 2) {
-        return dateString + ':00';
+  submit() {
+    // Marcar todos los campos como touched para mostrar errores
+    this.form.markAllAsTouched();
+
+    // Asegurar que los totales estén actualizados
+    this.actualizarTotales();
+
+    // Validar detalles
+    let detallesValidos = true;
+    for (let i = 0; i < this.detalles.length; i++) {
+      const detalle = this.detalles.at(i);
+      detalle.markAllAsTouched();
+      
+      if (detalle.invalid) {
+        detallesValidos = false;
+        const idProducto = detalle.get('id_producto')?.value;
+        if (!idProducto) {
+          this._notificationService.showError(`Seleccione un producto para la línea ${i + 1}`);
+          return;
+        }
       }
-      return dateString;
     }
 
-    const date = new Date(dateString);
-    return date.toISOString().slice(0, 19);
-  }
-
-  submit() {
-    if (this.form.invalid) {
-      this._notificationService.showError('Por favor, complete todos los campos requeridos');
+    if (this.form.invalid || !detallesValidos) {
+      this._notificationService.showError('Por favor, complete todos los campos requeridos correctamente');
       return;
     }
 
-    if (this.detallesLength() === 0) {
+    if (this.detalles.length === 0) {
       this._notificationService.showError('Debe agregar al menos un producto a la venta');
       return;
     }
@@ -288,13 +314,10 @@ export class VentaCreateComponent implements OnInit {
     }
 
     // Validar stock final antes de enviar
-    const stockValido = this.detalles.controls.every((detalle, index) => {
-      return this.validarStock(index);
-    });
-
-    if (!stockValido) {
-      this._notificationService.showError('Verifique las cantidades de los productos');
-      return;
+    for (let i = 0; i < this.detalles.length; i++) {
+      if (!this.validarStock(i)) {
+        return;
+      }
     }
 
     this.isLoading.set(true);
@@ -302,30 +325,47 @@ export class VentaCreateComponent implements OnInit {
     // Preparar datos para enviar
     const formData = this.form.value;
 
-    const fechaVentaFormateada = this.formatDateForPrisma(formData.fecha_venta);
+    // Formatear fecha
+    const fechaVentaFormateada = formData.fecha_venta.length === 16 
+      ? formData.fecha_venta + ':00' 
+      : formData.fecha_venta;
 
-    const data = {
-      ...formData,
+    const ventaData = {
       id_cliente: parseInt(formData.id_cliente),
       id_usuario: this.usuarioActual()!.id_usuario,
       fecha_venta: fechaVentaFormateada,
+      subtotal: parseFloat(formData.subtotal) || 0,
+      descuento: parseFloat(formData.descuento) || 0,
+      total: parseFloat(formData.total) || 0,
+      metodo_pago: formData.metodo_pago,
+      estado: formData.estado,
       detalles: formData.detalles.map((detalle: any) => ({
         productoId: parseInt(detalle.id_producto),
-        cantidad: parseFloat(detalle.cantidad),
+        cantidad: parseInt(detalle.cantidad),
         precioUnitario: parseFloat(detalle.precio_unitario),
-      })),
+      }))
     };
 
-    this._ventaService.create(data).subscribe({
-      next: () => {
+    console.log('Datos a enviar al backend:', ventaData);
+
+    this._ventaService.create(ventaData).subscribe({
+      next: (response) => {
         this._notificationService.showSuccess('Venta creada exitosamente');
         this.isLoading.set(false);
         this._router.navigate(['/ventas']);
       },
       error: (error) => {
-        this._notificationService.showError('Error al crear la venta: ' + error.message);
-        this.isLoading.set(false);
         console.error('Error creating venta:', error);
+        let errorMessage = 'Error al crear la venta';
+        
+        if (error.error?.message) {
+          errorMessage += ': ' + error.error.message;
+        } else if (error.message) {
+          errorMessage += ': ' + error.message;
+        }
+        
+        this._notificationService.showError(errorMessage);
+        this.isLoading.set(false);
       },
     });
   }
