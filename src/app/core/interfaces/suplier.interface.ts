@@ -13,3 +13,4 @@ export interface ProveedorDto {
 export interface CountResponse {
   total: number;
 }
+  

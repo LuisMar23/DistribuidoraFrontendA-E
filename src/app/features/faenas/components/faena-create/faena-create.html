@@ -1,0 +1,555 @@
+<div
+  class="min-h-screen bg-gradient-to-br from-blue-50 via-sky-50/30 to-cyan-50 py-4 px-4 font-[Inter]"
+>
+  <!-- Contenedor del formulario con efecto glass -->
+  <div class="max-w-8xl mx-auto glass-effect rounded-1xl shadow-2xl overflow-hidden">
+    <!-- Header con gradiente azul -->
+    <div class="bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 px-6 py-8 md:px-8">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+        <div>
+          <h1 class="text-3xl md:text-4xl font-bold text-white mb-2">Nueva Faena</h1>
+          <p class="text-blue-100 text-lg">Gestión de faena ganadera</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Formulario -->
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="p-6 md:p-8 space-y-8">
+      <!-- Información Principal -->
+      <div class="section-card">
+        <div class="flex items-center mb-6">
+          <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center mr-4">
+            <fa-icon [icon]="faClipboardList" class="text-white"></fa-icon>
+          </div>
+          <h2 class="text-2xl font-semibold text-gray-800">Información Principal</h2>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          <!-- ID Compra -->
+          <div class="space-y-2">
+            <label class="block text-sm font-semibold text-gray-700">
+              <i class="fas fa-shopping-cart mr-2 text-blue-500"></i>ID Compra
+              <span class="text-red-500">*</span>
+            </label>
+            <input
+              formControlName="compraId"
+              type="number"
+              placeholder="Ej: 12345"
+              class="w-full border border-gray-300 rounded-xl px-4 py-3 input-focus text-gray-700 placeholder-gray-400"
+            />
+          </div>
+
+          <!-- Propiedad -->
+          <div class="space-y-2">
+            <label class="block text-sm font-semibold text-gray-700">
+              <i class="fas fa-building mr-2 text-blue-500"></i>Propiedad
+              <span class="text-red-500">*</span>
+            </label>
+            <input
+              formControlName="propiedad"
+              type="text"
+              placeholder="Nombre de la propiedad"
+              class="w-full border border-gray-300 rounded-xl px-4 py-3 input-focus text-gray-700 placeholder-gray-400"
+            />
+          </div>
+
+          <!-- Número de Reses -->
+          <div class="space-y-2">
+            <label class="block text-sm font-semibold text-gray-700">
+              <i class="fas fa-cow mr-2 text-blue-500"></i>Número de Reses
+              <span class="text-red-500">*</span>
+            </label>
+            <input
+              formControlName="numeroReses"
+              type="number"
+              min="1"
+              placeholder="Cantidad"
+              class="w-full border border-gray-300 rounded-xl px-4 py-3 input-focus text-gray-700 placeholder-gray-400"
+            />
+          </div>
+
+          <!-- Tipo de Ganado -->
+          <div class="space-y-2">
+            <label class="block text-sm font-semibold text-gray-700">
+              <i class="fas fa-tags mr-2 text-blue-500"></i>Tipo de Ganado
+              <span class="text-red-500">*</span>
+            </label>
+            <select
+              formControlName="tipo"
+              class="w-full border border-gray-300 rounded-xl px-4 py-3 input-focus text-gray-700 appearance-none bg-white"
+            >
+              <option value="" disabled>Seleccionar tipo</option>
+              <option value="TORO"><i class="fas fa-male mr-2"></i>Toro</option>
+              <option value="VACA"><i class="fas fa-female mr-2"></i>Vaca</option>
+              <option value="BECERRO"><i class="fas fa-baby mr-2"></i>Becerro</option>
+            </select>
+          </div>
+
+          <!-- Peso Bruto -->
+          <div class="space-y-2">
+            <label class="block text-sm font-semibold text-gray-700">
+              <i class="fas fa-weight-hanging mr-2 text-blue-500"></i>Peso Bruto (kg)
+              <span class="text-red-500">*</span>
+            </label>
+            <div class="relative">
+              <input
+                formControlName="pesoBruto"
+                type="number"
+                step="0.01"
+                placeholder="0.00"
+                class="w-full border border-gray-300 rounded-xl px-4 py-3 pr-12 input-focus text-gray-700 placeholder-gray-400"
+              />
+              <span
+                class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 text-sm font-medium"
+                >kg</span
+              >
+            </div>
+          </div>
+
+          <!-- Peso Neto -->
+          <div class="space-y-2">
+            <label class="block text-sm font-semibold text-gray-700">
+              <i class="fas fa-balance-scale mr-2 text-blue-500"></i>Peso Neto (kg)
+              <span class="text-red-500">*</span>
+            </label>
+            <div class="relative">
+              <input
+                formControlName="pesoNeto"
+                type="number"
+                step="0.01"
+                placeholder="0.00"
+                class="w-full border border-gray-300 rounded-xl px-4 py-3 pr-12 input-focus text-gray-700 placeholder-gray-400"
+              />
+              <span
+                class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 text-sm font-medium"
+                >kg</span
+              >
+            </div>
+          </div>
+        </div>
+
+        <!-- Información Financiera -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8 pt-6 border-t border-gray-200">
+          <!-- Precio Total -->
+          <div class="space-y-2">
+            <label class="block text-sm font-semibold text-gray-700">
+              <i class="fas fa-dollar-sign mr-2 text-blue-500"></i>Precio Total
+              <span class="text-red-500">*</span>
+            </label>
+            <div class="relative">
+              <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-medium"
+                >Bs.</span
+              >
+              <input
+                formControlName="precioTotal"
+                type="number"
+                step="0.01"
+                placeholder="0.00"
+                class="w-full border border-gray-300 rounded-xl pl-12 pr-4 py-3 input-focus text-gray-700 placeholder-gray-400"
+              />
+            </div>
+          </div>
+
+          <!-- Saldo a Depositar -->
+          <div class="space-y-2">
+            <label class="block text-sm font-semibold text-gray-700">
+              <i class="fas fa-piggy-bank mr-2 text-blue-500"></i>Saldo a Depositar
+              <span class="text-red-500">*</span>
+            </label>
+            <div class="relative">
+              <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-medium"
+                >Bs.</span
+              >
+              <input
+                formControlName="saldoDepositar"
+                type="number"
+                step="0.01"
+                placeholder="0.00"
+                class="w-full border border-gray-300 rounded-xl pl-12 pr-4 py-3 input-focus text-gray-700 placeholder-gray-400"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Gastos y Devoluciones -->
+      <div class="section-card">
+        <div class="flex items-center mb-6">
+          <div class="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center mr-4">
+            <fa-icon [icon]="faReceipt" class="text-white"></fa-icon>
+          </div>
+          <h2 class="text-2xl font-semibold text-gray-800">Gastos y Devoluciones</h2>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="space-y-2">
+            <label class="block text-sm font-semibold text-gray-700">
+              <i class="fas fa-undo mr-2 text-orange-500"></i>Precio Devolución
+            </label>
+            <div class="relative">
+              <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-medium"
+                >Bs.</span
+              >
+              <input
+                formControlName="precioDevolucion"
+                type="number"
+                step="0.01"
+                placeholder="0.00"
+                class="w-full border border-gray-300 rounded-xl pl-12 pr-4 py-3 input-focus text-gray-700 placeholder-gray-400"
+              />
+            </div>
+          </div>
+
+          <div class="space-y-2">
+            <label class="block text-sm font-semibold text-gray-700">
+              <i class="fas fa-arrow-left mr-2 text-orange-500"></i>Total Devolución
+            </label>
+            <div class="relative">
+              <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-medium"
+                >Bs.</span
+              >
+              <input
+                formControlName="totalDevolucion"
+                type="number"
+                step="0.01"
+                placeholder="0.00"
+                class="w-full border border-gray-300 rounded-xl pl-12 pr-4 py-3 input-focus text-gray-700 placeholder-gray-400"
+              />
+            </div>
+          </div>
+
+          <div class="space-y-2">
+            <label class="block text-sm font-semibold text-gray-700">
+              <i class="fas fa-money-bill-wave mr-2 text-orange-500"></i>Otros Gastos
+            </label>
+            <div class="relative">
+              <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-medium"
+                >Bs.</span
+              >
+              <input
+                formControlName="otrosGastos"
+                type="number"
+                step="0.01"
+                placeholder="0.00"
+                class="w-full border border-gray-300 rounded-xl pl-12 pr-4 py-3 input-focus text-gray-700 placeholder-gray-400"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Detalle de Faena -->
+      <div class="section-card">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
+          <div class="flex items-center">
+            <div class="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center mr-4">
+              <fa-icon [icon]="faCut" class="text-white"></fa-icon>
+            </div>
+            <h2 class="text-2xl font-semibold text-gray-800">Detalle de Faena</h2>
+            <span
+              class="ml-4 bg-blue-100 text-blue-800 text-sm font-medium px-2.5 py-0.5 rounded-full"
+            >
+              {{ detalleFaena.length }} {{ detalleFaena.length === 1 ? 'detalle' : 'detalles' }}
+            </span>
+          </div>
+          <button
+            type="button"
+            (click)="addDetalleFaena()"
+            class="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center gap-2"
+          >
+            <i class="fas fa-plus"></i>
+            Agregar Detalle
+          </button>
+        </div>
+
+        <!-- Información sobre la sincronización automática -->
+        <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6">
+          <div class="flex items-start">
+            <i class="fas fa-info-circle text-blue-500 mt-0.5 mr-3"></i>
+            <div>
+              <h3 class="text-sm font-semibold text-blue-800">Sincronización Automática</h3>
+              <p class="text-sm text-blue-600 mt-1">
+                Los detalles de faena se ajustarán automáticamente al cambiar el número de reses.
+                Actualmente hay <strong>{{ form.get('numeroReses')?.value || 0 }}</strong> reses
+                configuradas.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div formArrayName="detalleFaena" class="space-y-4">
+          @for ( d of detalleFaena.controls; track $index) {
+          <div
+            [formGroupName]="$index"
+            class="bg-white border border-gray-200 rounded-2xl p-4 md:p-6 relative shadow-sm hover:shadow-md transition-all duration-200"
+          >
+            <div class="absolute top-4 right-4 flex items-center gap-2">
+              <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-1 rounded-full">
+                Res #{{ $index + 1 }}
+              </span>
+              <button
+                type="button"
+                (click)="removeDetalleFaena($index)"
+                class="w-8 h-8 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center transition-all duration-200 shadow-lg hover:shadow-xl"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="18"
+                  height="12"
+                  fill="currentColor"
+                  class="bi bi-x"
+                  viewBox="0 0 16 16"
+                >
+                  <path
+                    d="M1.5 1.5a.5.5 0 0 1 .707 0L8 7.293 14.793 1.5a.5.5 0 1 1 .707.707L8.707 8l6.793 6.793a.5.5 0 0 1-.707.707L8 8.707l-6.793 6.793a.5.5 0 0 1-.707-.707L7.293 8 1.5 1.5z"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 pr-20">
+              <div>
+                <label class="block text-xs font-semibold text-gray-600 mb-1">
+                  <i class="fas fa-meat mr-1 text-green-500"></i>Tipo de Res
+                </label>
+                <select
+                  formControlName="tipoRes"
+                  class="w-full border border-gray-300 rounded-lg px-3 py-2.5 input-focus text-sm"
+                >
+                  <option value="">Seleccionar...</option>
+                  <option value="VACA">VACA</option>
+                  <option value="TORO">TORO</option>
+                  <option value="BECERRO">BECERRO</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-gray-600 mb-1">
+                  <i class="fas fa-weight mr-1 text-green-500"></i>Peso (kg)
+                </label>
+                <input
+                  formControlName="pesoRes"
+                  type="number"
+                  step="0.01"
+                  placeholder="0.00"
+                  class="w-full border border-gray-300 rounded-lg px-3 py-2.5 input-focus text-sm"
+                />
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-gray-600 mb-1">
+                  <i class="fas fa-dollar-sign mr-1 text-green-500"></i>Precio (Bs.)
+                </label>
+                <input
+                  formControlName="precioRes"
+                  type="number"
+                  step="0.01"
+                  placeholder="0.00"
+                  class="w-full border border-gray-300 rounded-lg px-3 py-2.5 input-focus text-sm"
+                />
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-gray-600 mb-1">
+                  <i class="fas fa-hashtag mr-1 text-green-500"></i>Peso Total
+                </label>
+                <input
+                  formControlName="pesoTotal"
+                  step="1"
+                  placeholder="1"
+                  class="w-full border border-gray-300 rounded-lg px-3 py-2.5 input-focus text-sm"
+                />
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-gray-600 mb-1">
+                  <i class="fas fa-ruler mr-1 text-green-500"></i>Unidad
+                </label>
+                <select
+                  formControlName="unidad"
+                  class="w-full border border-gray-300 rounded-lg px-3 py-2.5 input-focus text-sm"
+                >
+                  <option value="KG">Kilogramos</option>
+                  <option value="UNIDAD">Unidad</option>
+                  <option value="LIBRA">Libra</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          }
+
+          <!-- Estado vacío -->
+          @if(detalleFaena.length === 0){
+          <div class="text-center py-12">
+             <fa-icon [icon]="faCut " class="text-gray"></fa-icon>
+            <p class="text-gray-500 text-lg">No hay detalles de faena agregados</p>
+            <p class="text-gray-400 text-sm mt-1">
+              Ingresa el número de reses para generar automáticamente los detalles
+            </p>
+          </div>
+          }
+        </div>
+      </div>
+
+      <!-- Transportes -->
+      <div class="section-card">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
+          <div class="flex items-center">
+            <div class="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center mr-4">
+              <fa-icon [icon]="faTruck" class="text-white"></fa-icon>
+            </div>
+            <h2 class="text-2xl font-semibold text-gray-800">Transportes</h2>
+            <span
+              class="ml-4 bg-purple-100 text-purple-800 text-sm font-medium px-2.5 py-0.5 rounded-full"
+            >
+              {{ transportes.length }} {{ transportes.length === 1 ? 'transporte' : 'transportes' }}
+            </span>
+          </div>
+          <button
+            type="button"
+            (click)="addTransporte()"
+            class="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center gap-2"
+          >
+            <i class="fas fa-plus"></i>
+            Agregar Transporte
+          </button>
+        </div>
+
+        <div formArrayName="transportes" class="space-y-4">
+          @for (t of transportes.controls;track $index) {
+
+          <div
+            [formGroupName]="$index"
+            class="bg-white border border-gray-200 rounded-2xl p-4 md:p-6 relative shadow-sm hover:shadow-md transition-all duration-200"
+          >
+            <button
+              type="button"
+              (click)="removeTransporte($index)"
+              class="absolute -top-2 -right-2 w-8 h-8 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center transition-all duration-200 shadow-lg hover:shadow-xl z-10"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="18"
+                height="12"
+                fill="currentColor"
+                class="bi bi-x"
+                viewBox="0 0 16 16"
+              >
+                <path
+                  d="M1.5 1.5a.5.5 0 0 1 .707 0L8 7.293 14.793 1.5a.5.5 0 1 1 .707.707L8.707 8l6.793 6.793a.5.5 0 0 1-.707.707L8 8.707l-6.793 6.793a.5.5 0 0 1-.707-.707L7.293 8 1.5 1.5z"
+                />
+              </svg>
+            </button>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                  <i class="fas fa-tags mr-2 text-purple-500"></i>Tipo de Transporte
+                </label>
+                <select
+                  formControlName="tipo"
+                  class="w-full border border-gray-300 rounded-xl px-4 py-3 input-focus text-gray-700"
+                >
+                  <option value="" disabled [selected]>Seleccionar tipo</option>
+                  <option value="LOCAL">Local</option>
+                  <option value="DEPARTAMENTAL">Departamental</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                  <i class="fas fa-dollar-sign mr-2 text-purple-500"></i>Costo
+                </label>
+                <div class="relative">
+                  <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-medium"
+                    >Bs.</span
+                  >
+                  <input
+                    formControlName="costo"
+                    type="number"
+                    step="0.01"
+                    placeholder="0.00"
+                    class="w-full border border-gray-300 rounded-xl pl-12 pr-4 py-3 input-focus text-gray-700 placeholder-gray-400"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                  <i class="fas fa-align-left mr-2 text-purple-500"></i>Descripción
+                </label>
+                <input
+                  formControlName="descripcion"
+                  placeholder="Descripción del transporte"
+                  class="w-full border border-gray-300 rounded-xl px-4 py-3 input-focus text-gray-700 placeholder-gray-400"
+                />
+              </div>
+            </div>
+          </div>
+
+          }
+
+          <!-- Estado vacío -->
+          @if(transportes.length === 0){
+          <div class="text-center py-12">
+            <fa-icon [icon]="faTruck" class="text-gray"></fa-icon>
+            <p class="text-gray-500 text-lg">No hay transportes agregados</p>
+            <p class="text-gray-400 text-sm mt-1">Haz clic en "Agregar Transporte" para comenzar</p>
+          </div>
+          }
+        </div>
+      </div>
+
+      <!-- Resumen -->
+      <div class="bg-gradient-to-r from-blue-50 to-cyan-50 rounded-2xl p-6 border border-blue-200">
+        <h3 class="text-lg font-semibold text-blue-800 mb-4 flex items-center">
+          <i class="fas fa-calculator mr-2"></i>
+          Resumen de la Faena
+        </h3>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div class="text-center">
+            <p class="text-sm text-blue-600">Reses</p>
+            <p class="text-2xl font-bold text-blue-800">
+              {{ form.get('numeroReses')?.value || 0 }}
+            </p>
+          </div>
+          <div class="text-center">
+            <p class="text-sm text-blue-600">Detalles</p>
+            <p class="text-2xl font-bold text-blue-800">{{ detalleFaena.length }}</p>
+          </div>
+          <div class="text-center">
+            <p class="text-sm text-blue-600">Transportes</p>
+            <p class="text-2xl font-bold text-blue-800">{{ transportes.length }}</p>
+          </div>
+          <div class="text-center">
+            <p class="text-sm text-blue-600">Saldo</p>
+            <p class="text-2xl font-bold text-blue-800">
+              {{ form.get('saldoDepositar')?.value || 0 | currency : 'BOB' : 'symbol' : '1.2-2' }}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Botones de acción -->
+      <div class="flex justify-end gap-3 pt-6 border-t border-gray-200">
+        <button
+          type="button"
+          class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg font-medium transition-all duration-200 border border-gray-300 flex items-center justify-center gap-2 text-sm"
+        >
+          <i class="fas fa-times"></i>
+          Cancelar
+        </button>
+
+        <button
+          type="submit"
+          [disabled]="form.invalid"
+          class="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:from-gray-300 disabled:to-gray-400 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 disabled:transform-none disabled:shadow-none disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm"
+        >
+          <i class="fas fa-save"></i>
+          Guardar
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

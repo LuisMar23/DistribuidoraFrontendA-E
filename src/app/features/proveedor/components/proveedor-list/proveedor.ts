@@ -17,7 +17,7 @@ import {
   faTrash,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { ProveedorDto } from '../../../../core/interfaces/proveedor.interface';
+import { ProveedorDto } from '../../../../core/interfaces/suplier.interface';
 
 import { CommonModule } from '@angular/common';
 import { NotificationService } from '../../../../core/services/notification.service';
@@ -148,12 +148,12 @@ export class ProveedorComponent {
           this._notificationService.showSuccess('Eliminado correctamente');
           this.proveedorService.delete(data.id_proveedor).subscribe(() => this.loadProveedores());
         }
-      });
+    });
   }
   view(p: any) {}
   ordenarProveedores() {
     const col = this.sortColumn();
-    const dir = this.sortDirection(); 
+    const dir = this.sortDirection();
     if (!col) return;
 
     const arr = [...this.proveedores()];

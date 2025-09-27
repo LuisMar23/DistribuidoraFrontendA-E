@@ -22,6 +22,7 @@ import {
   faTimes,
   faStore,
   faTachometerAlt,
+  faCow,
 } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
@@ -41,6 +42,7 @@ export class Sidebar {
   faMoon = faMoon;
   faUsers=faUsers
   faStore=faStore
+  faCow=faCow;
  faDashboard = faTachometerAlt;
   imagen:string=''
   constructor(){
@@ -51,6 +53,7 @@ export class Sidebar {
   menu: { label: string; icon: IconDefinition; route: string }[] = [
     { label: 'Dashboard', icon:faTachometerAlt, route: '/dashboard' },
     { label: 'Proveedores', icon: faStore, route: '/proveedores' },
+    { label: 'Faenas', icon: faCow, route: '/faenas' },
     { label: 'Ventas', icon: faShoppingCart, route: '/ventas' },
     { label: 'Productos', icon: faBox, route: '/productos' },
     { label: 'Clientes', icon: faUsers, route: '/clientes' },
@@ -59,6 +62,7 @@ export class Sidebar {
     { label: 'Caja', icon: faCashRegister, route: '/caja' },
     { label: 'Usuarios', icon: faUsers, route: '/users' },
     { label: 'Ajustes', icon: faCog, route: '/ajustes' },
+
   ];
 
   toggleSidebar() {

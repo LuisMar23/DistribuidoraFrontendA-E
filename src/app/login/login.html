@@ -5,7 +5,7 @@
     <div class="text-center mb-8">
       <h2 class="text-3xl font-bold text-gray-800">Iniciar Sesión</h2>
       <p class="mt-2 text-sm text-gray-500">
-        O <a routerLink="/register" class="font-medium text-blue-600 hover:text-blue-500 underline">crea una cuenta nueva</a>
+        O <a [routerLink]="['/login/registrar']"     class="font-medium text-blue-600 hover:text-blue-500 underline">crea una cuenta nueva</a>
       </p>
     </div>
 
@@ -58,7 +58,7 @@
           <input type="checkbox" formControlName="rememberMe" class="h-4 w-4 text-blue-600 rounded focus:ring-blue-500 border-gray-300">
           <span class="text-sm font-medium">Recordarme</span>
         </label>
-        <a routerLink="/forgot-password" class="text-sm font-medium text-blue-600 hover:text-blue-500 underline">¿Olvidaste tu contraseña?</a>
+        <a [routerLink]="['/login/cambiar-contraseña']" class="text-sm font-medium text-blue-600 hover:text-blue-500 underline">¿Olvidaste tu contraseña?</a>
       </div>
 
       <!-- Submit -->

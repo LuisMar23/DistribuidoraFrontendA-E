@@ -45,6 +45,7 @@ export class AuthService {
   }
 
   register(data: RegisterDto): Observable<RegisterDto> {
+    console.log(data)
     return this.http.post(`${this.apiUrl}/auth/register`, data).pipe(
       tap((res: any) => {
         if (res.access_token) {
