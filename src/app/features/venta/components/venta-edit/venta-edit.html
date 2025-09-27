@@ -7,7 +7,7 @@
     <div class="bg-blue-100 text-blue-600 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full">
         <fa-icon [icon]="faShoppingCart" class="text-lg md:text-xl"></fa-icon>
     </div>
-    <h2 class="text-lg md:text-xl font-bold font-sans text-gray-800">Editar Venta</h2>
+    <h2 class="text-lg md:text-xl font-bold font-sans text-gray-800">Editar Venta #{{ ventaId() }}</h2>
 </div>
 
 <div class="max-w-6xl mx-auto p-2 md:p-5 bg-white rounded-2xl shadow-xl">
@@ -38,10 +38,10 @@
                 </label>
                 <div class="w-full border border-gray-300 rounded-xl px-4 py-3 bg-gray-100">
                     @if (usuarioActual()) {
-                    <span class="font-semibold text-gray-800">{{ usuarioActual()!.nombre }}</span>
-                    <input type="hidden" formControlName="id_usuario">
+                        <span class="font-semibold text-gray-800">{{ usuarioActual()!.nombre }}</span>
+                        <input type="hidden" formControlName="id_usuario">
                     } @else {
-                    <span class="text-red-500">No se pudo cargar el usuario</span>
+                        <span class="text-red-500">No se pudo cargar el usuario</span>
                     }
                 </div>
                 <small class="text-gray-500 text-xs">Usuario autenticado actualmente</small>
@@ -128,7 +128,7 @@
                     <!-- Subtotal -->
                     <div class="md:col-span-2">
                         <label class="block text-sm font-semibold text-gray-700 mb-2">Subtotal</label>
-                        <input [value]="detalle.get('subtotal')?.value || 0" type="number" step="0.01" readonly
+                        <input formControlName="subtotal" type="number" step="0.01" readonly
                             class="w-full border border-gray-300 rounded-xl px-3 py-2 bg-gray-100 font-semibold" />
                     </div>
 
@@ -144,7 +144,7 @@
                 }
             </div>
 
-            @if (detallesLength() === 0) {
+            @if (detalles.length === 0) {
             <div class="text-center py-8 text-gray-500">
                 <i class="fas fa-shopping-basket text-4xl mb-2"></i>
                 <p>No hay productos agregados</p>
@@ -159,7 +159,7 @@
                 <label class="block text-sm font-semibold text-gray-700 mb-2">
                     <i class="fas fa-dollar-sign mr-2 text-[#2196f3]"></i>Subtotal *
                 </label>
-                <input [value]="subtotalTotal() | number:'1.2-2'" type="text" readonly
+                <input formControlName="subtotal" type="number" step="0.01" readonly
                     class="w-full border border-gray-300 rounded-xl px-4 py-3 bg-gray-50 font-semibold text-lg" />
             </div>
 
@@ -168,8 +168,8 @@
                 <label class="block text-sm font-semibold text-gray-700 mb-2">
                     <i class="fas fa-tag mr-2 text-[#2196f3]"></i>Descuento
                 </label>
-                <input formControlName="descuento" type="number" step="0.01" min="0" placeholder="0.00"
-                    (blur)="calcularTotales()"
+                <input formControlName="descuento" type="number" step="0.01" placeholder="0.00"
+                    (blur)="onDescuentoChange()"
                     class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#2196f3] focus:border-transparent shadow-sm transition-all" />
             </div>
 
@@ -178,7 +178,7 @@
                 <label class="block text-sm font-semibold text-gray-700 mb-2">
                     <i class="fas fa-calculator mr-2 text-[#2196f3]"></i>Total *
                 </label>
-                <input [value]="totalGeneral() | number:'1.2-2'" type="text" readonly
+                <input formControlName="total" type="number" step="0.01" readonly
                     class="w-full border border-gray-300 rounded-xl px-4 py-3 bg-gray-50 font-semibold text-lg text-green-600" />
             </div>
         </div>

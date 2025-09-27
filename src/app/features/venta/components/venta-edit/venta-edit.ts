@@ -1,7 +1,6 @@
 import { Component, inject, signal, OnInit, computed } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormArray } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
-import { DecimalPipe } from '@angular/common';
 
 import {
   faShoppingCart,
@@ -21,9 +20,8 @@ import { ClientDto } from '../../../../core/interfaces/client.interface';
 import { UserDto } from '../../../../core/interfaces/user.interface';
 import { ProductDto } from '../../../../core/interfaces/product.interface';
 import { AuthService } from '../../../../components/services/auth.service';
-import { VentaDto } from '../../../../core/interfaces/venta.interface';
 
-// Interfaces locales para adaptar los datos
+// Interfaces locales (MISMO QUE CREATE)
 interface ClienteOption {
   id_cliente: number;
   nombre: string;
@@ -46,7 +44,7 @@ interface ProductoOption {
 @Component({
   selector: 'app-venta-edit',
   standalone: true,
-  imports: [ReactiveFormsModule, FontAwesomeModule, CommonModule, DecimalPipe],
+  imports: [ReactiveFormsModule, FontAwesomeModule, CommonModule],
   templateUrl: './venta-edit.html',
   styleUrl: './venta-edit.css',
 })
@@ -74,160 +72,100 @@ export class VentaEditComponent implements OnInit {
   clientes = signal<ClienteOption[]>([]);
   usuarioActual = signal<UsuarioOption | null>(null);
   productos = signal<ProductoOption[]>([]);
-  ventaId = signal<number | null>(null);
-  datosCargados = signal(false);
+  ventaId = signal<number>(0);
 
   // Form
   form: FormGroup;
 
   // Computed values
   detallesLength = computed(() => this.detalles.length);
-  subtotalTotal = computed(() => {
-    const total = this.detalles.controls.reduce((total, detalle) => {
-      const subtotal = parseFloat(detalle.get('subtotal')?.value) || 0;
-      return total + subtotal;
-    }, 0);
-    return total;
-  });
-
-  totalGeneral = computed(() => {
-    const descuento = parseFloat(this.form.get('descuento')?.value) || 0;
-    const subtotal = this.subtotalTotal();
-    const total = Math.max(0, subtotal - descuento);
-    return total;
-  });
 
   constructor() {
     this.form = this._fb.group({
       id_cliente: ['', Validators.required],
       id_usuario: ['', Validators.required],
       fecha_venta: ['', Validators.required],
-      subtotal: [0, [Validators.required, Validators.min(0)]],
-      descuento: [0, [Validators.min(0)]],
-      total: [0, [Validators.required, Validators.min(0)]],
+      subtotal: [0],
+      descuento: [0],
+      total: [0],
       metodo_pago: ['efectivo', Validators.required],
       estado: ['pendiente', Validators.required],
-      detalles: this._fb.array([]), // Sin validators required inicial
+      detalles: this._fb.array([]),
     });
   }
 
   ngOnInit() {
+    const id = this._route.snapshot.paramMap.get('id');
+    if (id) {
+      this.ventaId.set(parseInt(id));
+      this.loadVenta();
+    } else {
+      this._notificationService.showError('ID de venta no válido');
+      this._router.navigate(['/ventas']);
+      return;
+    }
+
     this.loadUsuarioActual();
     this.loadDatos();
   }
 
-  private loadDatos() {
-    // Cargar clientes y productos primero
+  private loadVenta() {
     this.isLoading.set(true);
-
-    // Cargar clientes
-    this._clienteService.getAll().subscribe({
-      next: (clientes: ClientDto[]) => {
-        const clientesOptions: ClienteOption[] = clientes.map((cliente) => ({
-          id_cliente: cliente.id_cliente || 0,
-          nombre: cliente.nombre || 'Cliente sin nombre',
-        }));
-        this.clientes.set(clientesOptions);
-
-        // Cargar productos
-        this._productoService.getAll().subscribe({
-          next: (productos: ProductDto[]) => {
-            const productosOptions: ProductoOption[] = productos
-              .filter((producto) => producto.estado)
-              .map((producto) => ({
-                id_producto: producto.id_producto || 0,
-                nombre: producto.nombre || 'Producto sin nombre',
-                precio_venta: producto.precio_base || 0,
-                stock: producto.stock_actual || 0,
-                categoria: producto.categoria || '',
-                unidad_medida: producto.unidad_medida || '',
-              }));
-            this.productos.set(productosOptions);
-
-            // Una vez cargados los productos, cargar la venta
-            this.loadVenta();
-          },
-          error: (error) => {
-            console.error('Error loading productos:', error);
-            this._notificationService.showError('Error al cargar los productos');
-            this.isLoading.set(false);
-          },
-        });
-      },
-      error: (error) => {
-        console.error('Error loading clientes:', error);
-        this._notificationService.showError('Error al cargar los clientes');
+    this._ventaService.getById(this.ventaId()).subscribe({
+      next: (venta) => {
+        this.patchFormWithVentaData(venta);
         this.isLoading.set(false);
       },
+      error: (error) => {
+        console.error('Error loading venta:', error);
+        this._notificationService.showError('Error al cargar la venta');
+        this.isLoading.set(false);
+        this._router.navigate(['/ventas']);
+      }
     });
   }
 
-  private loadVenta() {
-    const id = this._route.snapshot.paramMap.get('id');
-    if (id) {
-      this.ventaId.set(parseInt(id));
-
-      this._ventaService.getById(parseInt(id)).subscribe({
-        next: (venta: VentaDto) => {
-          this.cargarDatosVenta(venta);
-          this.datosCargados.set(true);
-          this.isLoading.set(false);
-        },
-        error: (error) => {
-          console.error('Error loading venta:', error);
-          this._notificationService.showError('Error al cargar la venta');
-          this.isLoading.set(false);
-        },
-      });
-    } else {
-      this.isLoading.set(false);
-    }
-  }
-
-  private cargarDatosVenta(venta: VentaDto) {
-    console.log('Cargando venta:', venta);
-
-    // Formatear fecha para el input datetime-local
+  private patchFormWithVentaData(venta: any) {
+    // Formatear fecha
     const fechaVenta = new Date(venta.fecha_venta);
-    const fechaFormateada = fechaVenta.toISOString().slice(0, 16);
+    const formattedDate = fechaVenta.toISOString().slice(0, 16);
 
-    // Cargar los detalles de la venta
+    // Limpiar detalles existentes
+    while (this.detalles.length !== 0) {
+      this.detalles.removeAt(0);
+    }
+
+    // Cargar detalles de la venta
     if (venta.detalles && venta.detalles.length > 0) {
-      this.detalles.clear();
-      venta.detalles.forEach((detalle) => {
-        this.agregarDetalleConDatos(detalle);
+      venta.detalles.forEach((detalle: any) => {
+        this.agregarDetalleExistente(detalle);
       });
     }
 
-    // Cargar el resto del formulario
+    // Actualizar formulario
     this.form.patchValue({
-      id_cliente: venta.id_cliente.toString(),
-      id_usuario: venta.id_usuario.toString(),
-      fecha_venta: fechaFormateada,
+      id_cliente: venta.id_cliente,
+      id_usuario: venta.id_usuario,
+      fecha_venta: formattedDate,
       subtotal: venta.subtotal,
-      descuento: venta.descuento || 0,
+      descuento: venta.descuento,
       total: venta.total,
       metodo_pago: venta.metodo_pago,
-      estado: venta.estado,
+      estado: venta.estado
     });
 
-    // Forzar cálculo y actualización de totales
-    this.actualizarTotalesFormulario();
+    this.actualizarTotales();
   }
 
-  private actualizarTotalesFormulario() {
-    const subtotal = this.subtotalTotal();
-    const total = this.totalGeneral();
+  private agregarDetalleExistente(detalleData: any) {
+    const detalleForm = this._fb.group({
+      id_producto: [detalleData.productoId.toString(), Validators.required],
+      cantidad: [detalleData.cantidad, [Validators.required, Validators.min(1)]],
+      precio_unitario: [detalleData.precioUnitario, [Validators.required, Validators.min(0)]],
+      subtotal: [detalleData.subtotal, [Validators.required, Validators.min(0)]],
+    });
 
-    this.form.patchValue(
-      {
-        subtotal: subtotal,
-        total: total,
-      },
-      { emitEvent: false }
-    ); // Evitar bucles de actualización
-
-    console.log('Totales calculados - Subtotal:', subtotal, 'Total:', total);
+    this.detalles.push(detalleForm);
   }
 
   private loadUsuarioActual() {
@@ -242,7 +180,48 @@ export class VentaEditComponent implements OnInit {
       this.usuarioActual.set(usuarioOption);
     } else {
       console.warn('No se encontró usuario autenticado');
+      this._notificationService.showError(
+        'No se pudo identificar al usuario. Por favor, inicie sesión nuevamente.'
+      );
     }
+  }
+
+  private loadDatos() {
+    // Cargar clientes
+    this._clienteService.getAll().subscribe({
+      next: (clientes: ClientDto[]) => {
+        const clientesOptions: ClienteOption[] = clientes.map((cliente) => ({
+          id_cliente: cliente.id_cliente || 0,
+          nombre: cliente.nombre || 'Cliente sin nombre',
+        }));
+        this.clientes.set(clientesOptions);
+      },
+      error: (error) => {
+        console.error('Error loading clientes:', error);
+        this._notificationService.showError('Error al cargar los clientes');
+      },
+    });
+
+    // Cargar productos
+    this._productoService.getAll().subscribe({
+      next: (productos: ProductDto[]) => {
+        const productosOptions: ProductoOption[] = productos
+          .filter((producto) => producto.estado)
+          .map((producto) => ({
+            id_producto: producto.id_producto || 0,
+            nombre: producto.nombre || 'Producto sin nombre',
+            precio_venta: producto.precio_base || 0,
+            stock: producto.stock_actual || 0,
+            categoria: producto.categoria || '',
+            unidad_medida: producto.unidad_medida || '',
+          }));
+        this.productos.set(productosOptions);
+      },
+      error: (error) => {
+        console.error('Error loading productos:', error);
+        this._notificationService.showError('Error al cargar los productos');
+      },
+    });
   }
 
   // Getter para el FormArray de detalles
@@ -250,7 +229,26 @@ export class VentaEditComponent implements OnInit {
     return this.form.get('detalles') as FormArray;
   }
 
-  // Agregar detalle vacío
+  // Calcular subtotal total de todos los productos
+  calcularSubtotalTotal(): number {
+    let total = 0;
+    for (let i = 0; i < this.detalles.length; i++) {
+      const detalle = this.detalles.at(i);
+      const cantidad = Number(detalle.get('cantidad')?.value) || 0;
+      const precioUnitario = Number(detalle.get('precio_unitario')?.value) || 0;
+      total += cantidad * precioUnitario;
+    }
+    return total;
+  }
+
+  // Calcular total general
+  calcularTotalGeneral(): number {
+    const subtotal = this.calcularSubtotalTotal();
+    const descuento = Number(this.form.get('descuento')?.value) || 0;
+    return Math.max(0, subtotal - descuento);
+  }
+
+  // Agregar detalle
   agregarDetalle() {
     const detalleForm = this._fb.group({
       id_producto: ['', Validators.required],
@@ -262,30 +260,10 @@ export class VentaEditComponent implements OnInit {
     this.detalles.push(detalleForm);
   }
 
-  // Agregar detalle con datos existentes
-  agregarDetalleConDatos(detalle: any) {
-    console.log('Agregando detalle:', detalle);
-
-    const detalleForm = this._fb.group({
-      id_producto: [
-        detalle.id_producto?.toString() || detalle.productoId?.toString() || '',
-        Validators.required,
-      ],
-      cantidad: [detalle.cantidad || 1, [Validators.required, Validators.min(1)]],
-      precio_unitario: [
-        detalle.precio_unitario || detalle.precioUnitario || 0,
-        [Validators.required, Validators.min(0)],
-      ],
-      subtotal: [detalle.subtotal || 0, [Validators.required, Validators.min(0)]],
-    });
-
-    this.detalles.push(detalleForm);
-  }
-
   // Eliminar detalle
   eliminarDetalle(index: number) {
     this.detalles.removeAt(index);
-    this.calcularTotales();
+    this.actualizarTotales();
   }
 
   // Cuando se selecciona un producto, cargar su precio
@@ -326,88 +304,59 @@ export class VentaEditComponent implements OnInit {
 
   // Calcular subtotal de un detalle
   calcularSubtotalDetalle(index: number) {
+    if (index < 0 || index >= this.detalles.length) return;
+
     const detalle = this.detalles.at(index);
-    const cantidad = parseFloat(detalle.get('cantidad')?.value) || 0;
-    const precioUnitario = parseFloat(detalle.get('precio_unitario')?.value) || 0;
+    const cantidad = Number(detalle.get('cantidad')?.value) || 0;
+    const precioUnitario = Number(detalle.get('precio_unitario')?.value) || 0;
     const subtotal = cantidad * precioUnitario;
 
-    detalle.patchValue({ subtotal: subtotal });
-
-    // Validar stock después del cálculo
-    this.validarStock(index);
-    this.calcularTotales();
+    detalle.patchValue({ subtotal: subtotal }, { emitEvent: false });
+    this.actualizarTotales();
   }
 
-  // Calcular totales generales
-  calcularTotales() {
-    this.actualizarTotalesFormulario();
+  // Actualizar totales
+  actualizarTotales() {
+    const subtotal = this.calcularSubtotalTotal();
+    const total = this.calcularTotalGeneral();
+
+    this.form.patchValue({
+      subtotal: subtotal,
+      total: total
+    });
   }
 
-  // Cuando cambia el descuento
   onDescuentoChange() {
-    this.calcularTotales();
-  }
-
-  // Función para formatear la fecha correctamente para Prisma
-  private formatDateForPrisma(dateString: string): string {
-    if (!dateString) return new Date().toISOString();
-
-    // Si ya tiene formato ISO con 'T', mantenerlo
-    if (dateString.includes('T')) {
-      const date = new Date(dateString);
-      return date.toISOString();
-    }
-
-    // Si es datetime-local (YYYY-MM-DDTHH:MM), convertirlo
-    if (dateString.includes('-') && dateString.includes(':')) {
-      const date = new Date(dateString);
-      return date.toISOString();
-    }
-
-    // Formato por defecto
-    const date = new Date(dateString);
-    return date.toISOString();
+    this.actualizarTotales();
   }
 
   submit() {
-    // CORRECCIÓN: Solo validar si no hay detalles cuando tampoco hay datos cargados
-    if (this.detallesLength() === 0 && !this.datosCargados()) {
-      this._notificationService.showError('Debe haber al menos un producto en la venta');
+    this.form.markAllAsTouched();
+    this.actualizarTotales();
+
+    // Validar detalles
+    let detallesValidos = true;
+    for (let i = 0; i < this.detalles.length; i++) {
+      const detalle = this.detalles.at(i);
+      detalle.markAllAsTouched();
+      
+      if (detalle.invalid) {
+        detallesValidos = false;
+        const idProducto = detalle.get('id_producto')?.value;
+        if (!idProducto) {
+          this._notificationService.showError(`Seleccione un producto para la línea ${i + 1}`);
+          return;
+        }
+      }
+    }
+
+    if (this.form.invalid || !detallesValidos) {
+      this._notificationService.showError('Por favor, complete todos los campos requeridos correctamente');
       return;
     }
 
-    // CORRECCIÓN: Si hay datos cargados pero se eliminaron todos los detalles, permitir guardar
-    if (this.detallesLength() === 0 && this.datosCargados()) {
-      // Permitir guardar incluso sin detalles si ya había datos cargados
-      // Esto permite editar otros campos de la venta sin necesidad de productos
-    }
-
-    // Marcar todos los campos como touched para mostrar errores
-    this.form.markAllAsTouched();
-
-    if (this.form.invalid) {
-      // Verificar qué campos son inválidos
-      if (this.form.get('id_cliente')?.invalid) {
-        this._notificationService.showError('Seleccione un cliente');
-      }
-      if (this.form.get('fecha_venta')?.invalid) {
-        this._notificationService.showError('La fecha de venta es requerida');
-      }
-
-      // Verificar detalles inválidos solo si hay detalles
-      if (this.detallesLength() > 0) {
-        let detallesInvalidos = false;
-        this.detalles.controls.forEach((detalle, index) => {
-          if (detalle.invalid) {
-            detallesInvalidos = true;
-          }
-        });
-
-        if (detallesInvalidos) {
-          this._notificationService.showError('Verifique los productos agregados');
-        }
-      }
-
+    if (this.detalles.length === 0) {
+      this._notificationService.showError('Debe agregar al menos un producto a la venta');
       return;
     }
 
@@ -418,70 +367,57 @@ export class VentaEditComponent implements OnInit {
       return;
     }
 
-    // Validar stock final antes de enviar solo si hay detalles
-    if (this.detallesLength() > 0) {
-      let stockValido = true;
-      this.detalles.controls.forEach((detalle, index) => {
-        if (!this.validarStock(index)) {
-          stockValido = false;
-        }
-      });
-
-      if (!stockValido) {
-        this._notificationService.showError('Verifique las cantidades de los productos');
+    // Validar stock
+    for (let i = 0; i < this.detalles.length; i++) {
+      if (!this.validarStock(i)) {
         return;
       }
     }
 
     this.isLoading.set(true);
 
-    // Asegurar que los totales estén actualizados
-    this.calcularTotales();
-
-    // Preparar datos para enviar
+    // Preparar datos
     const formData = this.form.value;
-    const fechaVentaFormateada = this.formatDateForPrisma(formData.fecha_venta);
+    const fechaVentaFormateada = formData.fecha_venta.length === 16 
+      ? formData.fecha_venta + ':00' 
+      : formData.fecha_venta;
 
-    const data = {
+    const ventaData = {
       id_cliente: parseInt(formData.id_cliente),
       id_usuario: this.usuarioActual()!.id_usuario,
       fecha_venta: fechaVentaFormateada,
-      subtotal: this.subtotalTotal(),
+      subtotal: parseFloat(formData.subtotal) || 0,
       descuento: parseFloat(formData.descuento) || 0,
-      total: this.totalGeneral(),
+      total: parseFloat(formData.total) || 0,
       metodo_pago: formData.metodo_pago,
       estado: formData.estado,
-      detalles:
-        this.detallesLength() > 0
-          ? formData.detalles.map((detalle: any) => ({
-              id_producto: parseInt(detalle.id_producto),
-              cantidad: parseFloat(detalle.cantidad),
-              precio_unitario: parseFloat(detalle.precio_unitario),
-              subtotal: parseFloat(detalle.subtotal),
-            }))
-          : [], // Enviar array vacío si no hay detalles
+      detalles: formData.detalles.map((detalle: any) => ({
+        productoId: parseInt(detalle.id_producto),
+        cantidad: parseInt(detalle.cantidad),
+        precioUnitario: parseFloat(detalle.precio_unitario),
+      }))
     };
 
-    console.log('Enviando datos:', data);
-
-    if (this.ventaId()) {
-      // Actualizar venta existente
-      this._ventaService.update(this.ventaId()!, data).subscribe({
-        next: () => {
-          this._notificationService.showSuccess('Venta actualizada exitosamente');
-          this.isLoading.set(false);
-          this._router.navigate(['/ventas']);
-        },
-        error: (error) => {
-          console.error('Error updating venta:', error);
-          this._notificationService.showError(
-            'Error al actualizar la venta: ' +
-              (error.error?.message || error.message || 'Error desconocido')
-          );
-          this.isLoading.set(false);
-        },
-      });
-    }
+    this._ventaService.update(this.ventaId(), ventaData).subscribe({
+      next: (response) => {
+        this._notificationService.showSuccess('Venta actualizada exitosamente');
+        this.isLoading.set(false);
+        this._router.navigate(['/ventas']);
+      },
+      error: (error) => {
+        console.error('Error updating venta:', error);
+        let errorMessage = 'Error al actualizar la venta';
+        
+        if (error.error?.message) {
+          errorMessage += ': ' + error.error.message;
+        } else if (error.message) {
+          errorMessage += ': ' + error.message;
+        }
+        
+        this._notificationService.showError(errorMessage);
+        this.isLoading.set(false);
+      },
+    });
   }
 
   cancel() {
