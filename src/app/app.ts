@@ -10,9 +10,9 @@ import { AuthService } from './components/services/auth.service';
   styleUrl: './app.css'
 })
 export class App {
-  protected readonly title = signal('frontend');
+  protected readonly title = signal('Sistema Ventas');
   constructor(
-    private authService: AuthService,
+  
 
   ) {}
 }

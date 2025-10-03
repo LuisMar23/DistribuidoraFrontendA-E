@@ -3,6 +3,7 @@ import { environment } from '../../../environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ProductDto } from '../interfaces/product.interface';
+// import { ProductDto } from '../interfaces/product.interface';
 
 @Injectable({
   providedIn: 'root',

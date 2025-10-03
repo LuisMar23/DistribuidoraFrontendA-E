@@ -37,12 +37,18 @@
       <button (click)="toggleUserMenu()"
         class="flex items-center gap-2 px-3 py-2 rounded-full hover:bg-gray-100 transition duration-200 border border-transparent hover:border-indigo-200">
         <!-- Avatar -->
+        @if (currentUser().avatarUrl) {
+        <img [src]="currentUser().avatarUrl" alt="Avatar" class="w-8 h-8 rounded-full object-cover shadow-sm"
+          onerror="this.src='/assets/default.jpg'" />
+        } @else {
         <div
           class="w-8 h-8 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white flex items-center justify-center font-bold shadow-sm">
-          {{ currentUser.username.charAt(0).toUpperCase() }}
+          {{ currentUser().username.charAt(0).toUpperCase() }}
         </div>
+        }
+
         <span class="hidden md:inline text-gray-800 font-medium">
-          {{ currentUser.username }}
+          {{ currentUser().username }}
         </span>
         <fa-icon [icon]="faChevronDown" class="text-gray-500 text-sm"></fa-icon>
       </button>

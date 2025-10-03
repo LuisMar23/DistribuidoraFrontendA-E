@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal, OnInit } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
   faBell,
@@ -12,6 +12,7 @@ import {
   faUser,
 } from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from '../components/services/auth.service';
+import { UserService } from '../features/users/services/users.service';
 
 @Component({
   selector: 'app-navbar',
@@ -20,7 +21,7 @@ import { AuthService } from '../components/services/auth.service';
   templateUrl: './navbar.html',
   styleUrl: './navbar.css',
 })
-export class Navbar {
+export class Navbar implements OnInit {
   faBell = faBell;
   faChevronDown = faChevronDown;
   faSignOutAlt = faSignOutAlt;
@@ -32,15 +33,23 @@ export class Navbar {
 
   isUserMenuOpen: boolean = false;
 
-  _authService = inject(AuthService);
-  currentUser = {
+  // CORREGIDO: Solo una definición de currentUser usando signal
+  currentUser = signal<{ username: string; avatarUrl: string }>({
     username: 'Admin',
-  };
+    avatarUrl: '/assets/default.jpg',
+  });
+
+  _authService = inject(AuthService);
+  _userService = inject(UserService); // Agregado el UserService
 
   notifications = [
     { id: 1, message: 'Nuevo pedido recibido' },
     { id: 2, message: 'Pago confirmado' },
   ];
+
+  ngOnInit() {
+    this.loadUser();
+  }
 
   toggleUserMenu() {
     this.isUserMenuOpen = !this.isUserMenuOpen;
@@ -48,5 +57,17 @@ export class Navbar {
 
   logout() {
     this._authService.logout();
+  }
+
+  loadUser() {
+    this._userService.getProfile().subscribe((user) => {
+      // actualizar señal
+      this.currentUser.set({
+        username: user.username,
+        avatarUrl: user.avatarUrl
+          ? `http://localhost:3000/${user.avatarUrl}`
+          : '/assets/default.jpg',
+      });
+    });
   }
 }

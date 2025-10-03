@@ -2,14 +2,15 @@ import { Component, inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../components/services/auth.service';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { faEye, faEyeSlash, faLock, faUser } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { AppRoutingModule } from "../app.routes";
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule,FontAwesomeModule],
+  imports: [CommonModule, ReactiveFormsModule, FontAwesomeModule,RouterModule],
   templateUrl: './login.html',
   styleUrls: ['./login.css'],
 })
@@ -21,7 +22,7 @@ export class LoginComponent {
 
 
   loginForm: FormGroup;
-  showPassword: boolean = false; // Propiedad agregada
+  showPassword: boolean = false; 
   _authService = inject(AuthService)
   
   constructor(private fb: FormBuilder,private router:Router) {
@@ -32,7 +33,7 @@ export class LoginComponent {
     });
   }
   
-  // Método agregado
+
   togglePasswordVisibility(): void {
     this.showPassword = !this.showPassword;
   }
@@ -44,7 +45,7 @@ export class LoginComponent {
       console.log(data);
       this._authService.login(data).subscribe({
         next: () => {
-          this.router.navigate(['/']); //
+          this.router.navigate(['/dashboard']);
         },
         error:()=>{
           alert("No se encontro datos")
