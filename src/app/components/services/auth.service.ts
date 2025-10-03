@@ -6,15 +6,14 @@ import { LoginDto } from '../../core/interfaces/login.interface';
 import { RegisterDto } from '../../core/interfaces/register.interface';
 import { Router } from '@angular/router';
 
-
-
 export interface LoginResponse {
   data: {
-    user: any; // puedes tipar con User si quieres
+    user: any;
     accessToken: string;
     refreshToken: string;
   };
 }
+
 @Injectable({
   providedIn: 'root',
 })
@@ -23,7 +22,7 @@ export class AuthService {
   private tokenKey = 'access_token';
   private userKey = 'user_data';
 
-  constructor(private http: HttpClient,private router:Router) {}
+  constructor(private http: HttpClient, private router: Router) {}
 
   login(data: LoginDto): Observable<LoginResponse> {
     return this.http.post<LoginResponse>(`${this.apiUrl}/auth/login`, data).pipe(
@@ -65,7 +64,6 @@ export class AuthService {
       })
       .pipe(
         tap((res) => {
-          // actualizar tokens en storage
           localStorage.setItem('access_token', res.accessToken);
           localStorage.setItem('refresh_token', res.refreshToken);
         }),
@@ -73,7 +71,6 @@ export class AuthService {
       );
   }
 
-  // Método para recuperación de contraseña
   forgotPassword(email: string): Observable<string> {
     return this.http.post<string>(`${this.apiUrl}/forgot-password`, { email });
   }
@@ -93,18 +90,34 @@ export class AuthService {
   isLoggedIn(): boolean {
     return !!this.getToken();
   }
+
   logout() {
- 
     localStorage.removeItem(this.tokenKey);
     localStorage.removeItem('refresh_token');
     localStorage.removeItem(this.userKey);
-
 
     sessionStorage.removeItem(this.tokenKey);
     sessionStorage.removeItem('refresh_token');
     sessionStorage.removeItem(this.userKey);
 
-
     this.router.navigate(['/login']);
+  }
+
+  // MÉTODO NUEVO - Obtener usuario actual
+  getCurrentUser(): any {
+    if (typeof window !== 'undefined' && localStorage) {
+      // Primero intenta obtener de localStorage
+      const userData = localStorage.getItem(this.userKey) || sessionStorage.getItem(this.userKey);
+      
+      if (userData) {
+        try {
+          return JSON.parse(userData);
+        } catch (error) {
+          console.error('Error parsing user data:', error);
+          return null;
+        }
+      }
+    }
+    return null;
   }
 }

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
   faBell,
@@ -14,10 +14,13 @@ import {
   faUsers,
 } from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from '../components/services/auth.service';
+import { AppRoutingModule } from "../app.routes";
+import { RouterModule } from '@angular/router';
+import { UserService } from '../features/users/services/users.service';
 
 @Component({
   selector: 'app-navbar',
-  imports: [FontAwesomeModule, CommonModule],
+  imports: [FontAwesomeModule, CommonModule,RouterModule],
   templateUrl: './navbar.html',
   styleUrl: './navbar.css',
 })
@@ -33,12 +36,13 @@ export class Navbar {
   faCog=faCog
 
   isUserMenuOpen: boolean = false;
+ currentUser = signal<{ username: string; avatarUrl: string }>({ username: '', avatarUrl: '/assets/default.jpg' });
 
-
-  _authService=inject(AuthService)
-  currentUser = {
-    username: 'Admin',
-  };
+  private _authService=inject(AuthService)
+  private _userService = inject(UserService);
+  constructor() {
+    this.loadUser();
+  }
 
   notifications = [
     { id: 1, message: 'Nuevo pedido recibido' },
@@ -51,5 +55,14 @@ export class Navbar {
 
   logout() {
     this._authService.logout()
+  }
+    loadUser() {
+    this._userService.getProfile().subscribe(user => {
+      // actualizar señal
+      this.currentUser.set({
+        username: user.username,
+        avatarUrl: user.avatarUrl ? `http://localhost:3000/${user.avatarUrl}` : '/assets/default.jpg',
+      });
+    });
   }
 }

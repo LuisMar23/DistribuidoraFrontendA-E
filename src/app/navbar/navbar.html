@@ -1,6 +1,4 @@
-<nav
-  class="flex items-center justify-between bg-white shadow-md px-6 py-3 sticky top-0 z-50"
->
+<nav class="flex items-center justify-between bg-white shadow-md px-6 py-3 sticky top-0 z-50">
   <!-- Left: Logo -->
   <div class="flex items-center gap-2">
     <fa-icon [icon]="faLayerGroup" class="text-indigo-600 text-2xl"></fa-icon>
@@ -17,8 +15,7 @@
       <input
         type="text"
         placeholder="Buscar..."
-        class="w-full pl-10 pr-4 py-2 rounded-full border border-gray-300
-               focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm"
+        class="w-full pl-10 pr-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm"
       />
     </div>
   </div>
@@ -26,30 +23,21 @@
   <!-- Right: Opciones -->
   <div class="flex items-center gap-4">
     <!-- Notificaciones -->
-    <button
-      class="relative p-2 rounded-full hover:bg-gray-100 transition"
-      title="Notificaciones"
-    >
+    <button class="relative p-2 rounded-full hover:bg-gray-100 transition" title="Notificaciones">
       <fa-icon [icon]="faBell" class="text-gray-600 text-lg"></fa-icon>
       @if (notifications.length>0) {
       <span
-   
         class="absolute -top-1 -right-1 text-xs bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center shadow"
       >
         {{ notifications.length }}
       </span>
       }
-
     </button>
 
     <!-- Modo oscuro -->
 
-
     <!-- Configuración -->
-    <button
-      class="p-2 rounded-full hover:bg-gray-100 transition"
-      title="Configuración"
-    >
+    <button class="p-2 rounded-full hover:bg-gray-100 transition" title="Configuración">
       <fa-icon [icon]="faCog" class="text-gray-600 text-lg"></fa-icon>
     </button>
 
@@ -59,23 +47,38 @@
         (click)="toggleUserMenu()"
         class="flex items-center gap-2 px-3 py-1 rounded-full hover:bg-gray-100 transition"
       >
-        <!-- Avatar -->
-        <div class="w-8 h-8 rounded-full bg-indigo-500 text-white flex items-center justify-center font-bold">
-          {{ currentUser.username.charAt(0).toUpperCase() }}
+        <!-- Avatar del usuario -->
+        @if ( currentUser().avatarUrl && currentUser().avatarUrl !== '/assets/default.jpg'; ) {
+        <div>
+          <img
+            [src]="currentUser().avatarUrl"
+            alt="Avatar"
+            class="w-8 h-8 rounded-full object-cover"
+          />
         </div>
+        }@else {
+      
+          <div
+            class="w-8 h-8 rounded-full bg-indigo-500 text-white flex items-center justify-center font-bold"
+          >
+            {{ currentUser().username.charAt(0).toUpperCase() }}
+          </div>
+      
+        }
+
         <span class="hidden md:inline text-gray-800 font-medium">
-          {{ currentUser.username }}
+          {{ currentUser().username }}
         </span>
         <fa-icon [icon]="faChevronDown" class="text-gray-500 text-sm"></fa-icon>
       </button>
 
       <!-- Dropdown -->
-       @if (isUserMenuOpen) {
-     <div
-   
+      @if (isUserMenuOpen) {
+      <div
         class="absolute right-0 mt-2 w-52 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden z-50"
       >
         <button
+          [routerLink]="['users/perfil']"
           class="w-full text-left px-4 py-2 hover:bg-gray-100 transition flex items-center gap-2"
         >
           <fa-icon [icon]="faUser" class="text-indigo-500"></fa-icon>
@@ -95,8 +98,7 @@
           Cerrar sesión
         </button>
       </div>
-       }
- 
+      }
     </div>
   </div>
 </nav>

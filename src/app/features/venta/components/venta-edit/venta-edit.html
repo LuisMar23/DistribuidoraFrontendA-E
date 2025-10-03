@@ -1,0 +1,283 @@
+<!-- Header -->
+<div class="bg-white rounded-2xl p-4 md:p-6 mb-6 flex items-center gap-4 shadow-sm">
+  <button
+    (click)="cancel()"
+    class="bg-gray-100 text-gray-600 w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-200 transition-colors"
+  >
+    <fa-icon [icon]="faArrowLeft" class="text-lg"></fa-icon>
+  </button>
+  <div
+    class="bg-blue-100 text-blue-600 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full"
+  >
+    <fa-icon [icon]="faShoppingCart" class="text-lg md:text-xl"></fa-icon>
+  </div>
+  <h2 class="text-lg md:text-xl font-bold font-sans text-gray-800">
+    Editar Venta #{{ ventaId() }}
+  </h2>
+</div>
+
+<div class="max-w-6xl mx-auto p-2 md:p-5 bg-white rounded-2xl shadow-xl">
+  <form [formGroup]="form" (ngSubmit)="submit()" class="space-y-6">
+    <!-- Información Básica -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Cliente -->
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-2">
+          <i class="fas fa-user mr-2 text-[#2196f3]"></i>Cliente *
+        </label>
+        <select
+          formControlName="id_cliente"
+          class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#2196f3] focus:border-transparent shadow-sm appearance-none bg-white"
+        >
+          <option value="">Seleccione un cliente</option>
+          @for (cliente of clientes(); track cliente.id_cliente) {
+          <option [value]="cliente.id_cliente">{{ cliente.nombre }}</option>
+          }
+        </select>
+        @if (form.get('id_cliente')?.invalid && form.get('id_cliente')?.touched) {
+        <span class="text-red-500 text-xs">Seleccione un cliente</span>
+        }
+      </div>
+
+      <!-- Usuario (Ahora es de solo lectura) -->
+      <!-- <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                    <i class="fas fa-user-tie mr-2 text-[#2196f3]"></i>Usuario *
+                </label>
+                <div class="w-full border border-gray-300 rounded-xl px-4 py-3 bg-gray-100">
+                    @if (usuarioActual()) {
+                        <span class="font-semibold text-gray-800">{{ usuarioActual()!.nombre }}</span>
+                        <input type="hidden" formControlName="id_usuario">
+                    } @else {
+                        <span class="text-red-500">No se pudo cargar el usuario</span>
+                    }
+                </div>
+                <small class="text-gray-500 text-xs">Usuario autenticado actualmente</small>
+            </div> -->
+    </div>
+
+    <!-- Fecha y Método de Pago -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Fecha -->
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-2">
+          <i class="fas fa-calendar mr-2 text-[#2196f3]"></i>Fecha Venta *
+        </label>
+        <input
+          formControlName="fecha_venta"
+          type="datetime-local"
+          class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#2196f3] focus:border-transparent shadow-sm transition-all"
+        />
+        @if (form.get('fecha_venta')?.invalid && form.get('fecha_venta')?.touched) {
+        <span class="text-red-500 text-xs">La fecha de venta es requerida</span>
+        }
+      </div>
+
+      <!-- Método de Pago -->
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-2">
+          <i class="fas fa-credit-card mr-2 text-[#2196f3]"></i>Método de Pago *
+        </label>
+        <select
+          formControlName="metodo_pago"
+          class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#2196f3] focus:border-transparent shadow-sm appearance-none bg-white"
+        >
+          <option value="efectivo">Efectivo</option>
+          <option value="tarjeta">Tarjeta</option>
+          <option value="transferencia">Transferencia</option>
+          <option value="credito">Crédito</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Detalles de Venta -->
+    <div class="border-t pt-6">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-semibold text-gray-800">
+          <i class="fas fa-list mr-2 text-[#2196f3]"></i>Productos de la Venta
+        </h3>
+        <button
+          type="button"
+          (click)="agregarDetalle()"
+          class="flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors"
+        >
+          <fa-icon [icon]="faPlus" class="text-sm"></fa-icon>
+          Agregar Producto
+        </button>
+      </div>
+
+      <!-- Lista de detalles -->
+      <div formArrayName="detalles" class="space-y-4">
+        @for (detalle of detalles.controls; track $index; let i = $index) {
+        <div
+          [formGroupName]="i"
+          class="grid grid-cols-1 md:grid-cols-12 gap-4 p-4 border rounded-lg bg-gray-50"
+        >
+          <!-- Producto -->
+          <div class="md:col-span-4">
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Producto *</label>
+            <select
+              formControlName="id_producto"
+              (change)="onProductoSeleccionado(i)"
+              class="w-full border border-gray-300 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2196f3]"
+            >
+              <option value="">Seleccione un producto</option>
+              @for (producto of productos(); track producto.id_producto) {
+              <option [value]="producto.id_producto">
+                {{ producto.nombre }} - {{ producto.precio_venta | number : '1.2-2' }} Bs. (Stock:
+                {{ producto.stock }})
+              </option>
+              }
+            </select>
+          </div>
+
+          <!-- Cantidad -->
+          <div class="md:col-span-2">
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Cantidad *</label>
+            <input
+              formControlName="cantidad"
+              type="number"
+              min="1"
+              step="1"
+              (blur)="calcularSubtotalDetalle(i)"
+              class="w-full border border-gray-300 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2196f3]"
+            />
+          </div>
+
+          <!-- Precio Unitario -->
+          <div class="md:col-span-2">
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Precio Unitario *</label>
+            <input
+              formControlName="precio_unitario"
+              type="number"
+              step="0.01"
+              min="0"
+              readonly
+              class="w-full border border-gray-300 rounded-xl px-3 py-2 bg-gray-100"
+            />
+          </div>
+
+          <!-- Subtotal -->
+          <div class="md:col-span-2">
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Subtotal</label>
+            <input
+              formControlName="subtotal"
+              type="number"
+              step="0.01"
+              readonly
+              class="w-full border border-gray-300 rounded-xl px-3 py-2 bg-gray-100 font-semibold"
+            />
+          </div>
+
+          <!-- Eliminar -->
+          <div class="md:col-span-2 flex items-end">
+            <button
+              type="button"
+              (click)="eliminarDetalle(i)"
+              class="w-full bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg transition-colors flex items-center justify-center gap-2"
+            >
+              <fa-icon [icon]="faTrash" class="text-sm"></fa-icon>
+              Eliminar
+            </button>
+          </div>
+        </div>
+        }
+      </div>
+
+      @if (detalles.length === 0) {
+      <div class="text-center py-8 text-gray-500">
+        <i class="fas fa-shopping-basket text-4xl mb-2"></i>
+        <p>No hay productos agregados</p>
+      </div>
+      }
+    </div>
+
+    <!-- Montos -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 border-t pt-6">
+      <!-- Subtotal -->
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-2">
+          <i class="fas fa-dollar-sign mr-2 text-[#2196f3]"></i>Subtotal *
+        </label>
+        <input
+          formControlName="subtotal"
+          type="number"
+          step="0.01"
+          readonly
+          class="w-full border border-gray-300 rounded-xl px-4 py-3 bg-gray-50 font-semibold text-lg"
+        />
+      </div>
+
+      <!-- Descuento -->
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-2">
+          <i class="fas fa-tag mr-2 text-[#2196f3]"></i>Descuento
+        </label>
+        <input
+          formControlName="descuento"
+          type="number"
+          step="0.01"
+          placeholder="0.00"
+          (blur)="onDescuentoChange()"
+          class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#2196f3] focus:border-transparent shadow-sm transition-all"
+        />
+      </div>
+
+      <!-- Total -->
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-2">
+          <i class="fas fa-calculator mr-2 text-[#2196f3]"></i>Total *
+        </label>
+        <input
+          formControlName="total"
+          type="number"
+          step="0.01"
+          readonly
+          class="w-full border border-gray-300 rounded-xl px-4 py-3 bg-gray-50 font-semibold text-lg text-green-600"
+        />
+      </div>
+    </div>
+
+    <!-- Estado -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-2">
+          <i class="fas fa-check-circle mr-2 text-[#2196f3]"></i>Estado *
+        </label>
+        <select
+          formControlName="estado"
+          class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#2196f3] focus:border-transparent shadow-sm appearance-none bg-white"
+        >
+          <option value="pendiente">Pendiente</option>
+          <option value="pagado">Pagado</option>
+          <option value="anulado">Anulado</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Botones -->
+    <div class="flex flex-col sm:flex-row justify-end gap-3 mt-8 pt-6 border-t">
+      <button
+        type="button"
+        (click)="cancel()"
+        class="flex items-center justify-center gap-2 bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-xl shadow-md transition-all duration-200 transform hover:scale-105 order-2 sm:order-1"
+        [disabled]="isLoading()"
+      >
+        <fa-icon [icon]="faArrowLeft" class="text-sm"></fa-icon>
+        Cancelar
+      </button>
+      <button
+        type="submit"
+        class="flex items-center justify-center gap-2 bg-[#2196f3] hover:bg-blue-700 text-white px-8 py-3 rounded-xl shadow-md transition-all duration-200 transform hover:scale-105 order-1 sm:order-2"
+        [disabled]="isLoading() || !usuarioActual()"
+      >
+        <fa-icon [icon]="faSave" class="text-sm"></fa-icon>
+        @if (isLoading()) {
+        <span>Actualizando...</span>
+        } @else {
+        <span>Actualizar Venta</span>
+        }
+      </button>
+    </div>
+  </form>
+</div>

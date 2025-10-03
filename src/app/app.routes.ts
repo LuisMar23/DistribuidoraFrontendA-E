@@ -5,9 +5,12 @@ import { DashboardComponent } from './dashboard/dashboard';
 import { LayoutComponent } from './layout/layout';
 import { RegisterComponent } from './components/auth/register/register';
 import { ForgotPasswordComponent } from './forgot-password/forgot-password';
-import { TransportComponent } from './transport/transport';
+
+import { ProductComponent } from './product/product';
+
 import { ClientComponent } from './client/client';
 import { AuthGuard } from './core/guards/auth.guard';
+import { ProfileComponent } from './features/users/components/profile/profile';
 
 export const routes: Routes = [
   {
@@ -15,7 +18,7 @@ export const routes: Routes = [
     component: LoginComponent,
   },
   { path: 'login/registrar', component: RegisterComponent },
-  {path:'login/cambiar-contraseña',component:ForgotPasswordComponent},
+  { path: 'login/cambiar-contraseña', component: ForgotPasswordComponent },
   {
     path: '',
     component: LayoutComponent,
@@ -23,8 +26,13 @@ export const routes: Routes = [
     canActivateChild: [AuthGuard],
     children: [
       { path: 'dashboard', component: DashboardComponent },
-      { path: 'users', 
-        loadChildren:()=>import('./features/users/user.routes').then((r)=>r.UserRoutingModule)
+      {
+        path: 'compras',
+        loadChildren: () => import('./features/compras/compras.routes').then((r)=>r.ComprasRoutingModule),
+      },
+      {
+        path: 'users',
+        loadChildren: () => import('./features/users/user.routes').then((r) => r.UserRoutingModule),
       },
       { path: 'clientes', component: ClientComponent },
       {
@@ -42,7 +50,20 @@ export const routes: Routes = [
         loadChildren: () =>
           import('./features/faenas/faenas.routes').then((r) => r.FaenasRoutingModule),
       },
-      { path: 'transporte', component: TransportComponent },
+      {
+        path: 'transporte',
+        loadChildren: () =>
+          import('./features/transport/transport.routes').then((r) => r.TransportRoutingModule),
+      },
+      {
+        path: 'ventas',
+        loadChildren: () =>
+          import('./features/venta/venta.routes').then((r) => r.VentasRoutingModule),
+      },
+      {
+        path: 'caja',
+        loadChildren: () => import('./features/caja/caja.routes').then((r) => r.CajaRoutingModule),
+      },
     ],
   },
   { path: '**', redirectTo: '/login' },

@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 
 import { HttpClient, HttpParams } from '@angular/common/http';
 
@@ -12,6 +12,9 @@ import { CountResponse, ProveedorDto } from '../../../core/interfaces/suplier.in
 })
 export class ProveedorService {
   apiUrl = environment.apiUrl;
+  proveedores = signal<ProveedorDto[]>([]);
+  total = signal(0);
+
   constructor(private http: HttpClient) {}
   getAll(
     page: number = 1,
@@ -44,5 +47,19 @@ export class ProveedorService {
 
   count(): Observable<CountResponse> {
     return this.http.get<CountResponse>(`${this.apiUrl}/proveedor/count`);
+  }
+    // Método para cargar proveedores y actualizar signals
+  cargar(page: number = 1, pageSize: number = 50) {
+    this.getAll(page, pageSize).subscribe({
+      next: (res) => {
+        this.proveedores.set(res.data);
+        this.total.set(res.total);
+      },
+      error: (err) => {
+        console.error('Error al cargar proveedores', err);
+        this.proveedores.set([]);
+        this.total.set(0);
+      },
+    });
   }
 }

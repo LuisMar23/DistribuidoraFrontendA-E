@@ -1,0 +1,167 @@
+@if ( loading() ) {
+<div class="flex flex-col items-center justify-center p-10">
+    <fa-icon [icon]="faSpinner" class="text-4xl text-blue-500 spin mb-4"></fa-icon>
+    <span class="text-lg text-gray-600">Cargando transporte...</span>
+</div>
+}
+
+<nav class="flex text-gray-500 text-sm mb-6" aria-label="Breadcrumb">
+    <ol class="inline-flex items-center space-x-1 md:space-x-3">
+        <!-- Inicio -->
+        <li class="inline-flex items-center">
+            <a routerLink="" class="inline-flex items-center text-gray-500 hover:text-blue-500">
+                <fa-icon [icon]="faHome"></fa-icon> Inicio
+            </a>
+        </li>
+
+        <!-- Transportes -->
+        <li class="inline-flex items-center">
+            <span class="mx-2 text-gray-400">/</span>
+            <a [routerLink]="['/transporte']" class="inline-flex items-center text-gray-500 hover:text-blue-500">
+                <fa-icon [icon]="faTruck"></fa-icon> Transportes
+            </a>
+        </li>
+
+        <!-- Detalle de transporte -->
+        @if (transporte()) {
+        <li class="inline-flex items-center">
+            <span class="mx-2 text-gray-400">/</span>
+            <span class="inline-flex items-center text-gray-700">
+                <fa-icon [icon]="faBox"></fa-icon> Transporte #{{ transporte()?.id_transporte }}
+            </span>
+        </li>
+        }
+    </ol>
+</nav>
+
+@if(!loading() && transporte()){
+<div class="max-w-8xl mx-auto bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
+    <!-- Cabecera -->
+    <div class="bg-gradient-to-r from-blue-500 to-blue-300 text-white p-6 flex items-center justify-between">
+        <div class="flex items-center gap-4">
+            <fa-icon [icon]="faTruck" class="text-3xl"></fa-icon>
+            <div>
+                <h2 class="text-2xl font-semibold">Transporte #{{ transporte()?.id_transporte }}</h2>
+                <p class="text-blue-100 mt-1">{{ transporte()?.transportista }}</p>
+            </div>
+        </div>
+        <span [class]="getEstadoClass(transporte()?.estado)"
+            class="px-4 py-2 rounded-full text-sm font-medium capitalize">
+            {{ (transporte()?.estado || 'N/A').replace('_', ' ') }}
+        </span>
+    </div>
+
+    <!-- Contenido -->
+    <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6 text-gray-700">
+        <!-- ID Transporte -->
+        <div class="flex items-center gap-3 bg-gray-50 p-4 rounded-lg shadow-sm">
+            <fa-icon [icon]="faHashtag" class="text-blue-500 text-xl"></fa-icon>
+            <div>
+                <p class="text-sm font-medium text-gray-500">N° Transporte</p>
+                <p class="font-semibold text-gray-800">{{ transporte()?.id_transporte }}</p>
+            </div>
+        </div>
+
+        <!-- ID Compra -->
+        <div class="flex items-center gap-3 bg-gray-50 p-4 rounded-lg shadow-sm">
+            <fa-icon [icon]="faShoppingCart" class="text-purple-500 text-xl"></fa-icon>
+            <div>
+                <p class="text-sm font-medium text-gray-500">ID Compra</p>
+                <p class="font-semibold text-gray-800">{{ transporte()?.id_compra || 'N/A' }}</p>
+            </div>
+        </div>
+
+        <!-- Transportista -->
+        <div class="flex items-center gap-3 bg-gray-50 p-4 rounded-lg shadow-sm">
+            <fa-icon [icon]="faUserTie" class="text-green-500 text-xl"></fa-icon>
+            <div>
+                <p class="text-sm font-medium text-gray-500">Transportista</p>
+                <p class="font-semibold text-gray-800">{{ transporte()?.transportista || 'N/A' }}</p>
+            </div>
+        </div>
+
+        <!-- Vehículo -->
+        <div class="flex items-center gap-3 bg-gray-50 p-4 rounded-lg shadow-sm">
+            <fa-icon [icon]="faTruckLoading" class="text-orange-500 text-xl"></fa-icon>
+            <div>
+                <p class="text-sm font-medium text-gray-500">Vehículo</p>
+                <p class="font-semibold text-gray-800">{{ transporte()?.vehiculo || 'N/A' }}</p>
+            </div>
+        </div>
+
+        <!-- Costo Local -->
+        <div class="flex items-center gap-3 bg-gray-50 p-4 rounded-lg shadow-sm">
+            <fa-icon [icon]="faDollarSign" class="text-green-500 text-xl"></fa-icon>
+            <div>
+                <p class="text-sm font-medium text-gray-500">Costo Local</p>
+                <p class="font-semibold text-gray-800">{{ transporte()?.costo_local | currency:'USD' }}</p>
+            </div>
+        </div>
+
+        <!-- Costo Departamental -->
+        <div class="flex items-center gap-3 bg-gray-50 p-4 rounded-lg shadow-sm">
+            <fa-icon [icon]="faMoneyBillWave" class="text-blue-500 text-xl"></fa-icon>
+            <div>
+                <p class="text-sm font-medium text-gray-500">Costo Departamental</p>
+                <p class="font-semibold text-gray-800">{{ transporte()?.costo_departamental | currency:'USD' }}</p>
+            </div>
+        </div>
+
+        <!-- Estado -->
+        <div class="flex items-center gap-3 bg-gray-50 p-4 rounded-lg shadow-sm">
+            <fa-icon [icon]="faToggleOn" class="text-purple-500 text-xl"></fa-icon>
+            <div>
+                <p class="text-sm font-medium text-gray-500">Estado</p>
+                <p class="font-semibold text-gray-800 capitalize">{{ (transporte()?.estado || 'N/A').replace('_', ' ')
+                    }}</p>
+            </div>
+        </div>
+
+        <!-- Fecha Salida -->
+        <div class="flex items-center gap-3 bg-gray-50 p-4 rounded-lg shadow-sm">
+            <fa-icon [icon]="faCalendarAlt" class="text-red-500 text-xl"></fa-icon>
+            <div>
+                <p class="text-sm font-medium text-gray-500">Fecha de Salida</p>
+                <p class="font-semibold text-gray-800">{{ transporte()?.fecha_salida | date:'short' }}</p>
+            </div>
+        </div>
+
+        <!-- Fecha Llegada -->
+        <div class="flex items-center gap-3 bg-gray-50 p-4 rounded-lg shadow-sm">
+            <fa-icon [icon]="faCalendarCheck" class="text-green-500 text-xl"></fa-icon>
+            <div>
+                <p class="text-sm font-medium text-gray-500">Fecha de Llegada</p>
+                <p class="font-semibold text-gray-800">{{ transporte()?.fecha_llegada | date:'short' }}</p>
+            </div>
+        </div>
+
+        <!-- Información adicional si existe -->
+        <!-- Se removió la sección de notas ya que no existe en TransportDto -->
+    </div>
+
+    <!-- Botones de acción -->
+    <div class="p-6 border-t border-gray-200 flex justify-end gap-4">
+        <button [routerLink]="['/transporte']"
+            class="flex items-center gap-2 bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-xl shadow-md transition-all duration-200 transform hover:scale-105">
+            <fa-icon [icon]="faArrowLeft"></fa-icon>
+            Volver a Transportes
+        </button>
+        <button [routerLink]="['/transportes/editar', transporte()?.id_transporte]"
+            class="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-xl shadow-md transition-all duration-200 transform hover:scale-105">
+            <fa-icon [icon]="faEdit"></fa-icon>
+            Editar Transporte
+        </button>
+    </div>
+</div>
+
+} @if(!loading() && !transporte()){
+<div class="flex flex-col items-center justify-center p-10 text-red-500">
+    <fa-icon [icon]="faExclamationTriangle" class="text-4xl mb-4"></fa-icon>
+    <span class="text-lg">No se encontró el transporte.</span>
+    <button [routerLink]="['/transportes']"
+        class="mt-4 flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors">
+        <fa-icon [icon]="faArrowLeft"></fa-icon>
+        Volver a Transportes
+    </button>
+</div>
+}

@@ -11,7 +11,7 @@ import { Observable } from "rxjs";
 export class ProductService{
 
     private http=inject(HttpClient)
-    private apiUrl=environment.apiUrl
+    private apiUrl=environment.apiUrl + '/product'
   products = signal<ProductDto[]>([]);
 
    list(): Observable<ProductDto[]> {

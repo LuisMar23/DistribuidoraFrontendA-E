@@ -16,10 +16,7 @@
     <!-- Proveedores -->
     <li class="inline-flex items-center">
       <span class="mx-2 text-gray-400">/</span>
-      <a
-        [routerLink]="['/proveedores']"
-        class="inline-flex items-center text-gray-500 hover:text-blue-500"
-      >
+      <a [routerLink]="['/proveedores']" class="inline-flex items-center text-gray-500 hover:text-blue-500">
         <fa-icon [icon]="faShop"></fa-icon> Proveedores
       </a>
     </li>
@@ -29,7 +26,7 @@
     <li class="inline-flex items-center">
       <span class="mx-2 text-gray-400">/</span>
       <span class="inline-flex items-center text-gray-700">
-         <fa-icon [icon]="faUserTie" ></fa-icon>{{ proveedor()?.nombre }}
+        <fa-icon [icon]="faUserTie"></fa-icon>{{ proveedor()?.nombre }}
       </span>
     </li>
     }
@@ -44,7 +41,7 @@
       <fa-icon [icon]="faUserTie" class="text-3xl"></fa-icon>
       <h2 class="text-2xl font-semibold">{{ proveedor()?.nombre }}</h2>
     </div>
-  
+
   </div>
 
   <!-- Contenido -->

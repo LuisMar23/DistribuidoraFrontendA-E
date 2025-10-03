@@ -11,7 +11,7 @@ const routes: Routes = [
     path: 'detalle/:id',
     component: ProveedorDetalle,
     canActivate: [AuthGuard],
-    data: { renderMode: 'client' },
+  
   },
 ];
 

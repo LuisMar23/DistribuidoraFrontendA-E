@@ -4,15 +4,15 @@ import { AuthService } from './components/services/auth.service';
 
 @Component({
   selector: 'app-root',
-   standalone: true,
+  standalone: true,
   imports: [RouterOutlet],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
 export class App {
-  protected readonly title = signal('frontend');
+  protected readonly title = signal('Sistema Ventas');
   constructor(
-    private authService: AuthService,
+  
 
   ) {}
 }

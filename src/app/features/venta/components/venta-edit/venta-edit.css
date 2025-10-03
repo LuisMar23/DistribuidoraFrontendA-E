@@ -1,0 +1,38 @@
+/* Estilos específicos para el formulario de edición */
+.form-section {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.input-focus:focus {
+  box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+  border-color: #2196f3;
+}
+
+.amount-display {
+  font-family: 'Courier New', monospace;
+  font-weight: 600;
+  background-color: #f7fafc;
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+  .grid-cols-1.md\:grid-cols-2 {
+    grid-template-columns: 1fr;
+  }
+
+  .grid-cols-1.md\:grid-cols-3 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Loading state */
+.loading {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+/* Estilos para campos requeridos */
+.required-label::after {
+  content: ' *';
+  color: #ef4444;
+}
