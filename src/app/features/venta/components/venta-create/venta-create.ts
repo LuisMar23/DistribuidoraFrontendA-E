@@ -1,6 +1,8 @@
 import { Component, inject, signal, OnInit, computed } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormArray } from '@angular/forms';
 import { Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 import {
   faShoppingCart,
@@ -8,9 +10,16 @@ import {
   faSave,
   faPlus,
   faTrash,
+  faSearch,
+  faTimes,
+  faMoneyBillWave,
+  faCalendarDay,
+  faClock,
+  faSyncAlt,
+  faCalendarCheck,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { CommonModule } from '@angular/common';
+
 import { NotificationService } from '../../../../core/services/notification.service';
 import { VentaService } from '../../services/venta.service';
 import { ClientService } from '../../../../core/services/client.service';
@@ -44,7 +53,7 @@ interface ProductoOption {
 @Component({
   selector: 'app-venta-create',
   standalone: true,
-  imports: [ReactiveFormsModule, FontAwesomeModule, CommonModule],
+  imports: [ReactiveFormsModule, FontAwesomeModule, CommonModule, FormsModule],
   templateUrl: './venta-create.html',
   styleUrl: './venta-create.css',
 })
@@ -55,6 +64,13 @@ export class VentaCreateComponent implements OnInit {
   faSave = faSave;
   faPlus = faPlus;
   faTrash = faTrash;
+  faSearch = faSearch;
+  faTimes = faTimes;
+  faMoneyBillWave = faMoneyBillWave;
+  faCalendarDay = faCalendarDay;
+  faClock = faClock;
+  faSyncAlt = faSyncAlt;
+  faCalendarCheck = faCalendarCheck;
 
   // Services
   private _notificationService = inject(NotificationService);
@@ -72,6 +88,15 @@ export class VentaCreateComponent implements OnInit {
   usuarioActual = signal<UsuarioOption | null>(null);
   productos = signal<ProductoOption[]>([]);
 
+  // Signals para búsqueda
+  mostrarBuscadorClientesModal = signal(false);
+  mostrarBuscadorProductosModal = signal<number | null>(null);
+  clienteSeleccionado = signal<ClienteOption | null>(null);
+  clientesFiltrados = signal<ClienteOption[]>([]);
+  productosFiltrados = signal<ProductoOption[]>([]);
+  terminoBusquedaCliente = '';
+  terminoBusquedaProducto = '';
+
   // Form
   form: FormGroup;
 
@@ -88,6 +113,11 @@ export class VentaCreateComponent implements OnInit {
       total: [0],
       metodo_pago: ['efectivo', Validators.required],
       estado: ['pendiente', Validators.required],
+      // Campos para plan de pago
+      monto_inicial: [0],
+      plazo: [''],
+      periodicidad: ['DIAS'],
+      fecha_inicio: [''],
       detalles: this._fb.array([]),
     });
 
@@ -130,6 +160,7 @@ export class VentaCreateComponent implements OnInit {
           nombre: cliente.nombre || 'Cliente sin nombre',
         }));
         this.clientes.set(clientesOptions);
+        this.clientesFiltrados.set(clientesOptions);
       },
       error: (error) => {
         console.error('Error loading clientes:', error);
@@ -151,12 +182,176 @@ export class VentaCreateComponent implements OnInit {
             unidad_medida: producto.unidad_medida || '',
           }));
         this.productos.set(productosOptions);
+        this.productosFiltrados.set(productosOptions);
       },
       error: (error) => {
         console.error('Error loading productos:', error);
         this._notificationService.showError('Error al cargar los productos');
       },
     });
+  }
+
+  // Métodos para el plan de pago
+  onMetodoPagoChange() {
+    const metodoPago = this.form.get('metodo_pago')?.value;
+    if (metodoPago === 'credito') {
+      // Establecer validadores para plan de pago
+      this.form.get('plazo')?.setValidators([Validators.required, Validators.min(1)]);
+      this.form.get('fecha_inicio')?.setValidators([Validators.required]);
+      this.form.get('periodicidad')?.setValidators([Validators.required]);
+
+      // Establecer fecha de inicio como la misma fecha de la venta
+      const fechaVenta = this.form.get('fecha_venta')?.value;
+      if (fechaVenta) {
+        const fechaVentaDate = new Date(fechaVenta);
+        this.form.patchValue({
+          fecha_inicio: fechaVentaDate.toISOString().split('T')[0],
+        });
+      }
+    } else {
+      // Remover validadores
+      this.form.get('plazo')?.clearValidators();
+      this.form.get('fecha_inicio')?.clearValidators();
+      this.form.get('periodicidad')?.clearValidators();
+    }
+    this.form.get('plazo')?.updateValueAndValidity();
+    this.form.get('fecha_inicio')?.updateValueAndValidity();
+    this.form.get('periodicidad')?.updateValueAndValidity();
+  }
+
+  calcularFechaVencimiento(): string {
+    const fechaInicio = this.form.get('fecha_inicio')?.value;
+    const plazo = this.form.get('plazo')?.value;
+    const periodicidad = this.form.get('periodicidad')?.value;
+
+    if (!fechaInicio || !plazo) {
+      return 'No calculada';
+    }
+
+    const fecha = new Date(fechaInicio);
+
+    switch (periodicidad) {
+      case 'DIAS':
+        fecha.setDate(fecha.getDate() + parseInt(plazo));
+        break;
+      case 'SEMANAS':
+        fecha.setDate(fecha.getDate() + parseInt(plazo) * 7);
+        break;
+      case 'MESES':
+        fecha.setMonth(fecha.getMonth() + parseInt(plazo));
+        break;
+    }
+
+    return fecha.toLocaleDateString('es-ES');
+  }
+
+  calcularTotalFinanciar(): number {
+    const total = this.form.get('total')?.value || 0;
+    const montoInicial = this.form.get('monto_inicial')?.value || 0;
+    return Math.max(0, total - montoInicial);
+  }
+
+  calcularSaldoPendiente(): number {
+    return this.calcularTotalFinanciar();
+  }
+
+  getPeriodicidadTexto(): string {
+    const periodicidad = this.form.get('periodicidad')?.value;
+    switch (periodicidad) {
+      case 'DIAS':
+        return 'días';
+      case 'SEMANAS':
+        return 'semanas';
+      case 'MESES':
+        return 'meses';
+      default:
+        return '';
+    }
+  }
+
+  // Métodos para el buscador de clientes
+  mostrarBuscadorClientes() {
+    this.mostrarBuscadorClientesModal.set(true);
+    this.terminoBusquedaCliente = '';
+    this.filtrarClientes();
+  }
+
+  cerrarBuscadorClientes() {
+    this.mostrarBuscadorClientesModal.set(false);
+  }
+
+  filtrarClientes() {
+    const termino = this.terminoBusquedaCliente.toLowerCase().trim();
+    if (!termino) {
+      this.clientesFiltrados.set(this.clientes());
+      return;
+    }
+
+    const filtrados = this.clientes().filter(
+      (cliente) =>
+        cliente.nombre.toLowerCase().includes(termino) ||
+        cliente.id_cliente.toString().includes(termino)
+    );
+    this.clientesFiltrados.set(filtrados);
+  }
+
+  seleccionarCliente(cliente: ClienteOption) {
+    this.clienteSeleccionado.set(cliente);
+    this.form.patchValue({
+      id_cliente: cliente.id_cliente,
+    });
+    this.cerrarBuscadorClientes();
+  }
+
+  // Métodos para el buscador de productos
+  mostrarBuscadorProductos(index: number) {
+    this.mostrarBuscadorProductosModal.set(index);
+    this.terminoBusquedaProducto = '';
+    this.filtrarProductos();
+  }
+
+  cerrarBuscadorProductos() {
+    this.mostrarBuscadorProductosModal.set(null);
+  }
+
+  filtrarProductos() {
+    const termino = this.terminoBusquedaProducto.toLowerCase().trim();
+    if (!termino) {
+      this.productosFiltrados.set(this.productos());
+      return;
+    }
+
+    const filtrados = this.productos().filter(
+      (producto) =>
+        producto.nombre.toLowerCase().includes(termino) ||
+        producto.categoria.toLowerCase().includes(termino) ||
+        producto.id_producto.toString().includes(termino)
+    );
+    this.productosFiltrados.set(filtrados);
+  }
+
+  seleccionarProducto(producto: ProductoOption) {
+    const index = this.mostrarBuscadorProductosModal();
+    if (index !== null) {
+      const detalle = this.detalles.at(index);
+      detalle.patchValue({
+        id_producto: producto.id_producto,
+        precio_unitario: producto.precio_venta,
+      });
+      this.calcularSubtotalDetalle(index);
+    }
+    this.cerrarBuscadorProductos();
+  }
+
+  getProductoSeleccionadoNombre(index: number): string {
+    const detalle = this.detalles.at(index);
+    const idProducto = detalle.get('id_producto')?.value;
+
+    if (idProducto) {
+      const producto = this.productos().find((p) => p.id_producto === parseInt(idProducto));
+      return producto ? producto.nombre : '';
+    }
+    return '';
   }
 
   // Getter para el FormArray de detalles
@@ -187,7 +382,7 @@ export class VentaCreateComponent implements OnInit {
   agregarDetalle() {
     const detalleForm = this._fb.group({
       id_producto: ['', Validators.required],
-      cantidad: [1, [Validators.required, Validators.min(1)]],
+      cantidad: [1, [Validators.required, Validators.min(0.01)]],
       precio_unitario: [0, [Validators.required, Validators.min(0)]],
       subtotal: [0, [Validators.required, Validators.min(0)]],
     });
@@ -199,22 +394,6 @@ export class VentaCreateComponent implements OnInit {
   eliminarDetalle(index: number) {
     this.detalles.removeAt(index);
     this.actualizarTotales();
-  }
-
-  // Cuando se selecciona un producto, cargar su precio
-  onProductoSeleccionado(index: number) {
-    const detalle = this.detalles.at(index);
-    const idProducto = detalle.get('id_producto')?.value;
-
-    if (idProducto) {
-      const producto = this.productos().find((p) => p.id_producto === parseInt(idProducto));
-      if (producto) {
-        detalle.patchValue({
-          precio_unitario: producto.precio_venta,
-        });
-        this.calcularSubtotalDetalle(index);
-      }
-    }
   }
 
   // Validar stock disponible
@@ -257,7 +436,7 @@ export class VentaCreateComponent implements OnInit {
 
     this.form.patchValue({
       subtotal: subtotal,
-      total: total
+      total: total,
     });
   }
 
@@ -285,7 +464,7 @@ export class VentaCreateComponent implements OnInit {
     for (let i = 0; i < this.detalles.length; i++) {
       const detalle = this.detalles.at(i);
       detalle.markAllAsTouched();
-      
+
       if (detalle.invalid) {
         detallesValidos = false;
         const idProducto = detalle.get('id_producto')?.value;
@@ -296,8 +475,20 @@ export class VentaCreateComponent implements OnInit {
       }
     }
 
+    // Validar plan de pago si es crédito
+    if (this.form.get('metodo_pago')?.value === 'credito') {
+      if (!this.form.get('plazo')?.value || !this.form.get('fecha_inicio')?.value) {
+        this._notificationService.showError(
+          'Para ventas a crédito, complete todos los campos del plan de pago'
+        );
+        return;
+      }
+    }
+
     if (this.form.invalid || !detallesValidos) {
-      this._notificationService.showError('Por favor, complete todos los campos requeridos correctamente');
+      this._notificationService.showError(
+        'Por favor, complete todos los campos requeridos correctamente'
+      );
       return;
     }
 
@@ -326,11 +517,11 @@ export class VentaCreateComponent implements OnInit {
     const formData = this.form.value;
 
     // Formatear fecha
-    const fechaVentaFormateada = formData.fecha_venta.length === 16 
-      ? formData.fecha_venta + ':00' 
-      : formData.fecha_venta;
+    const fechaVentaFormateada =
+      formData.fecha_venta.length === 16 ? formData.fecha_venta + ':00' : formData.fecha_venta;
 
-    const ventaData = {
+    // Preparar datos de la venta
+    const ventaData: any = {
       id_cliente: parseInt(formData.id_cliente),
       id_usuario: this.usuarioActual()!.id_usuario,
       fecha_venta: fechaVentaFormateada,
@@ -341,10 +532,20 @@ export class VentaCreateComponent implements OnInit {
       estado: formData.estado,
       detalles: formData.detalles.map((detalle: any) => ({
         productoId: parseInt(detalle.id_producto),
-        cantidad: parseInt(detalle.cantidad),
+        cantidad: parseFloat(detalle.cantidad),
         precioUnitario: parseFloat(detalle.precio_unitario),
-      }))
+      })),
     };
+
+    // Agregar plan de pago si es crédito
+    if (formData.metodo_pago === 'credito') {
+      ventaData.plan_pago = {
+        monto_inicial: parseFloat(formData.monto_inicial) || 0,
+        plazo: parseInt(formData.plazo),
+        periodicidad: formData.periodicidad,
+        fecha_inicio: formData.fecha_inicio + 'T00:00:00', // Formato ISO
+      };
+    }
 
     console.log('Datos a enviar al backend:', ventaData);
 
@@ -357,13 +558,13 @@ export class VentaCreateComponent implements OnInit {
       error: (error) => {
         console.error('Error creating venta:', error);
         let errorMessage = 'Error al crear la venta';
-        
+
         if (error.error?.message) {
           errorMessage += ': ' + error.error.message;
         } else if (error.message) {
           errorMessage += ': ' + error.message;
         }
-        
+
         this._notificationService.showError(errorMessage);
         this.isLoading.set(false);
       },

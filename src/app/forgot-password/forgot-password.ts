@@ -9,7 +9,7 @@ import { AuthService } from '../components/services/auth.service';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterModule],
   templateUrl: './forgot-password.html',
-  styleUrls: ['./forgot-password.css']
+  styleUrls: ['./forgot-password.css'],
 })
 export class ForgotPasswordComponent {
   forgotPasswordForm: FormGroup;
@@ -23,35 +23,40 @@ export class ForgotPasswordComponent {
 
   constructor() {
     this.forgotPasswordForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email]]
+      email: ['', [Validators.required, Validators.email]],
     });
   }
 
   onSubmit(): void {
+    this.forgotPasswordForm.markAllAsTouched();
+
     if (this.forgotPasswordForm.valid) {
       this.loading.set(true);
       this.errorMessage.set('');
-      
-      const email = this.forgotPasswordForm.value.email;
-      
+
+      const email = this.forgotPasswordForm.get('email')?.value;
+
       this.authService.forgotPassword(email).subscribe({
-        next: () => {
+        next: (response) => {
           this.submittedEmail.set(email);
           this.emailSent.set(true);
           this.loading.set(false);
+          this.forgotPasswordForm.reset();
         },
         error: (error) => {
           this.errorMessage.set(error.message || 'Error al enviar el correo de recuperación');
           this.loading.set(false);
-        }
+        },
       });
     }
   }
 
   resendEmail(): void {
+    if (!this.submittedEmail()) return;
+
     this.loading.set(true);
     this.errorMessage.set('');
-    
+
     this.authService.forgotPassword(this.submittedEmail()).subscribe({
       next: () => {
         this.loading.set(false);
@@ -59,7 +64,11 @@ export class ForgotPasswordComponent {
       error: (error) => {
         this.errorMessage.set(error.message || 'Error al reenviar el correo');
         this.loading.set(false);
-      }
+      },
     });
+  }
+
+  get email() {
+    return this.forgotPasswordForm.get('email');
   }
 }
