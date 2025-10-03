@@ -1,283 +1,438 @@
 <!-- Header -->
 <div class="bg-white rounded-2xl p-4 md:p-6 mb-6 flex items-center gap-4 shadow-sm">
-  <button
-    (click)="cancel()"
-    class="bg-gray-100 text-gray-600 w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-200 transition-colors"
-  >
-    <fa-icon [icon]="faArrowLeft" class="text-lg"></fa-icon>
-  </button>
-  <div
-    class="bg-blue-100 text-blue-600 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full"
-  >
-    <fa-icon [icon]="faShoppingCart" class="text-lg md:text-xl"></fa-icon>
-  </div>
-  <h2 class="text-lg md:text-xl font-bold font-sans text-gray-800">
-    Editar Venta #{{ ventaId() }}
-  </h2>
+    <button (click)="cancel()"
+        class="bg-gray-100 text-gray-600 w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-200 transition-colors">
+        <fa-icon [icon]="faArrowLeft" class="text-lg"></fa-icon>
+    </button>
+    <div class="bg-blue-100 text-blue-600 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full">
+        <fa-icon [icon]="faShoppingCart" class="text-lg md:text-xl"></fa-icon>
+    </div>
+    <h2 class="text-lg md:text-xl font-bold font-sans text-gray-800">Editar Venta #{{ ventaId() }}</h2>
 </div>
 
 <div class="max-w-6xl mx-auto p-2 md:p-5 bg-white rounded-2xl shadow-xl">
-  <form [formGroup]="form" (ngSubmit)="submit()" class="space-y-6">
-    <!-- Información Básica -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <!-- Cliente -->
-      <div>
-        <label class="block text-sm font-semibold text-gray-700 mb-2">
-          <i class="fas fa-user mr-2 text-[#2196f3]"></i>Cliente *
-        </label>
-        <select
-          formControlName="id_cliente"
-          class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#2196f3] focus:border-transparent shadow-sm appearance-none bg-white"
-        >
-          <option value="">Seleccione un cliente</option>
-          @for (cliente of clientes(); track cliente.id_cliente) {
-          <option [value]="cliente.id_cliente">{{ cliente.nombre }}</option>
-          }
-        </select>
-        @if (form.get('id_cliente')?.invalid && form.get('id_cliente')?.touched) {
-        <span class="text-red-500 text-xs">Seleccione un cliente</span>
-        }
-      </div>
-
-      <!-- Usuario (Ahora es de solo lectura) -->
-      <!-- <div>
+    <form [formGroup]="form" (ngSubmit)="submit()" class="space-y-6">
+        <!-- Información Básica -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Cliente con buscador -->
+            <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-2">
-                    <i class="fas fa-user-tie mr-2 text-[#2196f3]"></i>Usuario *
+                    Cliente *
+                </label>
+                <div class="relative">
+                    <input type="text" [value]="clienteSeleccionado() ? clienteSeleccionado()!.nombre : ''"
+                        (click)="mostrarBuscadorClientes()" (focus)="mostrarBuscadorClientes()" readonly
+                        placeholder="Buscar cliente..."
+                        class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#2196f3] focus:border-transparent shadow-sm appearance-none bg-white cursor-pointer">
+                    <fa-icon [icon]="faSearch"
+                        class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></fa-icon>
+                </div>
+                <input type="hidden" formControlName="id_cliente">
+                @if (form.get('id_cliente')?.invalid && form.get('id_cliente')?.touched) {
+                <span class="text-red-500 text-xs">Seleccione un cliente</span>
+                }
+            </div>
+
+            <!-- Usuario -->
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                    Usuario *
                 </label>
                 <div class="w-full border border-gray-300 rounded-xl px-4 py-3 bg-gray-100">
                     @if (usuarioActual()) {
-                        <span class="font-semibold text-gray-800">{{ usuarioActual()!.nombre }}</span>
-                        <input type="hidden" formControlName="id_usuario">
+                    <span class="font-semibold text-gray-800">{{ usuarioActual()!.nombre }}</span>
+                    <input type="hidden" formControlName="id_usuario">
                     } @else {
-                        <span class="text-red-500">No se pudo cargar el usuario</span>
+                    <span class="text-red-500">No se pudo cargar el usuario</span>
                     }
                 </div>
                 <small class="text-gray-500 text-xs">Usuario autenticado actualmente</small>
-            </div> -->
-    </div>
+            </div>
+        </div>
 
-    <!-- Fecha y Método de Pago -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <!-- Fecha -->
-      <div>
-        <label class="block text-sm font-semibold text-gray-700 mb-2">
-          <i class="fas fa-calendar mr-2 text-[#2196f3]"></i>Fecha Venta *
-        </label>
-        <input
-          formControlName="fecha_venta"
-          type="datetime-local"
-          class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#2196f3] focus:border-transparent shadow-sm transition-all"
-        />
-        @if (form.get('fecha_venta')?.invalid && form.get('fecha_venta')?.touched) {
-        <span class="text-red-500 text-xs">La fecha de venta es requerida</span>
-        }
-      </div>
+        <!-- Fecha y Método de Pago -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Fecha -->
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                    Fecha Venta *
+                </label>
+                <input formControlName="fecha_venta" type="datetime-local"
+                    class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#2196f3] focus:border-transparent shadow-sm transition-all" />
+                @if (form.get('fecha_venta')?.invalid && form.get('fecha_venta')?.touched) {
+                <span class="text-red-500 text-xs">La fecha de venta es requerida</span>
+                }
+            </div>
 
-      <!-- Método de Pago -->
-      <div>
-        <label class="block text-sm font-semibold text-gray-700 mb-2">
-          <i class="fas fa-credit-card mr-2 text-[#2196f3]"></i>Método de Pago *
-        </label>
-        <select
-          formControlName="metodo_pago"
-          class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#2196f3] focus:border-transparent shadow-sm appearance-none bg-white"
-        >
-          <option value="efectivo">Efectivo</option>
-          <option value="tarjeta">Tarjeta</option>
-          <option value="transferencia">Transferencia</option>
-          <option value="credito">Crédito</option>
-        </select>
-      </div>
-    </div>
+            <!-- Método de Pago -->
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                    Método de Pago *
+                </label>
+                <select formControlName="metodo_pago" [disabled]="tienePlanPagoConPagos()"
+                    class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#2196f3] focus:border-transparent shadow-sm appearance-none bg-white">
+                    <option value="efectivo">Efectivo</option>
+                    <option value="transferencia">Transferencia</option>
+                    <option value="credito">Crédito</option>
+                </select>
+                @if (tienePlanPagoConPagos()) {
+                <small class="text-yellow-600 text-xs">No se puede cambiar el método de pago porque ya hay pagos
+                    registrados</small>
+                }
+            </div>
+        </div>
 
-    <!-- Detalles de Venta -->
-    <div class="border-t pt-6">
-      <div class="flex justify-between items-center mb-4">
-        <h3 class="text-lg font-semibold text-gray-800">
-          <i class="fas fa-list mr-2 text-[#2196f3]"></i>Productos de la Venta
-        </h3>
-        <button
-          type="button"
-          (click)="agregarDetalle()"
-          class="flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors"
-        >
-          <fa-icon [icon]="faPlus" class="text-sm"></fa-icon>
-          Agregar Producto
-        </button>
-      </div>
+        <!-- Detalles de Venta -->
+        <div class="border-t pt-6">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold text-gray-800">
+                    Productos de la Venta
+                </h3>
+                @if (!tienePlanPagoConPagos()) {
+                <button type="button" (click)="agregarDetalle()"
+                    class="flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors">
+                    <fa-icon [icon]="faPlus" class="text-sm"></fa-icon>
+                    Agregar Producto
+                </button>
+                }
+            </div>
 
-      <!-- Lista de detalles -->
-      <div formArrayName="detalles" class="space-y-4">
-        @for (detalle of detalles.controls; track $index; let i = $index) {
-        <div
-          [formGroupName]="i"
-          class="grid grid-cols-1 md:grid-cols-12 gap-4 p-4 border rounded-lg bg-gray-50"
-        >
-          <!-- Producto -->
-          <div class="md:col-span-4">
-            <label class="block text-sm font-semibold text-gray-700 mb-2">Producto *</label>
-            <select
-              formControlName="id_producto"
-              (change)="onProductoSeleccionado(i)"
-              class="w-full border border-gray-300 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2196f3]"
-            >
-              <option value="">Seleccione un producto</option>
-              @for (producto of productos(); track producto.id_producto) {
-              <option [value]="producto.id_producto">
-                {{ producto.nombre }} - {{ producto.precio_venta | number : '1.2-2' }} Bs. (Stock:
-                {{ producto.stock }})
-              </option>
-              }
-            </select>
-          </div>
+            <!-- Alerta si hay pagos registrados -->
+            @if (tienePlanPagoConPagos()) {
+            <div class="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-xl">
+                <div class="flex items-center">
+                    <fa-icon [icon]="faExclamationTriangle" class="text-yellow-600 mr-2"></fa-icon>
+                    <span class="text-yellow-800 font-medium">No se pueden modificar los productos porque ya hay pagos
+                        registrados en el plan de pago</span>
+                </div>
+            </div>
+            }
 
-          <!-- Cantidad -->
-          <div class="md:col-span-2">
-            <label class="block text-sm font-semibold text-gray-700 mb-2">Cantidad *</label>
-            <input
-              formControlName="cantidad"
-              type="number"
-              min="1"
-              step="1"
-              (blur)="calcularSubtotalDetalle(i)"
-              class="w-full border border-gray-300 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2196f3]"
-            />
-          </div>
+            <!-- Lista de detalles -->
+            <div formArrayName="detalles" class="space-y-4">
+                @for (detalle of detalles.controls; track $index; let i = $index) {
+                <div [formGroupName]="i"
+                    class="grid grid-cols-1 md:grid-cols-12 gap-4 p-4 border rounded-lg bg-gray-50">
+                    <!-- Producto con buscador -->
+                    <div class="md:col-span-4">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Producto *</label>
+                        <div class="relative">
+                            <input type="text" [value]="getProductoSeleccionadoNombre(i)"
+                                (click)="!tienePlanPagoConPagos() && mostrarBuscadorProductos(i)"
+                                (focus)="!tienePlanPagoConPagos() && mostrarBuscadorProductos(i)" readonly
+                                placeholder="Buscar producto..." [class.cursor-not-allowed]="tienePlanPagoConPagos()"
+                                [class.cursor-pointer]="!tienePlanPagoConPagos()"
+                                [class.bg-gray-100]="tienePlanPagoConPagos()"
+                                class="w-full border border-gray-300 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2196f3] focus:border-transparent">
+                            <fa-icon [icon]="faSearch"
+                                class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm"></fa-icon>
+                        </div>
+                        <input type="hidden" formControlName="productoId">
+                    </div>
 
-          <!-- Precio Unitario -->
-          <div class="md:col-span-2">
-            <label class="block text-sm font-semibold text-gray-700 mb-2">Precio Unitario *</label>
-            <input
-              formControlName="precio_unitario"
-              type="number"
-              step="0.01"
-              min="0"
-              readonly
-              class="w-full border border-gray-300 rounded-xl px-3 py-2 bg-gray-100"
-            />
-          </div>
+                    <!-- Cantidad -->
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Cantidad *</label>
+                        <input formControlName="cantidad" type="number" min="0.01" step="0.01"
+                            (blur)="calcularSubtotalDetalle(i)" [readonly]="tienePlanPagoConPagos()"
+                            [class.bg-gray-100]="tienePlanPagoConPagos()"
+                            class="w-full border border-gray-300 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2196f3]" />
+                    </div>
 
-          <!-- Subtotal -->
-          <div class="md:col-span-2">
-            <label class="block text-sm font-semibold text-gray-700 mb-2">Subtotal</label>
-            <input
-              formControlName="subtotal"
-              type="number"
-              step="0.01"
-              readonly
-              class="w-full border border-gray-300 rounded-xl px-3 py-2 bg-gray-100 font-semibold"
-            />
-          </div>
+                    <!-- Precio Unitario -->
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Precio Unitario *</label>
+                        <input formControlName="precioUnitario" type="number" step="0.01" min="0" readonly
+                            class="w-full border border-gray-300 rounded-xl px-3 py-2 bg-gray-100" />
+                    </div>
 
-          <!-- Eliminar -->
-          <div class="md:col-span-2 flex items-end">
-            <button
-              type="button"
-              (click)="eliminarDetalle(i)"
-              class="w-full bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg transition-colors flex items-center justify-center gap-2"
-            >
-              <fa-icon [icon]="faTrash" class="text-sm"></fa-icon>
-              Eliminar
-            </button>
-          </div>
+                    <!-- Subtotal -->
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Subtotal</label>
+                        <input formControlName="subtotal" type="number" step="0.01" readonly
+                            class="w-full border border-gray-300 rounded-xl px-3 py-2 bg-gray-100 font-semibold" />
+                    </div>
+
+                    <!-- Eliminar -->
+                    <div class="md:col-span-2 flex items-end">
+                        @if (!tienePlanPagoConPagos()) {
+                        <button type="button" (click)="eliminarDetalle(i)"
+                            class="w-full bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg transition-colors flex items-center justify-center gap-2">
+                            <fa-icon [icon]="faTrash" class="text-sm"></fa-icon>
+                            Eliminar
+                        </button>
+                        }
+                    </div>
+                </div>
+                }
+            </div>
+
+            @if (detalles.length === 0) {
+            <div class="text-center py-8 text-gray-500">
+                <fa-icon [icon]="faShoppingBasket" class="text-4xl mb-2"></fa-icon>
+                <p>No hay productos agregados</p>
+            </div>
+            }
+        </div>
+
+        <!-- Sección de Plan de Pago y Pagos -->
+        @if (form.get('metodo_pago')?.value === 'credito' && planPagoOriginal()) {
+        <div class="border-t pt-6">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">
+                Plan de Pago y Pagos Registrados
+            </h3>
+
+            <!-- Información del Plan de Pago -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                    <div class="text-sm text-blue-600 font-medium">Total del Plan</div>
+                    <div class="text-lg font-bold text-blue-800">{{ planPagoOriginal().total | number:'1.2-2' }} Bs.
+                    </div>
+                </div>
+                <div class="bg-green-50 p-4 rounded-lg border border-green-200">
+                    <div class="text-sm text-green-600 font-medium">Total Pagado</div>
+                    <div class="text-lg font-bold text-green-800">{{ calcularTotalPagado() | number:'1.2-2' }} Bs.</div>
+                </div>
+                <div class="bg-orange-50 p-4 rounded-lg border border-orange-200">
+                    <div class="text-sm text-orange-600 font-medium">Saldo Pendiente</div>
+                    <div class="text-lg font-bold text-orange-800">{{ calcularSaldoPendiente() | number:'1.2-2' }} Bs.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Formulario para agregar pago -->
+            <div class="bg-gray-50 p-6 rounded-xl border border-gray-200 mb-6">
+                <h4 class="text-md font-semibold text-gray-800 mb-4">Registrar Nuevo Pago</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Monto del Pago *</label>
+                        <input type="number" step="0.01" min="0.01" [max]="calcularSaldoPendiente()"
+                            [(ngModel)]="nuevoPago.monto" [ngModelOptions]="{standalone: true}" placeholder="0.00"
+                            class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#2196f3] focus:border-transparent shadow-sm">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Fecha del Pago *</label>
+                        <input type="date" [(ngModel)]="nuevoPago.fecha_pago" [ngModelOptions]="{standalone: true}"
+                            class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#2196f3] focus:border-transparent shadow-sm">
+                    </div>
+                </div>
+                <div class="mt-4 flex justify-end">
+                    <button type="button" (click)="agregarPago()"
+                        [disabled]="!nuevoPago.monto || !nuevoPago.fecha_pago || nuevoPago.monto > calcularSaldoPendiente()"
+                        class="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-xl transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed">
+                        <fa-icon [icon]="faMoneyBillWave" class="mr-2"></fa-icon>
+                        Registrar Pago
+                    </button>
+                </div>
+            </div>
+
+            <!-- Lista de Pagos Registrados -->
+            <div class="bg-white border border-gray-200 rounded-xl">
+                <h4 class="text-md font-semibold text-gray-800 p-4 border-b">Pagos Registrados</h4>
+                <div class="divide-y">
+                    @for (pago of planPagoOriginal()?.pagos || []; track $index) {
+                    <div class="p-4 flex justify-between items-center">
+                        <div>
+                            <div class="font-semibold text-gray-800">{{ pago.monto | number:'1.2-2' }} Bs.</div>
+                            <div class="text-sm text-gray-600">{{ pago.fecha_pago | date:'dd/MM/yyyy' }}</div>
+                        </div>
+                        <button type="button" (click)="eliminarPago(pago.id_pago)"
+                            class="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg transition-colors">
+                            <fa-icon [icon]="faTrash" class="text-sm"></fa-icon>
+                        </button>
+                    </div>
+                    }
+                    @if (!planPagoOriginal()?.pagos || planPagoOriginal()?.pagos?.length === 0) {
+                    <div class="p-8 text-center text-gray-500">
+                        <fa-icon [icon]="faReceipt" class="text-4xl mb-2"></fa-icon>
+                        <p>No hay pagos registrados</p>
+                    </div>
+                    }
+                </div>
+            </div>
         </div>
         }
-      </div>
 
-      @if (detalles.length === 0) {
-      <div class="text-center py-8 text-gray-500">
-        <i class="fas fa-shopping-basket text-4xl mb-2"></i>
-        <p>No hay productos agregados</p>
-      </div>
-      }
-    </div>
+        <!-- Montos -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 border-t pt-6">
+            <!-- Subtotal -->
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                    Subtotal *
+                </label>
+                <input formControlName="subtotal" type="number" step="0.01" readonly
+                    class="w-full border border-gray-300 rounded-xl px-4 py-3 bg-gray-50 font-semibold text-lg" />
+            </div>
 
-    <!-- Montos -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 border-t pt-6">
-      <!-- Subtotal -->
-      <div>
-        <label class="block text-sm font-semibold text-gray-700 mb-2">
-          <i class="fas fa-dollar-sign mr-2 text-[#2196f3]"></i>Subtotal *
-        </label>
-        <input
-          formControlName="subtotal"
-          type="number"
-          step="0.01"
-          readonly
-          class="w-full border border-gray-300 rounded-xl px-4 py-3 bg-gray-50 font-semibold text-lg"
-        />
-      </div>
+            <!-- Descuento -->
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                    Descuento
+                </label>
+                <input formControlName="descuento" type="number" step="0.01" placeholder="0.00"
+                    (blur)="onDescuentoChange()" [readonly]="tienePlanPagoConPagos()"
+                    [class.bg-gray-100]="tienePlanPagoConPagos()"
+                    class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#2196f3] focus:border-transparent shadow-sm transition-all" />
+                @if (tienePlanPagoConPagos()) {
+                <small class="text-yellow-600 text-xs">No se puede modificar el descuento porque ya hay pagos
+                    registrados</small>
+                }
+            </div>
 
-      <!-- Descuento -->
-      <div>
-        <label class="block text-sm font-semibold text-gray-700 mb-2">
-          <i class="fas fa-tag mr-2 text-[#2196f3]"></i>Descuento
-        </label>
-        <input
-          formControlName="descuento"
-          type="number"
-          step="0.01"
-          placeholder="0.00"
-          (blur)="onDescuentoChange()"
-          class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#2196f3] focus:border-transparent shadow-sm transition-all"
-        />
-      </div>
+            <!-- Total -->
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                    Total *
+                </label>
+                <input formControlName="total" type="number" step="0.01" readonly
+                    class="w-full border border-gray-300 rounded-xl px-4 py-3 bg-gray-50 font-semibold text-lg text-green-600" />
+            </div>
+        </div>
 
-      <!-- Total -->
-      <div>
-        <label class="block text-sm font-semibold text-gray-700 mb-2">
-          <i class="fas fa-calculator mr-2 text-[#2196f3]"></i>Total *
-        </label>
-        <input
-          formControlName="total"
-          type="number"
-          step="0.01"
-          readonly
-          class="w-full border border-gray-300 rounded-xl px-4 py-3 bg-gray-50 font-semibold text-lg text-green-600"
-        />
-      </div>
-    </div>
+        <!-- Estado -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                    Estado *
+                </label>
+                <select formControlName="estado"
+                    class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#2196f3] focus:border-transparent shadow-sm appearance-none bg-white">
+                    <option value="pendiente">Pendiente</option>
+                    <option value="pagado">Pagado</option>
+                    <option value="anulado">Anulado</option>
+                </select>
+            </div>
+        </div>
 
-    <!-- Estado -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <div>
-        <label class="block text-sm font-semibold text-gray-700 mb-2">
-          <i class="fas fa-check-circle mr-2 text-[#2196f3]"></i>Estado *
-        </label>
-        <select
-          formControlName="estado"
-          class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#2196f3] focus:border-transparent shadow-sm appearance-none bg-white"
-        >
-          <option value="pendiente">Pendiente</option>
-          <option value="pagado">Pagado</option>
-          <option value="anulado">Anulado</option>
-        </select>
-      </div>
-    </div>
-
-    <!-- Botones -->
-    <div class="flex flex-col sm:flex-row justify-end gap-3 mt-8 pt-6 border-t">
-      <button
-        type="button"
-        (click)="cancel()"
-        class="flex items-center justify-center gap-2 bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-xl shadow-md transition-all duration-200 transform hover:scale-105 order-2 sm:order-1"
-        [disabled]="isLoading()"
-      >
-        <fa-icon [icon]="faArrowLeft" class="text-sm"></fa-icon>
-        Cancelar
-      </button>
-      <button
-        type="submit"
-        class="flex items-center justify-center gap-2 bg-[#2196f3] hover:bg-blue-700 text-white px-8 py-3 rounded-xl shadow-md transition-all duration-200 transform hover:scale-105 order-1 sm:order-2"
-        [disabled]="isLoading() || !usuarioActual()"
-      >
-        <fa-icon [icon]="faSave" class="text-sm"></fa-icon>
-        @if (isLoading()) {
-        <span>Actualizando...</span>
-        } @else {
-        <span>Actualizar Venta</span>
-        }
-      </button>
-    </div>
-  </form>
+        <!-- Botones -->
+        <div class="flex flex-col sm:flex-row justify-end gap-3 mt-8 pt-6 border-t">
+            <button type="button" (click)="cancel()"
+                class="flex items-center justify-center gap-2 bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-xl shadow-md transition-all duration-200 transform hover:scale-105 order-2 sm:order-1"
+                [disabled]="isLoading()">
+                <fa-icon [icon]="faArrowLeft" class="text-sm"></fa-icon>
+                Cancelar
+            </button>
+            <button type="submit"
+                class="flex items-center justify-center gap-2 bg-[#2196f3] hover:bg-blue-700 text-white px-8 py-3 rounded-xl shadow-md transition-all duration-200 transform hover:scale-105 order-1 sm:order-2"
+                [disabled]="isLoading() || !usuarioActual()">
+                <fa-icon [icon]="faSave" class="text-sm"></fa-icon>
+                @if (isLoading()) {
+                <span>Actualizando...</span>
+                } @else {
+                <span>Actualizar Venta</span>
+                }
+            </button>
+        </div>
+    </form>
 </div>
+
+<!-- Modal Buscador Clientes -->
+@if (mostrarBuscadorClientesModal()) {
+<div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl w-full max-w-2xl max-h-[80vh] overflow-hidden">
+        <div class="p-6 border-b">
+            <div class="flex justify-between items-center">
+                <h3 class="text-xl font-bold text-gray-800">Buscar Cliente</h3>
+                <button (click)="cerrarBuscadorClientes()" class="text-gray-500 hover:text-gray-700">
+                    <fa-icon [icon]="faTimes" class="text-lg"></fa-icon>
+                </button>
+            </div>
+            <div class="mt-4 relative">
+                <input type="text" [(ngModel)]="terminoBusquedaCliente" (input)="filtrarClientes()"
+                    placeholder="Escriba para buscar clientes..."
+                    class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#2196f3] focus:border-transparent shadow-sm">
+                <fa-icon [icon]="faSearch"
+                    class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></fa-icon>
+            </div>
+        </div>
+        <div class="overflow-y-auto max-h-96">
+            @if (clientesFiltrados().length === 0) {
+            <div class="p-8 text-center text-gray-500">
+                <fa-icon [icon]="faUsers" class="text-4xl mb-2"></fa-icon>
+                <p>No se encontraron clientes</p>
+            </div>
+            } @else {
+            <div class="divide-y">
+                @for (cliente of clientesFiltrados(); track cliente.id_cliente) {
+                <div (click)="seleccionarCliente(cliente)" class="p-4 hover:bg-blue-50 cursor-pointer transition-colors"
+                    [class.bg-blue-50]="clienteSeleccionado()?.id_cliente === cliente.id_cliente">
+                    <div class="font-semibold text-gray-800">{{ cliente.nombre }}</div>
+                    <div class="text-sm text-gray-600 mt-1">ID: {{ cliente.id_cliente }}</div>
+                </div>
+                }
+            </div>
+            }
+        </div>
+        <div class="p-4 border-t bg-gray-50">
+            <button (click)="cerrarBuscadorClientes()"
+                class="w-full bg-[#2196f3] hover:bg-blue-700 text-white px-4 py-3 rounded-xl transition-colors">
+                Cerrar
+            </button>
+        </div>
+    </div>
+</div>
+}
+
+<!-- Modal Buscador Productos -->
+@if (mostrarBuscadorProductosModal() !== null) {
+<div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl w-full max-w-4xl max-h-[80vh] overflow-hidden">
+        <div class="p-6 border-b">
+            <div class="flex justify-between items-center">
+                <h3 class="text-xl font-bold text-gray-800">Buscar Producto</h3>
+                <button (click)="cerrarBuscadorProductos()" class="text-gray-500 hover:text-gray-700">
+                    <fa-icon [icon]="faTimes" class="text-lg"></fa-icon>
+                </button>
+            </div>
+            <div class="mt-4 relative">
+                <input type="text" [(ngModel)]="terminoBusquedaProducto" (input)="filtrarProductos()"
+                    placeholder="Escriba para buscar productos..."
+                    class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#2196f3] focus:border-transparent shadow-sm">
+                <fa-icon [icon]="faSearch"
+                    class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></fa-icon>
+            </div>
+        </div>
+        <div class="overflow-y-auto max-h-96">
+            @if (productosFiltrados().length === 0) {
+            <div class="p-8 text-center text-gray-500">
+                <fa-icon [icon]="faBoxes" class="text-4xl mb-2"></fa-icon>
+                <p>No se encontraron productos</p>
+            </div>
+            } @else {
+            <div class="divide-y">
+                @for (producto of productosFiltrados(); track producto.id_producto) {
+                <div (click)="seleccionarProducto(producto)"
+                    class="p-4 hover:bg-blue-50 cursor-pointer transition-colors">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <div class="font-semibold text-gray-800">{{ producto.nombre }}</div>
+                            <div class="text-sm text-gray-600 mt-1">
+                                <span class="font-medium">Precio: {{ producto.precio_venta | number:'1.2-2' }}
+                                    Bs.</span> •
+                                <span>Stock: {{ producto.stock }}</span> •
+                                <span>Categoría: {{ producto.categoria || 'N/A' }}</span>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-sm font-semibold text-green-600">
+                                {{ producto.precio_venta | number:'1.2-2' }} Bs.
+                            </div>
+                            <div class="text-xs text-gray-500 mt-1">
+                                Stock: {{ producto.stock }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                }
+            </div>
+            }
+        </div>
+        <div class="p-4 border-t bg-gray-50">
+            <button (click)="cerrarBuscadorProductos()"
+                class="w-full bg-[#2196f3] hover:bg-blue-700 text-white px-4 py-3 rounded-xl transition-colors">
+                Cerrar
+            </button>
+        </div>
+    </div>
+</div>
+}

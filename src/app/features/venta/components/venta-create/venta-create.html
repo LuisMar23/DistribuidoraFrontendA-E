@@ -14,18 +14,20 @@
     <form [formGroup]="form" (ngSubmit)="submit()" class="space-y-6">
         <!-- Información Básica -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- Cliente -->
+            <!-- Cliente con buscador -->
             <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-2">
                     <i class="fas fa-user mr-2 text-[#2196f3]"></i>Cliente *
                 </label>
-                <select formControlName="id_cliente"
-                    class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#2196f3] focus:border-transparent shadow-sm appearance-none bg-white">
-                    <option value="">Seleccione un cliente</option>
-                    @for (cliente of clientes(); track cliente.id_cliente) {
-                    <option [value]="cliente.id_cliente">{{ cliente.nombre }}</option>
-                    }
-                </select>
+                <div class="relative">
+                    <input type="text" [value]="clienteSeleccionado() ? clienteSeleccionado()!.nombre : ''"
+                        (click)="mostrarBuscadorClientes()" (focus)="mostrarBuscadorClientes()" readonly
+                        placeholder="Buscar cliente..."
+                        class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#2196f3] focus:border-transparent shadow-sm appearance-none bg-white cursor-pointer">
+                    <fa-icon [icon]="faSearch"
+                        class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></fa-icon>
+                </div>
+                <input type="hidden" formControlName="id_cliente">
                 @if (form.get('id_cliente')?.invalid && form.get('id_cliente')?.touched) {
                 <span class="text-red-500 text-xs">Seleccione un cliente</span>
                 }
@@ -38,10 +40,10 @@
                 </label>
                 <div class="w-full border border-gray-300 rounded-xl px-4 py-3 bg-gray-100">
                     @if (usuarioActual()) {
-                        <span class="font-semibold text-gray-800">{{ usuarioActual()!.nombre }}</span>
-                        <input type="hidden" formControlName="id_usuario">
+                    <span class="font-semibold text-gray-800">{{ usuarioActual()!.nombre }}</span>
+                    <input type="hidden" formControlName="id_usuario">
                     } @else {
-                        <span class="text-red-500">No se pudo cargar el usuario</span>
+                    <span class="text-red-500">No se pudo cargar el usuario</span>
                     }
                 </div>
                 <small class="text-gray-500 text-xs">Usuario autenticado actualmente</small>
@@ -67,10 +69,9 @@
                 <label class="block text-sm font-semibold text-gray-700 mb-2">
                     <i class="fas fa-credit-card mr-2 text-[#2196f3]"></i>Método de Pago *
                 </label>
-                <select formControlName="metodo_pago"
+                <select formControlName="metodo_pago" (change)="onMetodoPagoChange()"
                     class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#2196f3] focus:border-transparent shadow-sm appearance-none bg-white">
                     <option value="efectivo">Efectivo</option>
-                    <option value="tarjeta">Tarjeta</option>
                     <option value="transferencia">Transferencia</option>
                     <option value="credito">Crédito</option>
                 </select>
@@ -95,25 +96,24 @@
                 @for (detalle of detalles.controls; track $index; let i = $index) {
                 <div [formGroupName]="i"
                     class="grid grid-cols-1 md:grid-cols-12 gap-4 p-4 border rounded-lg bg-gray-50">
-                    <!-- Producto -->
+                    <!-- Producto con buscador -->
                     <div class="md:col-span-4">
                         <label class="block text-sm font-semibold text-gray-700 mb-2">Producto *</label>
-                        <select formControlName="id_producto" (change)="onProductoSeleccionado(i)"
-                            class="w-full border border-gray-300 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2196f3]">
-                            <option value="">Seleccione un producto</option>
-                            @for (producto of productos(); track producto.id_producto) {
-                            <option [value]="producto.id_producto">
-                                {{ producto.nombre }} - {{ producto.precio_venta | number:'1.2-2' }} Bs. (Stock: {{
-                                producto.stock }})
-                            </option>
-                            }
-                        </select>
+                        <div class="relative">
+                            <input type="text" [value]="getProductoSeleccionadoNombre(i)"
+                                (click)="mostrarBuscadorProductos(i)" (focus)="mostrarBuscadorProductos(i)" readonly
+                                placeholder="Buscar producto..."
+                                class="w-full border border-gray-300 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2196f3] cursor-pointer">
+                            <fa-icon [icon]="faSearch"
+                                class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm"></fa-icon>
+                        </div>
+                        <input type="hidden" formControlName="id_producto">
                     </div>
 
                     <!-- Cantidad -->
                     <div class="md:col-span-2">
                         <label class="block text-sm font-semibold text-gray-700 mb-2">Cantidad *</label>
-                        <input formControlName="cantidad" type="number" min="1" step="1"
+                        <input formControlName="cantidad" type="number" min="0.01" step="0.01"
                             (blur)="calcularSubtotalDetalle(i)"
                             class="w-full border border-gray-300 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2196f3]" />
                     </div>
@@ -151,6 +151,110 @@
             </div>
             }
         </div>
+
+        <!-- Plan de Pago (Solo para crédito) -->
+        @if (form.get('metodo_pago')?.value === 'credito') {
+        <div class="border-t pt-6">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">
+                <i class="fas fa-calendar-alt mr-2 text-[#2196f3]"></i>Plan de Pago
+            </h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Monto Inicial -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        <i class="fas fa-money-bill-wave mr-2 text-[#2196f3]"></i>Monto Inicial
+                    </label>
+                    <input formControlName="monto_inicial" type="number" step="0.01" min="0"
+                        [max]="form.get('total')?.value" placeholder="0.00"
+                        class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#2196f3] focus:border-transparent shadow-sm transition-all" />
+                    <small class="text-gray-500 text-xs">Monto a pagar al momento de la venta</small>
+                </div>
+
+                <!-- Fecha Inicio -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        <i class="fas fa-calendar-day mr-2 text-[#2196f3]"></i>Fecha de Inicio *
+                    </label>
+                    <input formControlName="fecha_inicio" type="date"
+                        class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#2196f3] focus:border-transparent shadow-sm transition-all" />
+                    @if (form.get('fecha_inicio')?.invalid && form.get('fecha_inicio')?.touched) {
+                    <span class="text-red-500 text-xs">La fecha de inicio es requerida</span>
+                    }
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
+                <!-- Plazo -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        <i class="fas fa-clock mr-2 text-[#2196f3]"></i>Plazo *
+                    </label>
+                    <input formControlName="plazo" type="number" min="1" placeholder="Ej: 30"
+                        class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#2196f3] focus:border-transparent shadow-sm transition-all" />
+                    @if (form.get('plazo')?.invalid && form.get('plazo')?.touched) {
+                    <span class="text-red-500 text-xs">El plazo es requerido</span>
+                    }
+                </div>
+
+                <!-- Periodicidad -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        <i class="fas fa-sync-alt mr-2 text-[#2196f3]"></i>Periodicidad *
+                    </label>
+                    <select formControlName="periodicidad"
+                        class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#2196f3] focus:border-transparent shadow-sm appearance-none bg-white">
+                        <option value="DIAS">Días</option>
+                        <option value="SEMANAS">Semanas</option>
+                        <option value="MESES">Meses</option>
+                    </select>
+                    @if (form.get('periodicidad')?.invalid && form.get('periodicidad')?.touched) {
+                    <span class="text-red-500 text-xs">La periodicidad es requerida</span>
+                    }
+                </div>
+
+                <!-- Fecha Vencimiento (Calculada) -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        <i class="fas fa-calendar-check mr-2 text-[#2196f3]"></i>Fecha de Vencimiento
+                    </label>
+                    <div class="w-full border border-gray-300 rounded-xl px-4 py-3 bg-gray-100">
+                        <span class="font-semibold text-gray-800">{{ calcularFechaVencimiento() }}</span>
+                    </div>
+                    <small class="text-gray-500 text-xs">Calculada automáticamente</small>
+                </div>
+            </div>
+
+            <!-- Resumen del Plan -->
+            @if (form.get('total')?.value > 0) {
+            <div class="mt-6 p-4 bg-blue-50 rounded-xl border border-blue-200">
+                <h4 class="font-semibold text-blue-800 mb-2">Resumen del Plan de Pago</h4>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                    <div>
+                        <span class="text-gray-600">Total a Financiar:</span>
+                        <div class="font-semibold text-green-600">{{ calcularTotalFinanciar() | number:'1.2-2' }} Bs.
+                        </div>
+                    </div>
+                    <div>
+                        <span class="text-gray-600">Monto Inicial:</span>
+                        <div class="font-semibold text-blue-600">{{ (form.get('monto_inicial')?.value || 0) |
+                            number:'1.2-2' }} Bs.</div>
+                    </div>
+                    <div>
+                        <span class="text-gray-600">Saldo Pendiente:</span>
+                        <div class="font-semibold text-orange-600">{{ calcularSaldoPendiente() | number:'1.2-2' }} Bs.
+                        </div>
+                    </div>
+                    <div>
+                        <span class="text-gray-600">Plazo:</span>
+                        <div class="font-semibold text-gray-800">{{ form.get('plazo')?.value }} {{
+                            getPeriodicidadTexto() }}</div>
+                    </div>
+                </div>
+            </div>
+            }
+        </div>
+        }
 
         <!-- Montos -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 border-t pt-6">
@@ -219,3 +323,114 @@
         </div>
     </form>
 </div>
+
+<!-- Modal Buscador Clientes -->
+@if (mostrarBuscadorClientesModal()) {
+<div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl w-full max-w-2xl max-h-[80vh] overflow-hidden">
+        <div class="p-6 border-b">
+            <div class="flex justify-between items-center">
+                <h3 class="text-xl font-bold text-gray-800">Buscar Cliente</h3>
+                <button (click)="cerrarBuscadorClientes()" class="text-gray-500 hover:text-gray-700">
+                    <fa-icon [icon]="faTimes" class="text-lg"></fa-icon>
+                </button>
+            </div>
+            <div class="mt-4 relative">
+                <input type="text" [(ngModel)]="terminoBusquedaCliente" (input)="filtrarClientes()"
+                    placeholder="Escriba para buscar clientes..."
+                    class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#2196f3] focus:border-transparent shadow-sm">
+                <fa-icon [icon]="faSearch"
+                    class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></fa-icon>
+            </div>
+        </div>
+        <div class="overflow-y-auto max-h-96">
+            @if (clientesFiltrados().length === 0) {
+            <div class="p-8 text-center text-gray-500">
+                <i class="fas fa-users text-4xl mb-2"></i>
+                <p>No se encontraron clientes</p>
+            </div>
+            } @else {
+            <div class="divide-y">
+                @for (cliente of clientesFiltrados(); track cliente.id_cliente) {
+                <div (click)="seleccionarCliente(cliente)" class="p-4 hover:bg-blue-50 cursor-pointer transition-colors"
+                    [class.bg-blue-50]="clienteSeleccionado()?.id_cliente === cliente.id_cliente">
+                    <div class="font-semibold text-gray-800">{{ cliente.nombre }}</div>
+                    <div class="text-sm text-gray-600 mt-1">ID: {{ cliente.id_cliente }}</div>
+                </div>
+                }
+            </div>
+            }
+        </div>
+        <div class="p-4 border-t bg-gray-50">
+            <button (click)="cerrarBuscadorClientes()"
+                class="w-full bg-[#2196f3] hover:bg-blue-700 text-white px-4 py-3 rounded-xl transition-colors">
+                Cerrar
+            </button>
+        </div>
+    </div>
+</div>
+}
+
+<!-- Modal Buscador Productos -->
+@if (mostrarBuscadorProductosModal() !== null) {
+<div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl w-full max-w-4xl max-h-[80vh] overflow-hidden">
+        <div class="p-6 border-b">
+            <div class="flex justify-between items-center">
+                <h3 class="text-xl font-bold text-gray-800">Buscar Producto</h3>
+                <button (click)="cerrarBuscadorProductos()" class="text-gray-500 hover:text-gray-700">
+                    <fa-icon [icon]="faTimes" class="text-lg"></fa-icon>
+                </button>
+            </div>
+            <div class="mt-4 relative">
+                <input type="text" [(ngModel)]="terminoBusquedaProducto" (input)="filtrarProductos()"
+                    placeholder="Escriba para buscar productos..."
+                    class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#2196f3] focus:border-transparent shadow-sm">
+                <fa-icon [icon]="faSearch"
+                    class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></fa-icon>
+            </div>
+        </div>
+        <div class="overflow-y-auto max-h-96">
+            @if (productosFiltrados().length === 0) {
+            <div class="p-8 text-center text-gray-500">
+                <i class="fas fa-boxes text-4xl mb-2"></i>
+                <p>No se encontraron productos</p>
+            </div>
+            } @else {
+            <div class="divide-y">
+                @for (producto of productosFiltrados(); track producto.id_producto) {
+                <div (click)="seleccionarProducto(producto)"
+                    class="p-4 hover:bg-blue-50 cursor-pointer transition-colors">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <div class="font-semibold text-gray-800">{{ producto.nombre }}</div>
+                            <div class="text-sm text-gray-600 mt-1">
+                                <span class="font-medium">Precio: {{ producto.precio_venta | number:'1.2-2' }}
+                                    Bs.</span> •
+                                <span>Stock: {{ producto.stock }}</span> •
+                                <span>Categoría: {{ producto.categoria || 'N/A' }}</span>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-sm font-semibold text-green-600">
+                                {{ producto.precio_venta | number:'1.2-2' }} Bs.
+                            </div>
+                            <div class="text-xs text-gray-500 mt-1">
+                                Stock: {{ producto.stock }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                }
+            </div>
+            }
+        </div>
+        <div class="p-4 border-t bg-gray-50">
+            <button (click)="cerrarBuscadorProductos()"
+                class="w-full bg-[#2196f3] hover:bg-blue-700 text-white px-4 py-3 rounded-xl transition-colors">
+                Cerrar
+            </button>
+        </div>
+    </div>
+</div>
+}

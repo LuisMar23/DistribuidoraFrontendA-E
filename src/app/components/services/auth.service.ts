@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { map, Observable, tap } from 'rxjs';
+import { map, Observable, tap, catchError, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { LoginDto } from '../../core/interfaces/login.interface';
 import { RegisterDto } from '../../core/interfaces/register.interface';
@@ -12,6 +12,12 @@ export interface LoginResponse {
     accessToken: string;
     refreshToken: string;
   };
+}
+
+export interface ForgotPasswordResponse {
+  message?: string;
+  success?: boolean;
+  data?: any;
 }
 
 @Injectable({
@@ -71,8 +77,24 @@ export class AuthService {
       );
   }
 
-  forgotPassword(email: string): Observable<string> {
-    return this.http.post<string>(`${this.apiUrl}/forgot-password`, { email });
+  forgotPassword(email: string): Observable<ForgotPasswordResponse> {
+    return this.http
+      .post<ForgotPasswordResponse>(`${this.apiUrl}/auth/forgot-password`, { email })
+      .pipe(
+        catchError((error) => {
+          let errorMessage = 'Error al enviar el correo de recuperación';
+
+          if (error.status === 404) {
+            errorMessage = 'No se encontró una cuenta con este email';
+          } else if (error.status === 429) {
+            errorMessage = 'Demasiados intentos. Por favor, espera unos minutos';
+          } else if (error.error?.message) {
+            errorMessage = error.error.message;
+          }
+
+          return throwError(() => new Error(errorMessage));
+        })
+      );
   }
 
   private saveTokens(access: string, refresh: string) {
@@ -103,12 +125,10 @@ export class AuthService {
     this.router.navigate(['/login']);
   }
 
-  // MÉTODO NUEVO - Obtener usuario actual
   getCurrentUser(): any {
     if (typeof window !== 'undefined' && localStorage) {
-      // Primero intenta obtener de localStorage
       const userData = localStorage.getItem(this.userKey) || sessionStorage.getItem(this.userKey);
-      
+
       if (userData) {
         try {
           return JSON.parse(userData);

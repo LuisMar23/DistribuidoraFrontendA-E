@@ -42,11 +42,11 @@
             <fa-icon [icon]="faShoppingCart" class="text-3xl"></fa-icon>
             <div>
                 <h2 class="text-2xl font-semibold">Venta #{{ venta()?.id_venta }}</h2>
-                <p class="text-blue-100 mt-1">Cliente: {{ venta()?.cliente?.nombre || 'Cliente ' + venta()?.id_cliente }}</p>
+                <p class="text-blue-100 mt-1">Cliente: {{ venta()?.cliente?.nombre || 'Cliente ' + venta()?.id_cliente
+                    }}</p>
             </div>
         </div>
-        <span [class]="getEstadoClass(venta()?.estado)"
-            class="px-4 py-2 rounded-full text-sm font-medium capitalize">
+        <span [class]="getEstadoClass(venta()?.estado)" class="px-4 py-2 rounded-full text-sm font-medium capitalize">
             {{ venta()?.estado || 'N/A' }}
         </span>
     </div>
@@ -144,6 +144,81 @@
         </div>
     </div>
 
+    <!-- Sección de Plan de Pago (Solo para ventas a crédito) -->
+    @if (tienePlanPago() && venta()?.metodo_pago?.toLowerCase() === 'credito') {
+    <div class="p-6 border-t border-gray-200">
+        <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+            <fa-icon [icon]="faMoneyBillWave" class="text-green-500"></fa-icon>
+            Plan de Pago
+        </h3>
+
+        <!-- Resumen del Plan de Pago -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                <div class="text-sm text-blue-600 font-medium flex items-center gap-2">
+                    <fa-icon [icon]="faCalculator"></fa-icon>
+                    Total del Plan
+                </div>
+                <div class="text-lg font-bold text-blue-800 mt-1">
+                    {{ getPlanPago()?.total | number:'1.2-2' }} Bs.
+                </div>
+            </div>
+            <div class="bg-green-50 p-4 rounded-lg border border-green-200">
+                <div class="text-sm text-green-600 font-medium flex items-center gap-2">
+                    <fa-icon [icon]="faCheckCircle"></fa-icon>
+                    Total Pagado
+                </div>
+                <div class="text-lg font-bold text-green-800 mt-1">
+                    {{ calcularTotalPagado() | number:'1.2-2' }} Bs.
+                </div>
+            </div>
+            <div class="bg-orange-50 p-4 rounded-lg border border-orange-200">
+                <div class="text-sm text-orange-600 font-medium flex items-center gap-2">
+                    <fa-icon [icon]="faClock"></fa-icon>
+                    Saldo Pendiente
+                </div>
+                <div class="text-lg font-bold text-orange-800 mt-1">
+                    {{ calcularSaldoPendiente() | number:'1.2-2' }} Bs.
+                </div>
+            </div>
+        </div>
+
+        <!-- Lista de Pagos Registrados -->
+        @if (getPlanPago()?.pagos && getPlanPago()!.pagos.length > 0) {
+        <div class="bg-white border border-gray-200 rounded-xl">
+            <h4 class="text-md font-semibold text-gray-800 p-4 border-b flex items-center gap-2">
+                <fa-icon [icon]="faList" class="text-blue-500"></fa-icon>
+                Pagos Registrados
+            </h4>
+            <div class="divide-y">
+                @for (pago of getPlanPago()!.pagos; track $index) {
+                <div class="p-4 flex justify-between items-center hover:bg-gray-50">
+                    <div class="flex items-center gap-4">
+                        <div
+                            class="bg-green-100 text-green-600 w-10 h-10 flex items-center justify-center rounded-full">
+                            <fa-icon [icon]="faMoneyBillWave" class="text-sm"></fa-icon>
+                        </div>
+                        <div>
+                            <div class="font-semibold text-gray-800">{{ pago.monto | number:'1.2-2' }} Bs.</div>
+                            <div class="text-sm text-gray-600">{{ formatDate(pago.fecha_pago) }}</div>
+                        </div>
+                    </div>
+                    <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">
+                        Completado
+                    </span>
+                </div>
+                }
+            </div>
+        </div>
+        } @else {
+        <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-6 text-center">
+            <fa-icon [icon]="faClock" class="text-yellow-600 text-2xl mb-2"></fa-icon>
+            <p class="text-yellow-800">No hay pagos registrados para este plan de pago</p>
+        </div>
+        }
+    </div>
+    }
+
     <!-- Sección de Detalles de Venta -->
     @let currentVenta = venta();
     @if (currentVenta && currentVenta.detalles && currentVenta.detalles.length > 0) {
@@ -156,10 +231,14 @@
             <table class="min-w-full bg-white rounded-lg overflow-hidden">
                 <thead class="bg-gray-100">
                     <tr>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Producto</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cantidad</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Precio Unitario</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subtotal</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Producto</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Cantidad</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Precio Unitario</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Subtotal</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200">
@@ -169,7 +248,7 @@
                             {{ detalle.producto?.nombre || 'Producto #' + detalle.productoId }}
                         </td>
                         <td class="px-4 py-3 text-sm text-gray-500">
-                            {{ detalle.cantidad }}
+                            {{ detalle.cantidad | number:'1.2-2' }}
                         </td>
                         <td class="px-4 py-3 text-sm text-gray-500">
                             {{ detalle.precioUnitario | number:'1.2-2' }} Bs.
