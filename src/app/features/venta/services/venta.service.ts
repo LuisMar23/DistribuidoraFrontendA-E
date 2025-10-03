@@ -31,4 +31,17 @@ export class VentaService {
   delete(id: number): Observable<VentaDto> {
     return this.http.delete<VentaDto>(`${this.apiUrl}/${id}`);
   }
+
+  // NUEVOS MÉTODOS PARA PAGOS
+  registrarPagoPlanPago(pagoData: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/plan-pago/pagar`, pagoData);
+  }
+
+  eliminarPagoPlanPago(pagoId: number): Observable<any> {
+    return this.http.delete<any>(`${this.apiUrl}/pago-plan/${pagoId}`);
+  }
+
+  obtenerResumenPlanPago(planPagoId: number): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/plan-pago/${planPagoId}/resumen`);
+  }
 }

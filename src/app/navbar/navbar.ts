@@ -10,32 +10,29 @@ import {
   faShieldAlt,
   faSignOutAlt,
   faUser,
-  faUserCircle,
-  faUsers,
 } from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from '../components/services/auth.service';
 
 @Component({
   selector: 'app-navbar',
+  standalone: true,
   imports: [FontAwesomeModule, CommonModule],
   templateUrl: './navbar.html',
   styleUrl: './navbar.css',
 })
 export class Navbar {
   faBell = faBell;
-  faUserCircle = faUserCircle;
   faChevronDown = faChevronDown;
   faSignOutAlt = faSignOutAlt;
   faUser = faUser;
-  faShieldAlt=faShieldAlt;
-  faLayerGroup=faLayerGroup;
-  faSearch=faSearch;
-  faCog=faCog
+  faShieldAlt = faShieldAlt;
+  faLayerGroup = faLayerGroup;
+  faSearch = faSearch;
+  faCog = faCog;
 
   isUserMenuOpen: boolean = false;
 
-
-  _authService=inject(AuthService)
+  _authService = inject(AuthService);
   currentUser = {
     username: 'Admin',
   };
@@ -50,6 +47,6 @@ export class Navbar {
   }
 
   logout() {
-    this._authService.logout()
+    this._authService.logout();
   }
 }

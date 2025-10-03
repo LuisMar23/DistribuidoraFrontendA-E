@@ -13,6 +13,11 @@ export interface VentaDto {
   cliente?: any;
   usuario?: any;
   detalles?: DetalleVentaDto[];
+  // Agregar estas propiedades para el plan de pago
+  PlanPago?: any;
+  planPago?: any;
+  plan_pago?: any;
+  pagos?: any[];
 }
 
 export interface DetalleVentaDto {

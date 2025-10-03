@@ -58,8 +58,8 @@ export class VentaComponent {
   total = signal(0);
   pageSize = signal(10);
   currentPage = signal(1);
-  sortColumn = signal<keyof VentaDto | null>(null); // Inicialmente sin ordenamiento
-  sortDirection = signal<'asc' | 'desc'>('desc');
+  sortColumn = signal<keyof VentaDto>('id_venta'); // Por defecto ordenar por ID
+  sortDirection = signal<'asc' | 'desc'>('desc'); // Por defecto descendente
 
   _notificationService = inject(NotificationService);
   private router = inject(Router);
@@ -70,24 +70,19 @@ export class VentaComponent {
 
   loadVentas() {
     this.ventaService.getAll().subscribe((ventas: VentaDto[]) => {
-      // Solo aplicar ordenamiento si el usuario ha hecho clic en una columna
-      let ventasParaMostrar = ventas;
-
-      if (this.sortColumn()) {
-        ventasParaMostrar = this.sortVentas(ventas);
-      }
-
-      const paginatedVentas = this.paginateVentas(ventasParaMostrar);
+      // Aplicar ordenamiento por defecto (por ID descendente)
+      const ventasOrdenadas = this.sortVentas(ventas);
+      const paginatedVentas = this.paginateVentas(ventasOrdenadas);
       this.ventas.set(paginatedVentas);
       this.total.set(ventas.length);
     });
   }
 
-  // Ordenar ventas manualmente - SOLO cuando hay una columna seleccionada
+  // Ordenar ventas manualmente
   private sortVentas(ventas: VentaDto[]): VentaDto[] {
     const column = this.sortColumn();
     if (!column) {
-      return ventas; // Retornar sin ordenar si no hay columna seleccionada
+      return ventas;
     }
 
     return ventas.sort((a, b) => {
@@ -105,7 +100,7 @@ export class VentaComponent {
         return direction * (new Date(aValue).getTime() - new Date(bValue).getTime());
       }
 
-      // Ordenar por números
+      // Ordenar por números (ID, montos)
       if (typeof aValue === 'number' && typeof bValue === 'number') {
         return direction * (aValue - bValue);
       }
@@ -147,6 +142,21 @@ export class VentaComponent {
         'inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 capitalize',
     };
     return classes[estado] || classes['pendiente'];
+  }
+
+  // Nuevo método para colores de métodos de pago
+  getMetodoPagoClass(metodoPago: string): string {
+    const classes: { [key: string]: string } = {
+      efectivo:
+        'inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 capitalize',
+      tarjeta:
+        'inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 capitalize',
+      transferencia:
+        'inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800 capitalize',
+      credito:
+        'inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800 capitalize',
+    };
+    return classes[metodoPago] || 'inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800 capitalize';
   }
 
   formatDate(dateString: string | undefined): string {
