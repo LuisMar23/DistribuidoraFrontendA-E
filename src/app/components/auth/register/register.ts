@@ -4,6 +4,7 @@ import { AuthService } from '../../services/auth.service';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AppRoutingModule } from "../../../app.routes";
+import { NotificationService } from '../../../core/services/notification.service';
 
 @Component({
   selector: 'app-register',
@@ -25,7 +26,7 @@ export class RegisterComponent {
     hasNumber: false,
     hasSymbol: false
   };
-
+  private _notificationService=inject(NotificationService)
   constructor(
     private fb: FormBuilder,
     private router: Router
@@ -83,12 +84,9 @@ export class RegisterComponent {
       next: (resp) => {
         console.log('Usuario registrado', resp);
         this.isLoading = false;
-        
+        this._notificationService.showSuccess(`Usuario registrado exitosamente ${resp.fullName}`)
         // Redirigir o mostrar mensaje de éxito
-        // this.router.navigate(['/login']); // O la ruta que necesites
-        
-        // O mostrar un mensaje de éxito
-        alert('Usuario registrado exitosamente');
+        this.router.navigate(['/login']); // O la ruta que necesites
       },
       error: (err) => {
         console.error('Error al registrar usuario', err);

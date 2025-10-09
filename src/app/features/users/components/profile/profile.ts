@@ -5,6 +5,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { UserService } from '../../services/users.service';
 import { NotificationService } from '../../../../core/services/notification.service';
+import { environment } from '../../../../../environments/environment';
 
 @Component({
   selector: 'app-profile',
@@ -16,7 +17,7 @@ export class ProfileComponent {
   private fb = inject(FormBuilder);
   private userService = inject(UserService);
   private _notificationService = inject(NotificationService);
-
+  serverFile=environment.fileServer
   userId = 1; // ⚡ Cambiar dinámicamente según auth
 
   // Signals
@@ -48,9 +49,10 @@ export class ProfileComponent {
       });
 
       if (user.avatarUrl) {
-        this.avatarUrlBackend.set(`http://localhost:3000/${user.avatarUrl}`);
+        this.avatarUrlBackend.set(`${this.serverFile}/${user.avatarUrl}`);
+            // this.avatarUrlBackend.set(`http://localhost:3000/${user.avatarUrl}`);
       } else {
-        this.avatarUrlBackend.set('/assets/default.jpg');
+        this.avatarUrlBackend.set('assets/default.jpg');
       }
 
       this.avatarFile.set(null);
@@ -85,7 +87,7 @@ export class ProfileComponent {
   deleteAvatar() {
     this.userService.deleteAvatar().subscribe({
       next: () => {
-        this.avatarUrlBackend.set('/assets/default.jpg');
+        this.avatarUrlBackend.set('assets/default.jpg');
         this.avatarFile.set(null);
         this._notificationService.showAlert('Avatar eliminado ✅');
       },

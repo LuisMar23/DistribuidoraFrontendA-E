@@ -1,247 +1,137 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
-import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule } from '@angular/forms';
-import { CompraService } from '../../services/compra.service';
+// compra-ganado.component.ts
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faDollar, faList, faShoppingCart } from '@fortawesome/free-solid-svg-icons';
+import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule } from '@angular/forms';
+import { ProveedorService } from '../../../proveedor/services/proveedor.service';
+import { NotificationService } from '../../../../core/services/notification.service';
 import { AppRoutingModule } from '../../../../app.routes';
 import { RouterModule } from '@angular/router';
-import { ProveedorService } from '../../../proveedor/services/proveedor.service';
 import { ProveedorDto } from '../../../../core/interfaces/suplier.interface';
+import { CompraService } from '../../services/compra.service';
 
 @Component({
-  selector: 'app-compra-form',
+  selector: 'app-compra-ganado',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, FontAwesomeModule, RouterModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule],
   templateUrl: './compra.html',
 })
-export class CompraFormComponent {
-  compraForm!: FormGroup;
-  faShopingCart = faShoppingCart;
-  faList = faList;
-  faDollar=faDollar
+export class CompraGanadoComponent implements OnInit {
+  compraForm: FormGroup;
+  proveedores: ProveedorDto[] = [];
 
-  proveedores = signal<ProveedorDto[]>([]);
-  resultados = signal<ProveedorDto[]>([]);
-  private compraService = inject(CompraService);
-  private proveedorSvc = inject(ProveedorService);
-  private fb = inject(FormBuilder);
+  private _proveedorService = inject(ProveedorService);
+  private _notificationService = inject(NotificationService);
+  private _compraService = inject(CompraService);
 
-  busqueda = signal<string>('');
-  mostrarResultados = signal<boolean>(false);
-
-  constructor() {}
-
-  ngOnInit() {
+  constructor(private fb: FormBuilder) {
     this.compraForm = this.fb.group({
-      proveedorId: [null, Validators.required],
-      precioTotal: [{ value: 0, disabled: true }],
-      estado: ['pendiente'],
+      proveedorId: [0, Validators.required],
       observaciones: [''],
-      faenas: this.fb.array([]),
-    });
-
-    // iniciar con una faena por defecto
-    this.addFaena();
-    this.getAllProveedores();
-  }
-
-  faenas(): FormArray {
-    return this.compraForm.get('faenas') as FormArray;
-  }
-
-  addFaena() {
-    const faena = this.fb.group({
-      propiedad: ['', Validators.required],
-      tipoGanado: ['', Validators.required],
-      tipoIngreso: ['', Validators.required],
-      otrosGastos: [0],
-      saldoDepositar: [0],
-      pesoBruto: [{ value: 0, disabled: true }],
-      pesoNeto: [{ value: 0, disabled: true }],
-      precioTotal: [{ value: 0, disabled: true }],
+      otrosGastos: [0, [Validators.min(0)]],
+      detalle: this.fb.group({
+        cantidad: [1, [Validators.required, Validators.min(1)]],
+        pesoBruto: [0, [Validators.required, Validators.min(0)]],
+        pesoNeto: [0, [Validators.required, Validators.min(0)]],
+        precio: [0, [Validators.required, Validators.min(0)]],
+        precioTotal: [0, [Validators.required, Validators.min(0)]],
+      }),
       transportes: this.fb.array([]),
-      reses: this.fb.array([]),
     });
-
-    // Primero agregamos la faena al FormArray
-    this.faenas().push(faena);
-    const faenaIndex = this.faenas().length - 1;
-
-    // Escuchar cambios en otrosGastos
-    faena.get('otrosGastos')?.valueChanges.subscribe(() => {
-      this.calcularFaena(faenaIndex);
-    });
-
-    // Agregar reses automáticamente
-    this.addRes(faenaIndex);
   }
 
-  removeFaena(index: number) {
-    this.faenas().removeAt(index);
-    this.calcularTotalCompra();
+  ngOnInit(): void {
+    this.obtenerProveedores();
   }
 
-  // ===== RESES =====
-  reses(faenaIndex: number): FormArray {
-    return this.faenas().at(faenaIndex).get('reses') as FormArray;
+  get detalle(): FormGroup {
+    return this.compraForm.get('detalle') as FormGroup;
   }
 
-  addRes(faenaIndex: number) {
-    const res = this.fb.group({
-      numero: [this.reses(faenaIndex).length + 1],
-      partes: this.fb.array([]),
-    });
-
-    // agregar partes A y B automáticamente
-    ['A', 'B'].forEach((nombre) => {
-      if (!res.get('partes')) {
-        res.setControl('partes', this.fb.array([]));
-      }
-      const partesArray = res.get('partes') as FormArray;
-
-      partesArray.push(
-        this.fb.group({
-          nombre,
-          pesoNeto: [0, Validators.required],
-          precioUnit: [0, Validators.required],
-          observaciones: [''],
-        })
-      );
-
-      // recalcular precio total y pesos al cambiar pesoNeto o precioUnit
-      partesArray.at(partesArray.length - 1).valueChanges.subscribe(() => {
-        this.calcularFaena(faenaIndex);
-      });
-    });
-
-    this.reses(faenaIndex).push(res);
-    this.calcularFaena(faenaIndex);
+  get transportes(): FormArray {
+    return this.compraForm.get('transportes') as FormArray;
   }
 
-  removeRes(faenaIndex: number, resIndex: number) {
-    this.reses(faenaIndex).removeAt(resIndex);
-    this.calcularFaena(faenaIndex);
+  calcularPrecioTotal(): void {
+    const precio = Number(this.detalle.get('precio')?.value) || 0;
+    const pesoNeto = Number(this.detalle.get('pesoNeto')?.value) || 0;
+    const otrosGastos = Number(this.detalle.get('otrosGastos')?.value) || 0;
+    const precioTotal = pesoNeto * precio;
+    const total = otrosGastos + precioTotal;
+
+    this.detalle.get('precioTotal')?.setValue(total, { emitEvent: false });
   }
 
-  // ===== PARTES =====
-  partes(faenaIndex: number, resIndex: number): FormArray {
-    return this.reses(faenaIndex).at(resIndex).get('partes') as FormArray;
-  }
-
-  // ===== TRANSPORTES =====
-  transportes(faenaIndex: number): FormArray {
-    return this.faenas().at(faenaIndex).get('transportes') as FormArray;
-  }
-
-  addTransporte(faenaIndex: number) {
-    const transporte = this.fb.group({
+  addTransporte(): void {
+    const transporteGroup = this.fb.group({
       tipo: ['', Validators.required],
       descripcion: [''],
-      costo: [0, Validators.required],
+      costo: [0, [Validators.required, Validators.min(0)]],
       observaciones: [''],
     });
-
-    // escuchar cambios en costo para recalcular
-    transporte.get('costo')?.valueChanges.subscribe(() => {
-      this.calcularFaena(faenaIndex);
-    });
-
-    this.transportes(faenaIndex).push(transporte);
-    this.calcularFaena(faenaIndex);
+    this.transportes.push(transporteGroup);
   }
 
-  removeTransporte(faenaIndex: number, transIndex: number) {
-    this.transportes(faenaIndex).removeAt(transIndex);
-    this.calcularFaena(faenaIndex);
+  removeTransporte(index: number): void {
+    this.transportes.removeAt(index);
   }
 
-  // ===== CÁLCULOS =====
-  calcularFaena(faenaIndex: number) {
-    const faena = this.faenas().at(faenaIndex);
-    let pesoBruto = 0;
-    let pesoNeto = 0;
-    let precioTotal = 0;
+  calcularTotalTransporte(): number {
+    return this.transportes.controls.reduce((sum, control) => {
+      return sum + (Number(control.get('costo')?.value) || 0);
+    }, 0);
+  }
 
-    // Sumar partes
-    this.reses(faenaIndex).controls.forEach((res) => {
-      (res.get('partes') as FormArray).controls.forEach((parte) => {
-        const precioUnit = Number(parte.get('precioUnit')?.value) || 0;
-        precioTotal += precioUnit;
+  calcularTotal(): number {
+    const subtotal = Number(this.detalle.get('precioTotal')?.value) || 0;
+    const totalTransportes = this.calcularTotalTransporte();
+    return subtotal + totalTransportes;
+  }
+
+  onSubmit(): void {
+    if (this.compraForm.valid) {
+      const formData = {
+        proveedorId: Number(this.compraForm.value.proveedorId),
+        observaciones: this.compraForm.value.observaciones,
+        otrosGastos: this.compraForm.value.otrosGastos,
+        detalles: [this.compraForm.value.detalle],
+        transportes: this.compraForm.value.transportes,
+      };
+
+      console.log('Datos de la compra:', formData);
+      this._compraService.create(formData).subscribe({
+        next: () => {
+          this._notificationService.showSuccess('¡Compra registrada exitosamente!');
+        },
       });
-    });
-
-    // Sumar transportes
-    this.transportes(faenaIndex).controls.forEach((t) => {
-      precioTotal += Number(t.get('costo')?.value) || 0;
-    });
-
-    // Sumar otros gastos
-    precioTotal += Number(faena.get('otrosGastos')?.value) || 0;
-
-    faena.patchValue(
-      {
-        pesoBruto,
-        pesoNeto,
-        precioTotal,
-      },
-      { emitEvent: false }
-    );
-
-    this.calcularTotalCompra();
-  }
-
-  calcularTotalCompra() {
-    let total = 0;
-    this.faenas().controls.forEach((faena) => {
-      total += faena.get('precioTotal')?.value || 0;
-    });
-    this.compraForm.get('precioTotal')?.setValue(total);
-  }
-
-  // ===== SUBMIT =====
-  submit() {
-    if (!this.compraForm.valid) return;
-
-    const payload = this.compraForm.getRawValue();
-    console.log('Compra payload:', payload);
-
-    this.compraService.create(payload).subscribe({
-      next: (res) => console.log('Compra creada', res),
-      error: (err) => console.error(err),
-    });
-  }
-
-  // ===== PROVEEDORES =====
-  getAllProveedores() {
-    this.proveedorSvc.getAll().subscribe({
-      next: (res) => {
-        this.proveedores.set(res.data);
-        this.resultados.set(res.data);
-      },
-    });
-  }
-
-  onBuscarProveedor(event: Event) {
-    const value = (event.target as HTMLInputElement).value.toLowerCase();
-    this.busqueda.set(value);
-
-    if (value.length >= 1) {
-      const filtrados = this.proveedores().filter(
-        (prov) =>
-          prov.nombre.toLowerCase().includes(value) || prov.nit_ci.toLowerCase().includes(value)
-      );
-      this.resultados.set(filtrados);
-      this.mostrarResultados.set(true);
     } else {
-      this.resultados.set([]);
-      this.mostrarResultados.set(false);
+      this.compraForm.markAllAsTouched();
+      this._notificationService.showError('Por favor complete todos los campos requeridos.');
     }
   }
 
-  seleccionarProveedor(prov: ProveedorDto) {
-    this.busqueda.set(prov.nombre);
-    this.compraForm.get('proveedorId')?.setValue(prov.id_proveedor);
-    this.mostrarResultados.set(false);
+  // cancelar(): void {
+  //   if (confirm('¿Está seguro que desea cancelar? Se perderán todos los datos ingresados.')) {
+  //     this.compraForm.reset({
+  //       proveedorId: '',
+  //       observaciones: '',
+  //       detalle: {
+  //         cantidad: 1,
+  //         pesoBruto: 0,
+  //         pesoNeto: 0,
+  //         precio: 0,
+  //         precioTotal: 0,
+  //       },
+  //     });
+  //     this.transportes.clear();
+  //   }
+  // }
+
+  obtenerProveedores() {
+    this._proveedorService.getAll().subscribe({
+      next: (resp) => {
+        console.log(resp.data);
+        this.proveedores = resp.data;
+      },
+    });
   }
 }

@@ -13,7 +13,11 @@
         "build": {
           "builder": "@angular/build:application",
           "options": {
-            "browser": "src/main.ts",
+            "outputPath": "dist",
+            "index": {
+              "input": "src/index.html",
+              "output": "index.html"
+            },
             "tsConfig": "tsconfig.app.json",
             "assets": [
               "src/assets",
@@ -23,12 +27,7 @@
                 "output": "public"
               }
             ],
-            "styles": ["src/styles.css"],
-            "server": "src/main.server.ts",
-            "outputMode": "server",
-            "ssr": {
-              "entry": "src/server.ts"
-            }
+            "styles": ["src/styles.css"]
           },
           "configurations": {
             "production": {

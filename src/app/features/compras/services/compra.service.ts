@@ -13,7 +13,7 @@ export class CompraService {
   private http=inject(HttpClient)
 
 
-  create(compra: CreateCompraDto): Observable<any> {
+  create(compra: any): Observable<any> {
     return this.http.post(`${this.baseUrl}`, compra);
   }
 

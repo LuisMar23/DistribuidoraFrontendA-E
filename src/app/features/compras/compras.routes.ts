@@ -1,11 +1,12 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { AuthGuard } from '../../core/guards/auth.guard';
-import { CompraFormComponent } from './components/compra/compra';
+
 import { CompraList } from './components/compra-list/compra-list';
+import { CompraGanadoComponent } from './components/compra/compra';
 
 const routes: Routes = [
-  { path: '', component: CompraFormComponent, canActivate: [AuthGuard] },
+  { path: '', component: CompraGanadoComponent, canActivate: [AuthGuard] },
   { path: 'lista', component: CompraList, canActivate: [AuthGuard] },
   //   { path: 'detalle/:id', component: , canActivate: [AuthGuard] },
 ];
