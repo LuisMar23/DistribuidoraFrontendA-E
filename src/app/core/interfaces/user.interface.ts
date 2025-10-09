@@ -4,7 +4,6 @@ export interface UserDto {
   fullName: string;
   username: string;
   ci: string;
-  email: string;
   passwordHash: string;
   avatarUrl?: string; 
   telefono: string;
@@ -17,5 +16,4 @@ export interface UserDto {
   lockUntil?: Date; 
 }
 
-
-export type UserRole = 'USER' | 'ADMIN'; 
+export type UserRole = 'USER' | 'ADMIN';

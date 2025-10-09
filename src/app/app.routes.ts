@@ -4,8 +4,7 @@ import { LoginComponent } from './login/login';
 import { DashboardComponent } from './dashboard/dashboard';
 import { LayoutComponent } from './layout/layout';
 import { RegisterComponent } from './components/auth/register/register';
-import { ForgotPasswordComponent } from './forgot-password/forgot-password';
-
+import { ChangePasswordComponent } from './components/auth/change-password/change-password';
 import { ProductComponent } from './product/product';
 
 import { ClientComponent } from './client/client';
@@ -18,7 +17,7 @@ export const routes: Routes = [
     component: LoginComponent,
   },
   { path: 'login/registrar', component: RegisterComponent },
-  { path: 'login/cambiar-contraseña', component: ForgotPasswordComponent },
+  { path: 'login/cambiar-contraseña', component: ChangePasswordComponent },
   {
     path: '',
     component: LayoutComponent,

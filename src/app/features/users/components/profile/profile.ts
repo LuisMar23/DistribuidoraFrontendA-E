@@ -26,7 +26,6 @@ export class ProfileComponent {
   profileForm = this.fb.group({
     fullName: this.fb.control('', Validators.required),
     username: this.fb.control('', Validators.required),
-    email: this.fb.control('', [Validators.required, Validators.email]),
     telefono: this.fb.control('', Validators.required),
   });
 
@@ -43,7 +42,6 @@ export class ProfileComponent {
       this.profileForm.patchValue({
         fullName: user.fullName,
         username: user.username,
-        email: user.email,
         telefono: user.telefono,
       });
 
