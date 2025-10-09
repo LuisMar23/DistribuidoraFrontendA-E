@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, OnInit } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
   faBell,
@@ -10,24 +10,20 @@ import {
   faShieldAlt,
   faSignOutAlt,
   faUser,
-  faUserCircle,
-  faUsers,
 } from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from '../components/services/auth.service';
-import { AppRoutingModule } from "../app.routes";
-import { RouterModule } from '@angular/router';
 import { UserService } from '../features/users/services/users.service';
 import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-navbar',
-  imports: [FontAwesomeModule, CommonModule,RouterModule],
+  standalone: true,
+  imports: [FontAwesomeModule, CommonModule],
   templateUrl: './navbar.html',
   styleUrl: './navbar.css',
 })
-export class Navbar {
+export class Navbar implements OnInit {
   faBell = faBell;
-  faUserCircle = faUserCircle;
   faChevronDown = faChevronDown;
   faSignOutAlt = faSignOutAlt;
   faUser = faUser;
@@ -39,26 +35,31 @@ export class Navbar {
   isUserMenuOpen: boolean = false;
  currentUser = signal<{ username: string; avatarUrl: string }>({ username: '', avatarUrl: 'assets/default.jpg' });
 
-  private _authService=inject(AuthService)
-  private _userService = inject(UserService);
-  constructor() {
-    this.loadUser();
-  }
+  // CORREGIDO: Solo una definición de currentUser usando signal
+
+
+  _authService = inject(AuthService);
+  _userService = inject(UserService); // Agregado el UserService
 
   notifications = [
     { id: 1, message: 'Nuevo pedido recibido' },
     { id: 2, message: 'Pago confirmado' },
   ];
 
+  ngOnInit() {
+    this.loadUser();
+  }
+
   toggleUserMenu() {
     this.isUserMenuOpen = !this.isUserMenuOpen;
   }
 
   logout() {
-    this._authService.logout()
+    this._authService.logout();
   }
-    loadUser() {
-    this._userService.getProfile().subscribe(user => {
+
+  loadUser() {
+    this._userService.getProfile().subscribe((user) => {
       // actualizar señal
       this.currentUser.set({
         username: user.username,

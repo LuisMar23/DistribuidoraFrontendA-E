@@ -49,10 +49,7 @@ export class UsersComponent implements OnInit {
     const term = this.searchTerm().toLowerCase();
     if (!term) return this.allUsers();
     return this.allUsers().filter(
-      (user) =>
-        user.username.toLowerCase().includes(term) ||
-        user.email.toLowerCase().includes(term) ||
-        user.role.toLowerCase().includes(term)
+      (user) => user.username.toLowerCase().includes(term) || user.role.toLowerCase().includes(term)
     );
   });
 

@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { map, Observable, tap, catchError, throwError } from 'rxjs';
+import { Router } from '@angular/router';
 import { environment } from '../../../environments/environment';
 import { LoginDto } from '../../core/interfaces/login.interface';
 import { RegisterDto } from '../../core/interfaces/register.interface';
-import { Router } from '@angular/router';
 
 export interface LoginResponse {
   data: {
@@ -14,10 +14,19 @@ export interface LoginResponse {
   };
 }
 
-export interface ForgotPasswordResponse {
-  message?: string;
-  success?: boolean;
-  data?: any;
+export interface ChangePasswordResponse {
+  message: string;
+  user: {
+    username: string;
+    fullName: string;
+    ci: string;
+  };
+}
+
+export interface ChangePasswordDto {
+  ci: string;
+  newPassword: string;
+  confirmPassword: string;
 }
 
 @Injectable({
@@ -50,12 +59,30 @@ export class AuthService {
   }
 
   register(data: RegisterDto): Observable<RegisterDto> {
-    console.log(data)
+    console.log(data);
     return this.http.post(`${this.apiUrl}/auth/register`, data).pipe(
       tap((res: any) => {
         if (res.access_token) {
           this.saveTokens(res.access_token, res.refresh_token);
         }
+      })
+    );
+  }
+
+  changePassword(data: ChangePasswordDto): Observable<ChangePasswordResponse> {
+    return this.http.post<ChangePasswordResponse>(`${this.apiUrl}/auth/change-password`, data).pipe(
+      catchError((error) => {
+        let errorMessage = 'Error al cambiar la contraseña';
+
+        if (error.status === 404) {
+          errorMessage = 'No se encontró ningún usuario con ese CI';
+        } else if (error.status === 400) {
+          errorMessage = error.error?.message || 'Datos inválidos';
+        } else if (error.error?.message) {
+          errorMessage = error.error.message;
+        }
+
+        return throwError(() => new Error(errorMessage));
       })
     );
   }
@@ -74,26 +101,6 @@ export class AuthService {
           localStorage.setItem('refresh_token', res.refreshToken);
         }),
         map((res) => res.accessToken)
-      );
-  }
-
-  forgotPassword(email: string): Observable<ForgotPasswordResponse> {
-    return this.http
-      .post<ForgotPasswordResponse>(`${this.apiUrl}/auth/forgot-password`, { email })
-      .pipe(
-        catchError((error) => {
-          let errorMessage = 'Error al enviar el correo de recuperación';
-
-          if (error.status === 404) {
-            errorMessage = 'No se encontró una cuenta con este email';
-          } else if (error.status === 429) {
-            errorMessage = 'Demasiados intentos. Por favor, espera unos minutos';
-          } else if (error.error?.message) {
-            errorMessage = error.error.message;
-          }
-
-          return throwError(() => new Error(errorMessage));
-        })
       );
   }
 

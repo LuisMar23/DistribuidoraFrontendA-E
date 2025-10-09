@@ -3,28 +3,29 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { AuthService } from '../../services/auth.service';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { AppRoutingModule } from "../../../app.routes";
+
+
 import { NotificationService } from '../../../core/services/notification.service';
 
 @Component({
   selector: 'app-register',
-  standalone:true,
-  imports: [ReactiveFormsModule, CommonModule,RouterModule],
+  standalone: true,
+  imports: [ReactiveFormsModule, CommonModule, RouterModule],
   templateUrl: './register.html',
   styleUrl: './register.css',
 })
 export class RegisterComponent {
-   isLoading = false;
+  isLoading = false;
   errorMessage = '';
   registerForm: FormGroup;
   showPassword = false;
   _authService = inject(AuthService);
-  
+
   passwordRequirements = {
     minLength: false,
     hasUpperCase: false,
     hasNumber: false,
-    hasSymbol: false
+    hasSymbol: false,
   };
   private _notificationService=inject(NotificationService)
   constructor(
@@ -36,7 +37,6 @@ export class RegisterComponent {
       username: ['', [Validators.required, Validators.minLength(3)]],
       ci: ['', [Validators.required]],
       telefono: ['', [Validators.required, Validators.pattern(/^[0-9]{8,}$/)]],
-      email: ['', [Validators.required, Validators.email]],
       password: [
         '',
         [
@@ -52,20 +52,20 @@ export class RegisterComponent {
   }
 
   private setupPasswordValidation(): void {
-    this.registerForm.get('password')?.valueChanges.subscribe(password => {
+    this.registerForm.get('password')?.valueChanges.subscribe((password) => {
       if (password) {
         this.passwordRequirements = {
           minLength: password.length >= 8,
           hasUpperCase: /[A-Z]/.test(password),
           hasNumber: /\d/.test(password),
-          hasSymbol: /[!@#$%^&*(),.?":{}|<>]/.test(password)
+          hasSymbol: /[!@#$%^&*(),.?":{}|<>]/.test(password),
         };
       } else {
         this.passwordRequirements = {
           minLength: false,
           hasUpperCase: false,
           hasNumber: false,
-          hasSymbol: false
+          hasSymbol: false,
         };
       }
     });
@@ -91,14 +91,14 @@ export class RegisterComponent {
       error: (err) => {
         console.error('Error al registrar usuario', err);
         this.isLoading = false;
-        
+
         // Manejo de errores más específico
         if (err.error?.message) {
           this.errorMessage = err.error.message;
         } else if (err.status === 400) {
           this.errorMessage = 'Datos inválidos. Verifica la información ingresada.';
         } else if (err.status === 409) {
-          this.errorMessage = 'El usuario o correo ya existe.';
+          this.errorMessage = 'El usuario ya existe.';
         } else {
           this.errorMessage = 'Error al crear la cuenta. Inténtalo nuevamente.';
         }
@@ -107,7 +107,7 @@ export class RegisterComponent {
   }
 
   private markFormGroupTouched(): void {
-    Object.keys(this.registerForm.controls).forEach(key => {
+    Object.keys(this.registerForm.controls).forEach((key) => {
       const control = this.registerForm.get(key);
       control?.markAsTouched();
     });
@@ -120,11 +120,10 @@ export class RegisterComponent {
       if (field.errors['required']) {
         return `${this.getFieldLabel(fieldName)} es requerido`;
       }
-      if (field.errors['email']) {
-        return 'Ingrese un email válido';
-      }
       if (field.errors['minlength']) {
-        return `${this.getFieldLabel(fieldName)} debe tener al menos ${field.errors['minlength'].requiredLength} caracteres`;
+        return `${this.getFieldLabel(fieldName)} debe tener al menos ${
+          field.errors['minlength'].requiredLength
+        } caracteres`;
       }
       if (field.errors['pattern']) {
         switch (fieldName) {
@@ -146,8 +145,7 @@ export class RegisterComponent {
       username: 'Usuario',
       ci: 'Cédula de Identidad',
       telefono: 'Teléfono',
-      email: 'Correo',
-      password: 'Contraseña'
+      password: 'Contraseña',
     };
     return labels[fieldName] || fieldName;
   }

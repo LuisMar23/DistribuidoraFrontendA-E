@@ -1,6 +1,7 @@
 <div class="p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
   <!-- Widget Ventas -->
-  <div class="bg-white shadow-lg  p-6 flex items-center gap-4 border border-gray-100 transform hover:shadow-xl hover:scale-105 transition duration-300">
+  <div
+    class="bg-white shadow-lg p-6 flex items-center gap-4 border border-gray-100 transform hover:shadow-xl hover:scale-105 transition duration-300">
     <div class="bg-indigo-100 text-indigo-600 w-12 h-12 flex items-center justify-center rounded-full">
       <fa-icon [icon]="faShoppingCart" class="text-xl"></fa-icon>
     </div>
@@ -11,7 +12,8 @@
   </div>
 
   <!-- Widget Clientes -->
-  <div class="bg-white shadow-lg  p-6 flex items-center gap-4 border border-gray-100 transform hover:shadow-xl hover:scale-105 transition duration-300">
+  <div
+    class="bg-white shadow-lg p-6 flex items-center gap-4 border border-gray-100 transform hover:shadow-xl hover:scale-105 transition duration-300">
     <div class="bg-green-100 text-green-600 w-12 h-12 flex items-center justify-center rounded-full">
       <fa-icon [icon]="faUsers" class="text-xl"></fa-icon>
     </div>
@@ -22,7 +24,8 @@
   </div>
 
   <!-- Widget Productos -->
-  <div class="bg-white shadow-lg p-6 flex items-center gap-4 border border-gray-100 transform hover:shadow-xl hover:scale-105 transition duration-300">
+  <div
+    class="bg-white shadow-lg p-6 flex items-center gap-4 border border-gray-100 transform hover:shadow-xl hover:scale-105 transition duration-300">
     <div class="bg-yellow-100 text-yellow-600 w-12 h-12 flex items-center justify-center rounded-full">
       <fa-icon [icon]="faBox" class="text-xl"></fa-icon>
     </div>
@@ -33,7 +36,8 @@
   </div>
 
   <!-- Widget Caja -->
-  <div class="bg-white shadow-lg p-6 flex items-center gap-4 border border-gray-100 transform hover:shadow-xl hover:scale-105 transition duration-300">
+  <div
+    class="bg-white shadow-lg p-6 flex items-center gap-4 border border-gray-100 transform hover:shadow-xl hover:scale-105 transition duration-300">
     <div class="bg-red-100 text-red-600 w-12 h-12 flex items-center justify-center rounded-full">
       <fa-icon [icon]="faCashRegister" class="text-xl"></fa-icon>
     </div>
@@ -44,18 +48,20 @@
   </div>
 
   <!-- Widget Proveedores -->
-  <div class="bg-white shadow-lg  p-6 flex items-center gap-4 border border-gray-100 transform hover:shadow-xl hover:scale-105 transition duration-300">
+  <div
+    class="bg-white shadow-lg p-6 flex items-center gap-4 border border-gray-100 transform hover:shadow-xl hover:scale-105 transition duration-300">
     <div class="bg-purple-100 text-purple-600 w-12 h-12 flex items-center justify-center rounded-full">
       <fa-icon [icon]="faTruck" class="text-xl"></fa-icon>
     </div>
     <div>
       <p class="text-sm text-gray-500">Proveedores</p>
-      <p class="text-xl font-semibold text-gray-800">       {{ (proveedores$ | async)?.total ?? 0 }}</p>
+      <p class="text-xl font-semibold text-gray-800">{{ (proveedores$ | async)?.total ?? 0 }}</p>
     </div>
   </div>
 
   <!-- Widget Usuarios -->
-  <div class="bg-white shadow-lg  p-6 flex items-center gap-4 border border-gray-100 transform hover:shadow-xl hover:scale-105 transition duration-300">
+  <div
+    class="bg-white shadow-lg p-6 flex items-center gap-4 border border-gray-100 transform hover:shadow-xl hover:scale-105 transition duration-300">
     <div class="bg-pink-100 text-pink-600 w-12 h-12 flex items-center justify-center rounded-full">
       <fa-icon [icon]="faUserShield" class="text-xl"></fa-icon>
     </div>

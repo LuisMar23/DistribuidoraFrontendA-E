@@ -13,6 +13,7 @@ import { ProveedorService } from '../features/proveedor/services/proveedor.servi
 
 @Component({
   selector: 'app-dashboard',
+  standalone: true,
   imports: [FontAwesomeModule, CommonModule],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
@@ -32,6 +33,5 @@ export class DashboardComponent {
   clientesActivos = 245;
   productosVendidos = 1234;
   balanceCaja = 5678;
-
   usuarios = 2;
 }

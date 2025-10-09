@@ -3,6 +3,5 @@ export interface RegisterDto {
   username: string;
   ci: string;
   telefono: string;
-  email: string;
   password: string;
 }
