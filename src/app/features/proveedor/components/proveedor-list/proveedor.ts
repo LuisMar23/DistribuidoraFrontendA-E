@@ -1,3 +1,4 @@
+// src/proveedor/components/proveedor.component.ts
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import {
   FormBuilder,
@@ -54,7 +55,6 @@ export class ProveedorComponent {
     { key: 'telefono', label: 'Teléfono' },
     { key: 'direccion', label: 'Dirección' },
     { key: 'departamento', label: 'Departamento' },
-    { key: 'email', label: 'Email' },
   ];
 
   total = signal(0);
@@ -73,7 +73,6 @@ export class ProveedorComponent {
       telefono: ['', Validators.required],
       direccion: ['', Validators.required],
       departamento: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]],
     });
 
     // Cargar proveedores al inicializar
@@ -148,7 +147,7 @@ export class ProveedorComponent {
           this._notificationService.showSuccess('Eliminado correctamente');
           this.proveedorService.delete(data.id_proveedor).subscribe(() => this.loadProveedores());
         }
-    });
+      });
   }
   view(p: any) {}
   ordenarProveedores() {

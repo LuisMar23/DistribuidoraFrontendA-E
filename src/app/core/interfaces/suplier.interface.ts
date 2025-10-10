@@ -5,7 +5,6 @@ export interface ProveedorDto {
   telefono: string;
   direccion: string;
   departamento: string;
-  email: string;
   isActive?: boolean;
   creado_en?: string;
 }
