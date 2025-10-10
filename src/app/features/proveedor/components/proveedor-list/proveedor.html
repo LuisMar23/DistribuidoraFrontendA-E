@@ -1,6 +1,6 @@
   <!-- Header -->
   <div class="bg-white rounded-2xl p-4 md:p-6 mb-6 flex items-center gap-4 shadow-sm">
-    <div class="bg-blue-500 text-white w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full">
+    <div class="bg-[#ff7676] text-white w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full">
       <fa-icon [icon]="faBox" class="text-lg md:text-xl"></fa-icon>
     </div>
     <h2 class="text-lg md:text-xl font-bold font-sans text-gray-800">Proveedores</h2>
@@ -28,7 +28,7 @@
       <!-- Botón nuevo proveedor -->
       <button
         (click)="openModal()"
-        class="flex items-center gap-2 bg-[#2196f3] hover:bg-blue-700 text-white px-6 py-3 rounded-xl shadow-lg transition-all duration-200 transform hover:scale-105 w-full lg:w-auto justify-center lg:justify-start"
+        class="flex items-center gap-2 bg-gray-400 hover:bg-gray-500 text-white px-6 py-3 rounded-xl shadow-lg transition-all duration-200 transform hover:scale-105 w-full lg:w-auto justify-center lg:justify-start"
       >
         <i class="fas fa-plus"></i> Nuevo Proveedor
       </button>
@@ -40,7 +40,7 @@
         <div class="overflow-x-auto table-container">
           <table class="min-w-full table-compact">
             <thead>
-              <tr class="bg-[#2196f3] text-white">
+              <tr class="bg-[#ff7676] text-white">
                 @for (col of columns; track col) {
                 <th 
                   class="px-2 xl:px-4 py-4 text-left text-xs font-bold uppercase tracking-wider cursor-pointer"
@@ -123,12 +123,6 @@
                   </span>
                 </td>
                 <td class="px-2 xl:px-4 py-4">
-                  <div class="flex items-center text-gray-700">
-                    <i class="fas fa-envelope text-xs mr-1 xl:mr-2 text-gray-400"></i>
-                    <span class="text-sm truncate max-w-[100px] xl:max-w-xs" [title]="p.email">{{ p.email }}</span>
-                  </div>
-                </td>
-                <td class="px-2 xl:px-4 py-4">
                   <div class="flex justify-center gap-2">
                     <a
                       [routerLink]="['/proveedores/detalle', p.id_proveedor]"
@@ -177,7 +171,7 @@
       @for (p of filteredProveedores(); track $index) {
       <div class="bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden">
         <!-- Header de la card -->
-        <div class="bg-gradient-to-r from-blue-500 to-blue-600 p-4">
+        <div class="bg-[#ff7676] p-4">
           <div class="flex justify-between items-start">
             <div class="flex-1">
               <h3 class="font-bold text-white text-lg leading-tight">{{ p.nombre }}</h3>
@@ -222,13 +216,7 @@
               </div>
               <p class="font-semibold text-gray-800 text-sm">{{ p.telefono }}</p>
             </div>
-            <div>
-              <div class="flex items-center text-gray-600 mb-1">
-                <i class="fas fa-envelope text-xs mr-2"></i>
-                <span class="text-xs font-medium uppercase tracking-wide">Email</span>
-              </div>
-              <p class="font-semibold text-gray-800 text-sm break-all">{{ p.email }}</p>
-            </div>
+ 
           </div>
 
           <!-- Fila 3: Dirección -->
@@ -325,125 +313,114 @@
 
   <!-- Modal - Actualizado para mejor responsividad -->
   @if (showModal()) {
-  <div class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
-    <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl animate-fadeIn max-h-[95vh] overflow-y-auto">
-      <!-- Header del Modal -->
-      <div class="bg-[#2196f3] text-white p-4 md:p-6 rounded-t-2xl">
-        <div class="flex justify-between items-center">
-          <h2 class="text-xl md:text-2xl font-bold">
-            {{ editMode() ? 'Editar Proveedor' : 'Nuevo Proveedor' }}
-          </h2>
-          <button (click)="cancelEdit()" class="text-white hover:text-gray-200 transition-colors p-2">
-            <i class="fas fa-times text-lg"></i>
-          </button>
+<div class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
+  <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl animate-fadeIn max-h-[95vh] overflow-y-auto">
+    
+    <!-- Header del Modal -->
+    <div class="bg-gradient-to-r from-red-500 to-red-600 text-white p-4 md:p-6 rounded-t-2xl shadow-md">
+      <div class="flex justify-between items-center">
+        <h2 class="text-xl md:text-2xl font-bold drop-shadow-sm">
+          {{ editMode() ? 'Editar Proveedor' : 'Nuevo Proveedor' }}
+        </h2>
+        <button (click)="cancelEdit()" class="text-white hover:text-gray-200 transition-colors p-2 rounded-full hover:bg-white/20">
+          <i class="fas fa-times text-lg"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Formulario -->
+    <form [formGroup]="form" (ngSubmit)="submit()" class="p-4 md:p-6 space-y-6">
+      <!-- Nombre -->
+      <div>
+        <label class=" text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+          <i class="fas fa-building text-red-500"></i>Nombre del Proveedor
+        </label>
+        <input
+          formControlName="nombre"
+          placeholder="Ingrese el nombre del proveedor"
+          class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-transparent shadow-sm transition-all"
+        />
+      </div>
+
+      <!-- Grid para NIT/CI y Teléfono -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+        <!-- NIT/CI -->
+        <div>
+          <label class="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+            <i class="fas fa-id-card text-red-500"></i>NIT/CI
+          </label>
+          <input
+            formControlName="nit_ci"
+            placeholder="Número de identificación"
+            class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-transparent shadow-sm transition-all"
+          />
+        </div>
+
+        <!-- Teléfono -->
+        <div>
+          <label class=" text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+            <i class="fas fa-phone text-red-500"></i>Teléfono
+          </label>
+          <input
+            formControlName="telefono"
+            placeholder="Número de teléfono"
+            class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-transparent shadow-sm transition-all"
+          />
         </div>
       </div>
 
-      <!-- Formulario -->
-      <form [formGroup]="form" (ngSubmit)="submit()" class="p-4 md:p-6">
-        <div class="space-y-4 md:space-y-6">
-          <!-- Nombre -->
-          <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-2">
-              <i class="fas fa-building mr-2 text-[#2196f3]"></i>Nombre del Proveedor
-            </label>
-            <input
-              formControlName="nombre"
-              placeholder="Ingrese el nombre del proveedor"
-              class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#2196f3] focus:border-transparent shadow-sm transition-all"
-            />
-          </div>
+      <!-- Dirección -->
+      <div>
+        <label class="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+          <i class="fas fa-map-marker-alt text-red-500"></i>Dirección
+        </label>
+        <input
+          formControlName="direccion"
+          placeholder="Dirección completa"
+          class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-transparent shadow-sm transition-all"
+        />
+      </div>
 
-          <!-- Grid para campos pequeños -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-            <!-- NIT/CI -->
-            <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-2">
-                <i class="fas fa-id-card mr-2 text-[#2196f3]"></i>NIT/CI
-              </label>
-              <input
-                formControlName="nit_ci"
-                placeholder="Número de identificación"
-                class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#2196f3] focus:border-transparent shadow-sm transition-all"
-              />
-            </div>
-
-            <!-- Teléfono -->
-            <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-2">
-                <i class="fas fa-phone mr-2 text-[#2196f3]"></i>Teléfono
-              </label>
-              <input
-                formControlName="telefono"
-                placeholder="Número de teléfono"
-                class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#2196f3] focus:border-transparent shadow-sm transition-all"
-              />
-            </div>
-          </div>
-
-          <!-- Dirección -->
-          <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-2">
-              <i class="fas fa-map-marker-alt mr-2 text-[#2196f3]"></i>Dirección
-            </label>
-            <input
-              formControlName="direccion"
-              placeholder="Dirección completa"
-              class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#2196f3] focus:border-transparent shadow-sm transition-all"
-            />
-          </div>
-
-          <!-- Grid para Departamento y Email -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-            <!-- Departamento -->
-            <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-2">
-                <i class="fas fa-map mr-2 text-[#2196f3]"></i>Departamento
-              </label>
-              <select
-                formControlName="departamento"
-                class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#2196f3] focus:border-transparent shadow-sm appearance-none bg-white"
-              >
-                <option value="" disabled>Selecciona un departamento</option>
-                @for (d of departments; track $index) {
-                <option [value]="d">{{ d }}</option>
-                }
-              </select>
-            </div>
-
-            <!-- Email -->
-            <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-2">
-                <i class="fas fa-envelope mr-2 text-[#2196f3]"></i>Email
-              </label>
-              <input
-                formControlName="email"
-                type="email"
-                placeholder="correo@ejemplo.com"
-                class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#2196f3] focus:border-transparent shadow-sm transition-all"
-              />
-            </div>
-          </div>
-        </div>
-
-        <!-- Botones -->
-        <div class="flex flex-col sm:flex-row justify-end gap-3 mt-6 md:mt-8 pt-4 md:pt-6 border-t">
-          <button
-            type="button"
-            (click)="cancelEdit()"
-            class="flex items-center justify-center gap-2 bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-xl shadow-md transition-all duration-200 transform hover:scale-105 order-2 sm:order-1"
+      <!-- Departamento -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+        <div>
+          <label class="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+            <i class="fas fa-map text-red-500"></i>Departamento
+          </label>
+          <select
+            formControlName="departamento"
+            class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-transparent shadow-sm bg-white appearance-none"
           >
-            <i class="fas fa-times"></i> Cancelar
-          </button>
-          <button
-            type="submit"
-            class="flex items-center justify-center gap-2 bg-[#2196f3] hover:bg-blue-700 text-white px-8 py-3 rounded-xl shadow-md transition-all duration-200 transform hover:scale-105 order-1 sm:order-2"
-          >
-            <i class="fas fa-check"></i>
-            {{ editMode() ? 'Actualizar' : 'Crear' }}
-          </button>
+            <option value="" selected disabled>Selecciona un departamento</option>
+            @for (d of departments; track $index) {
+            <option [value]="d">{{ d }}</option>
+            }
+          </select>
         </div>
-      </form>
-    </div>
+      </div>
+
+      <!-- Botones -->
+      <div class="flex flex-col sm:flex-row justify-end gap-3 mt-6 md:mt-8 pt-4 md:pt-6 border-t border-gray-200">
+        <!-- Cancelar -->
+        <button
+          type="button"
+          (click)="cancelEdit()"
+          class="flex items-center justify-center gap-2 bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-xl shadow-md transition-all duration-200 transform hover:scale-105 order-2 sm:order-1"
+        >
+          <i class="fas fa-times"></i> Cancelar
+        </button>
+
+        <!-- Crear / Actualizar -->
+        <button
+          type="submit"
+          class="flex items-center justify-center gap-2 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-8 py-3 rounded-xl shadow-md transition-all duration-200 transform hover:scale-105 order-1 sm:order-2"
+        >
+          <i class="fas fa-check"></i>
+          {{ editMode() ? 'Actualizar' : 'Crear' }}
+        </button>
+      </div>
+    </form>
   </div>
+</div>
+
   }

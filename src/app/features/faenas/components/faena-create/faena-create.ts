@@ -1,176 +1,140 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, OnInit, signal, effect, inject } from '@angular/core';
 import {
-  FormArray,
   FormBuilder,
   FormGroup,
   FormsModule,
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { FaenaService } from '../../services/faena.service';
-import { Router } from '@angular/router';
-import { CommonModule } from '@angular/common';
-import {
-  CreateDetalleFaenaDto,
-  CreateFaenaDto,
-  CreateTransporteDto,
-} from '../../../../core/interfaces/faena.interface';
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import {
-  faClipboardList,
-  faCow,
-  faDollar,
-  faSave,
-  faTimes,
-  faTruck,
-} from '@fortawesome/free-solid-svg-icons';
+import { ActivatedRoute, Router } from '@angular/router';
+import { DetalleFaenaService } from '../../services/faena.service';
+import { CompraService } from '../../../compras/services/compra.service';
+import { NotificationService } from '../../../../core/services/notification.service';
 
 @Component({
-  selector: 'app-faena-create',
-  imports: [FormsModule, ReactiveFormsModule, CommonModule, FontAwesomeModule],
+  selector: 'app-detalle-faena-form',
+  imports: [FormsModule, ReactiveFormsModule],
   templateUrl: './faena-create.html',
-  styleUrl: './faena-create.css',
 })
-export class FaenaCreate {
+export class DetalleFaenaFormComponent implements OnInit {
   form!: FormGroup;
-  faClipboardList = faClipboardList;
-  faReceipt = faDollar;
-  faCut = faCow;
-  faTruck = faTruck;
-  faSave = faSave;
-  faTimes = faTimes;
-  constructor(private fb: FormBuilder, private faenaService: FaenaService) {}
+  compras = signal<any[]>([]);
+  filteredCompras = signal<any[]>([]);
+  searchCompra = signal('');
+  isEditing = signal(false);
+  faenaId: number | null = null;
+   private detalleFaenaService=inject(DetalleFaenaService)
+    private compraService=inject(CompraService)
+    private _notificationService=inject(NotificationService)
+  constructor(
+    private fb: FormBuilder,
+    private route: ActivatedRoute,
+    private router: Router
+  ) {
+
+    effect(() => {
+      const term = this.searchCompra().toLowerCase();
+      if (term) {
+        this.filteredCompras.set(
+          this.compras().filter((c) => c.codigo.toLowerCase().includes(term))
+        );
+      } else {
+        this.filteredCompras.set([]);
+      }
+    });
+
+  }
 
   ngOnInit(): void {
     this.form = this.fb.group({
-      compraId: [null, Validators.required],
+      fecha: [new Date().toISOString().split('T')[0], Validators.required],
       propiedad: ['', Validators.required],
-      numeroReses: [null, Validators.required],
-      tipo: ['', Validators.required], // TipoGanado
-      pesoBruto: [null],
-      pesoNeto: [null],
-      precioTotal: [null],
-      precioDevolucion: [null],
-      totalDevolucion: [null],
+      numeroReses: [0, [Validators.required, Validators.min(1)]],
+      precioDevolucion: [0, Validators.required],
+      totalDevolucion: [0, Validators.required],
+      transporte: [0],
       otrosGastos: [0],
-      saldoDepositar: [null],
-      detalleFaena: this.fb.array([
-        this.fb.group({
-          tipoRes: ['', Validators.required],
-          pesoRes: [null, Validators.required],
-          precioRes: [null, Validators.required],
-          pesoTotal: [null, Validators.required]
-        }),
-      ]),
-      transportes: this.fb.array([
-        this.fb.group({
-          tipo: ['', Validators.required], // TipoTransporte
-          descripcion: [''],
-          costo: [null, Validators.required],
-        }),
-      ]),
+      saldoDepositar: [0, Validators.required],
+      compraId: [null, Validators.required],
     });
-    this.generarDetalleFaena(this.form.get('numeroReses')!.value);
-    this.form.get('numeroReses')!.valueChanges.subscribe((num: number) => {
-      this.generarDetalleFaena(num);
-    });
-  }
-  generarDetalleFaena(cantidad: number) {
-    const detalles = this.detalleFaena;
-    // Ajustar longitud del FormArray
-    while (detalles.length < cantidad) {
-      detalles.push(this.crearDetalle());
+
+    this.loadCompras();
+
+    // Detectar si hay un id para edición
+    const idParam = this.route.snapshot.paramMap.get('id');
+    if (idParam) {
+      this.faenaId = +idParam;
+      this.isEditing.set(true);
+      this.loadDetalle(this.faenaId);
     }
-    while (detalles.length > cantidad) {
-      detalles.removeAt(detalles.length - 1);
-    }
+
+
+
   }
-  crearDetalle(): FormGroup {
-    return this.fb.group({
-      tipoRes: [''],
-      pesoRes: [0],
-      precioRes: [0],
-      cantidad: [1],
-      unidad: ['KG'],
+
+  loadCompras() {
+    this.compraService.getAll().subscribe({
+      next: (res) => this.compras.set(res.data || res),
+      error: (err) => console.error(err),
     });
   }
-  // Getters para los FormArray
-  get detalleFaena(): FormArray {
-    return this.form.get('detalleFaena') as FormArray;
+
+  loadDetalle(id: number) {
+    this.detalleFaenaService.getById(id).subscribe({
+      next: (res) => {
+        this.form.patchValue({
+          fecha:
+            typeof res.fecha === 'string'
+              ? res.fecha.split('T')[0]
+              : res.fecha.toISOString().split('T')[0],
+          propiedad: res.propiedad,
+          numeroReses: res.numeroReses,
+          precioDevolucion: res.precioDevolucion,
+          totalDevolucion: res.totalDevolucion,
+          transporte: res.transporte ?? 0,
+          otrosGastos: res.otrosGastos ?? 0,
+          saldoDepositar: res.saldoDepositar,
+          compraId: res.compra?.id,
+        });
+
+        this.searchCompra.set(res.compra?.codigo || '');
+      },
+      error: (err) => console.error(err),
+    });
   }
 
-  get transportes(): FormArray {
-    return this.form.get('transportes') as FormArray;
+  selectCompra(compra: any) {
+    this.form.patchValue({ compraId: compra.id });
+    this.searchCompra.set(compra.codigo);
+    this.filteredCompras.set([]);
   }
 
-  // Métodos Detalle Faena
-  addDetalleFaena(): void {
-    this.detalleFaena.push(
-      this.fb.group({
-        tipoRes: ['', Validators.required],
-        pesoRes: [null, Validators.required],
-        precioRes: [null, Validators.required],
-        cantidad: [null, Validators.required],
-        unidad: ['', Validators.required],
-      })
-    );
-  }
+  submit() {
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
 
-  removeDetalleFaena(index: number): void {
-    this.detalleFaena.removeAt(index);
-  }
+    const dto = this.form.value;
 
-  // Métodos Transporte
-  addTransporte(): void {
-    this.transportes.push(
-      this.fb.group({
-        tipo: ['LOCAL', Validators.required],
-        descripcion: [''],
-        costo: [null, Validators.required],
-      })
-    );
-  }
+    if (this.isEditing()) {
+      this.detalleFaenaService.update(this.faenaId!, dto).subscribe({
+        next: () => {
 
-  removeTransporte(index: number): void {
-    this.transportes.removeAt(index);
-  }
-
-  // Enviar formulario al backend
-  onSubmit(): void {
-    if (this.form.valid) {
-      const dto: CreateFaenaDto = {
-        compraId: this.form.value.compraId,
-        propiedad: this.form.value.propiedad,
-        numeroReses: this.form.value.numeroReses,
-        tipo: this.form.value.tipo,
-        pesoBruto: this.form.value.pesoBruto,
-        pesoNeto: this.form.value.pesoNeto,
-        precioTotal: this.form.value.precioTotal,
-        precioDevolucion: this.form.value.precioDevolucion,
-        totalDevolucion: this.form.value.totalDevolucion,
-        otrosGastos: this.form.value.otrosGastos,
-        saldoDepositar: this.form.value.saldoDepositar,
-        detalleFaena: this.form.value.detalleFaena.map((d: any) => ({
-          tipoRes: d.tipoRes,
-          pesoRes: d.pesoRes,
-          precioRes: d.precioRes,
-          cantidad: d.cantidad,
-          unidad: d.unidad,
-        })) as CreateDetalleFaenaDto[],
-        transportes: this.form.value.transportes.map((t: any) => ({
-          tipo: t.tipo,
-          descripcion: t.descripcion,
-          costo: t.costo,
-        })) as CreateTransporteDto[],
-      };
-
-      this.faenaService.create(dto).subscribe({
-        next: (res) => console.log('✅ Faena creada:', res),
-        error: (err) => console.error('❌ Error creando faena:', err),
+          this._notificationService.showSuccess('Detalle de faena actualizado correctamente')
+    
+          this.router.navigate(['/detalle-faena']);
+        },
+        error: (err) => console.error(err),
       });
     } else {
-      console.log('⚠️ Formulario inválido');
-      this.form.markAllAsTouched();
+      this.detalleFaenaService.create(dto).subscribe({
+        next: () => {
+          this._notificationService.showSuccess('Detalle de faena creado correctamente')
+          this.router.navigate(['/detalle-faena']);
+        },
+        error: (err) => console.error(err),
+      });
     }
   }
 }

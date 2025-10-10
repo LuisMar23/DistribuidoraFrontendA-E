@@ -53,8 +53,7 @@ export class ProveedorComponent {
     { key: 'nit_ci', label: 'NIT/CI' },
     { key: 'telefono', label: 'Teléfono' },
     { key: 'direccion', label: 'Dirección' },
-    { key: 'departamento', label: 'Departamento' },
-    { key: 'email', label: 'Email' },
+    { key: 'departamento', label: 'Departamento' }
   ];
 
   total = signal(0);
@@ -73,7 +72,7 @@ export class ProveedorComponent {
       telefono: ['', Validators.required],
       direccion: ['', Validators.required],
       departamento: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]],
+
     });
 
     // Cargar proveedores al inicializar
@@ -114,6 +113,8 @@ export class ProveedorComponent {
       }
     } else {
       this.proveedorService.create(data).subscribe(() => {
+
+        console.log(data)
         this._notificationService.showSuccess(`Se ha creado al proveedor ${data.nombre}`);
         this.loadProveedores();
         this.cancelEdit();
@@ -150,7 +151,7 @@ export class ProveedorComponent {
         }
     });
   }
-  view(p: any) {}
+
   ordenarProveedores() {
     const col = this.sortColumn();
     const dir = this.sortDirection();

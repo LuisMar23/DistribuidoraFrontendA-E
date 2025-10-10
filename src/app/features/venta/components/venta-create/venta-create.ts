@@ -22,7 +22,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 import { NotificationService } from '../../../../core/services/notification.service';
 import { VentaService } from '../../services/venta.service';
-import { ClientService } from '../../../../core/services/client.service';
+
 
 import { ProductService } from '../../../../core/services/product.service';
 import { ClientDto } from '../../../../core/interfaces/client.interface';
@@ -30,6 +30,7 @@ import { UserDto } from '../../../../core/interfaces/user.interface';
 import { ProductDto } from '../../../../core/interfaces/product.interface';
 import { AuthService } from '../../../../components/services/auth.service';
 import { UserService } from '../../../users/services/users.service';
+import { ClientService } from '../../../clientes/services/cliente.service';
 
 // Interfaces locales para adaptar los datos
 interface ClienteOption {

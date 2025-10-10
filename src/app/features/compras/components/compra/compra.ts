@@ -29,7 +29,7 @@ export class CompraGanadoComponent implements OnInit {
       observaciones: [''],
       otrosGastos: [0, [Validators.min(0)]],
       detalle: this.fb.group({
-        cantidad: [1, [Validators.required, Validators.min(1)]],
+        cantidad: [0, [Validators.required, Validators.min(1)]],
         pesoBruto: [0, [Validators.required, Validators.min(0)]],
         pesoNeto: [0, [Validators.required, Validators.min(0)]],
         precio: [0, [Validators.required, Validators.min(0)]],

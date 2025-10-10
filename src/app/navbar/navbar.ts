@@ -15,10 +15,12 @@ import { AuthService } from '../components/services/auth.service';
 import { UserService } from '../features/users/services/users.service';
 import { environment } from '../../environments/environment';
 
+import { RouterModule } from '@angular/router';
+
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [FontAwesomeModule, CommonModule],
+  imports: [FontAwesomeModule, CommonModule,RouterModule],
   templateUrl: './navbar.html',
   styleUrl: './navbar.css',
 })
