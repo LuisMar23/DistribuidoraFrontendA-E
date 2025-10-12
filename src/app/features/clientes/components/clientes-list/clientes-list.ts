@@ -6,15 +6,25 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { faUser, faUsers, faEye, faPenToSquare, faTrash, faFileExcel } from '@fortawesome/free-solid-svg-icons';
+import {
+  faUser,
+  faUsers,
+  faEye,
+  faPenToSquare,
+  faTrash,
+  faFileExcel,
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 import { CommonModule } from '@angular/common';
-import { ClientDto } from '../../../../core/interfaces/client.interface';
+
 import { ClientService } from '../../services/cliente.service';
 import { NotificationService } from '../../../../core/services/notification.service';
 import { Workbook } from 'exceljs';
 import { saveAs } from 'file-saver';
+import { PdfService } from '../../../../core/services/pdf.service';
+import { DataTableService, TableState } from '../../../../core/services/ordenamiento.service';
+
 @Component({
   selector: 'app-client',
   standalone: true,
@@ -44,7 +54,7 @@ export class ClientComponent {
     { key: 'nit_ci', label: 'NIT/CI' },
     { key: 'telefono', label: 'Teléfono' },
     { key: 'direccion', label: 'Dirección' },
-    {key:'creado_en',label:'Fecha Creacion'},
+    { key: 'creado_en', label: 'Fecha Creacion' },
   ];
 
   total = signal(0);
@@ -52,7 +62,8 @@ export class ClientComponent {
   currentPage = signal(1);
   sortColumn = signal<string>('');
   sortDirection = signal<'asc' | 'desc'>('desc');
-private _notificationService=inject(NotificationService)
+  private _notificationService = inject(NotificationService);
+  private pdfService = inject(PdfService);
   constructor(private clientService: ClientService, private fb: FormBuilder) {
     this.form = this.fb.group({
       nombre: ['', Validators.required],
@@ -65,23 +76,105 @@ private _notificationService=inject(NotificationService)
   }
 
   loadClients() {
-    this.clientService.getAll().subscribe((data: ClientDto[]) => {
-      this.clients.set(data);
-      this.total.set(data.length);
-    });
+    this.clientService
+      .getAll(this.currentPage(), this.pageSize())
+      .subscribe((data: ClientDto[]) => {
+        this.clients.set(data);
+        this.total.set(data.length);
+      });
   }
 
-  filteredClients = computed(() => {
-    const term = this.searchTerm().toLowerCase();
-    return this.clients().filter(
-      (c) =>
-        (c.nombre || '').toLowerCase().includes(term) ||
-        (c.nit_ci || '').toLowerCase().includes(term) ||
-        (c.telefono || '').toLowerCase().includes(term) ||
-        (c.direccion || '').toLowerCase().includes(term) ||
-        (c.email || '').toLowerCase().includes(term)
-    );
-  });
+  // filteredClients = computed(() => {
+  //   let arr = this.clients();
+
+  //   // Primero ordenar
+  //   const col = this.sortColumn();
+  //   const dir = this.sortDirection();
+
+  //   if (col) {
+  //     arr = [...arr].sort((a, b) => {
+  //       // Acceder a las propiedades a través de persona
+  //       let valA: any;
+  //       let valB: any;
+
+  //       if (col === 'id_cliente') {
+  //         valA = a.id_cliente;
+  //         valB = b.id_cliente;
+  //       } else if (col === 'creado_en') {
+  //         valA = a.creado_en;
+  //         valB = b.creado_en;
+  //       } else {
+  //         // Para nombre, nit_ci, telefono, direccion
+  //         valA = a.persona?.[col as keyof typeof a.persona];
+  //         valB = b.persona?.[col as keyof typeof b.persona];
+  //       }
+
+  //       if (valA == null) return 1;
+  //       if (valB == null) return -1;
+
+  //       if (typeof valA === 'string' && typeof valB === 'string') {
+  //         return dir === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
+  //       }
+
+  //       // Para fechas y números
+  //       if (valA instanceof Date && valB instanceof Date) {
+  //         return dir === 'asc' ? valA.getTime() - valB.getTime() : valB.getTime() - valA.getTime();
+  //       }
+
+  //       return dir === 'asc' ? (valA < valB ? -1 : 1) : valA < valB ? 1 : -1;
+  //     });
+  //   }
+
+  //   // Luego filtrar
+  //   const term = this.searchTerm().toLowerCase();
+  //   if (!term) return arr;
+
+  //   return arr.filter((c) => {
+  //     const p = c.persona;
+  //     return (
+  //       (p.nombre || '').toLowerCase().includes(term) ||
+  //       (p.nit_ci || '').toLowerCase().includes(term) ||
+  //       (p.telefono || '').toLowerCase().includes(term) ||
+  //       (p.direccion || '').toLowerCase().includes(term)
+  //     );
+  //   });
+  // });
+  private dataTable = inject(DataTableService);
+
+  tableState: TableState<any> = {
+    data: this.clients,
+    searchTerm: this.searchTerm,
+    sortColumn: this.sortColumn,
+    sortDirection: this.sortDirection,
+  };
+  filteredClients = this.dataTable.filteredAndSorted(this.tableState, [
+    'persona.nombre',
+    'persona.nit_ci',
+    'persona.telefono',
+    'persona.direccion',
+  ]);
+
+  paginatedClients = this.dataTable.paginate(this.filteredClients, this.currentPage, this.pageSize);
+
+  toggleSort(column: any) {
+    this.dataTable.toggleSort(this.tableState, column);
+  }
+
+  // Simplifica el método sort
+  // sort(column: string) {
+  //   console.log('Ordenando por:', column);
+
+  //   if (this.sortColumn() === column) {
+  //     this.sortDirection.set(this.sortDirection() === 'asc' ? 'desc' : 'asc');
+  //   } else {
+  //     this.sortColumn.set(column);
+  //     this.sortDirection.set('asc');
+  //   }
+  //   // No necesitas llamar a ordenarClientes() porque filteredClients es computed
+  // }
+
+  // ELIMINA el método ordenarClientes() completamente
+
   ordenarClientes() {
     const col = this.sortColumn();
     const dir = this.sortDirection();
@@ -108,7 +201,7 @@ private _notificationService=inject(NotificationService)
 
   submit() {
     if (this.form.invalid) {
-      this._notificationService.showAlert('Formulario inválido')
+      this._notificationService.showAlert('Formulario inválido');
       return;
     }
 
@@ -119,40 +212,40 @@ private _notificationService=inject(NotificationService)
       if (id != null) {
         this.clientService.update(id, data).subscribe({
           next: (result) => {
-            this._notificationService.showSuccess(`Cliente actualizado: ${result}`)
+            this._notificationService.showSuccess(`Cliente actualizado: ${result}`);
             this.loadClients();
             this.cancelEdit();
           },
           error: (error) => {
-            this._notificationService.showError(`Error al actualizar cliente: ${error}`)
+            this._notificationService.showError(`Error al actualizar cliente: ${error}`);
           },
         });
       }
     } else {
       this.clientService.create(data).subscribe({
         next: (result) => {
-          this._notificationService.showSuccess(`Cliente creado: ${result}`)
+          this._notificationService.showSuccess(`Cliente creado: ${result}`);
           this.loadClients();
           this.cancelEdit();
         },
         error: (error) => {
-          this._notificationService.showError(`Error al crear cliente: ${error}`)
+          const msg = error.error?.message || 'Error al crear cliente';
+          this._notificationService.showError(msg);
         },
       });
     }
   }
-
   edit(client: ClientDto) {
     this.showModal.set(true);
     this.editMode.set(true);
     this.editId.set(client.id_cliente!);
 
+    const p = client.persona;
     this.form.patchValue({
-      nombre: client.nombre,
-      nit_ci: client.nit_ci,
-      telefono: client.telefono,
-      direccion: client.direccion,
-      email: client.email,
+      nombre: p.nombre,
+      nit_ci: p.nit_ci,
+      telefono: p.telefono,
+      direccion: p.direccion,
     });
   }
 
@@ -181,30 +274,33 @@ private _notificationService=inject(NotificationService)
     });
   }
 
-  delete(data:any) {
-     this._notificationService
+  delete(data: any) {
+    this._notificationService
       .confirmDelete(`Se eliminara al cliente ${data.nombre}`)
       .then((result) => {
         if (result.isConfirmed) {
           this._notificationService.showSuccess('Eliminado correctamente');
-          this.clientService.delete(data.id).subscribe(()=>this.loadClients())
+          this.clientService.delete(data.id).subscribe(() => this.loadClients());
         }
-    });
+      });
   }
 
   view(c: ClientDto) {
     console.log('Ver cliente:', c);
   }
 
-  sort(column: string) {
-    if (this.sortColumn() === column) {
-      this.sortDirection.set(this.sortDirection() === 'asc' ? 'desc' : 'asc');
-    } else {
-      this.sortColumn.set(column);
-      this.sortDirection.set('asc');
-    }
-    this.ordenarClientes();
-  }
+  // sort(column: string) {
+  //   console.log("adadada")
+  //   console.log(column)
+
+  //   if (this.sortColumn() === column) {
+  //     this.sortDirection.set(this.sortDirection() === 'asc' ? 'desc' : 'asc');
+  //   } else {
+  //     this.sortColumn.set(column);
+  //     this.sortDirection.set('asc');
+  //   }
+  //   this.ordenarClientes();
+  // }
 
   nextPage() {
     if (this.currentPage() < this.totalPages()) {
@@ -249,14 +345,14 @@ private _notificationService=inject(NotificationService)
   //   return new Date(dateString).toLocaleString();
   // }
 
-
-
   downloadExcel() {
     const workbook = new Workbook();
     const worksheet = workbook.addWorksheet('Clientes');
 
+    // Definir columnas
     worksheet.columns = [
-      { header: 'ID', key: 'id_cliente', width: 10 },
+      { header: 'N°', key: 'numero', width: 8 },
+      { header: 'ID Cliente', key: 'id_cliente', width: 12 },
       { header: 'Nombre', key: 'nombre', width: 30 },
       { header: 'NIT/CI', key: 'nit_ci', width: 20 },
       { header: 'Teléfono', key: 'telefono', width: 20 },
@@ -281,46 +377,120 @@ private _notificationService=inject(NotificationService)
       };
     });
 
-  
-    const clientes = this.clients(); 
-    clientes.forEach((cliente) => {
-      worksheet.addRow({
+    const clientes = this.filteredClients();
+
+    clientes.forEach((cliente, index) => {
+      const p = cliente.persona;
+
+      const row = worksheet.addRow({
+        numero: index + 1,
         id_cliente: cliente.id_cliente,
-        nombre: cliente.nombre,
-        nit_ci: cliente.nit_ci,
-        telefono: cliente.telefono,
-        direccion: cliente.direccion,
+        nombre: p.nombre || 'N/A',
+        nit_ci: p.nit_ci || 'N/A',
+        telefono: p.telefono || 'N/A',
+        direccion: p.direccion || 'N/A',
         creado_en: this.formatDate(cliente.creado_en),
       });
+
+      // Centrar la columna N°
+      row.getCell('numero').alignment = {
+        vertical: 'middle',
+        horizontal: 'center',
+      };
+
+      row.eachCell((cell) => {
+        cell.border = {
+          top: { style: 'thin', color: { argb: 'FFE0E0E0' } },
+          left: { style: 'thin', color: { argb: 'FFE0E0E0' } },
+          bottom: { style: 'thin', color: { argb: 'FFE0E0E0' } },
+          right: { style: 'thin', color: { argb: 'FFE0E0E0' } },
+        };
+      });
+
+      if (index % 2 === 0) {
+        row.eachCell((cell) => {
+          cell.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: 'FFF9F9F9' },
+          };
+        });
+      }
     });
 
     worksheet.eachRow({ includeEmpty: false }, (row) => {
       row.height = 22;
     });
 
+    const totalRow = worksheet.addRow({
+      numero: '',
+      id_cliente: '',
+      nombre: `Total de clientes: ${clientes.length}`,
+      nit_ci: '',
+      telefono: '',
+      direccion: '',
+      creado_en: new Date().toLocaleDateString('es-BO'),
+    });
+
+    totalRow.eachCell((cell) => {
+      cell.font = { bold: true };
+      cell.fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FFFFFFFF' },
+      };
+      cell.alignment = { vertical: 'middle', horizontal: 'center' };
+    });
+
     workbook.xlsx.writeBuffer().then((data) => {
       const blob = new Blob([data], {
-        type:
-          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       });
-      saveAs(blob, `Clientes_${new Date().toISOString().split('T')[0]}.xlsx`);
+      const fecha = new Date().toISOString().split('T')[0];
+      saveAs(blob, `Clientes_${fecha}.xlsx`);
     });
   }
 
+  formatDate(date?: string | Date): string {
+    if (!date) return '';
+    const d = new Date(date);
+    if (isNaN(d.getTime())) return '';
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+    const hours = String(d.getHours()).padStart(2, '0');
+    const minutes = String(d.getMinutes()).padStart(2, '0');
+    return `${day}/${month}/${year} ${hours}:${minutes}`;
+  }
 
- formatDate(date?: string | Date): string {
-  if (!date) return '';
-  const d = new Date(date);
-  if (isNaN(d.getTime())) return ''; 
-  const day = String(d.getDate()).padStart(2, '0');
-  const month = String(d.getMonth() + 1).padStart(2, '0');
-  const year = d.getFullYear();
-  const hours = String(d.getHours()).padStart(2, '0');
-  const minutes = String(d.getMinutes()).padStart(2, '0');
-  return `${day}/${month}/${year} ${hours}:${minutes}`;
-}
-
-
-
-
+  downloadPDF() {
+    this.pdfService.downloadTablePdf({
+      title: 'Sistema Ventas Carnes A&E ',
+      subtitle: 'Lista de Clientes',
+      columns: [
+        { header: 'N°', dataKey: 'numero', width: 30, alignment: 'center' },
+        { header: 'ID', dataKey: 'id_cliente', width: 40, alignment: 'center' },
+        { header: 'Nombre', dataKey: 'nombre', width: '*', alignment: 'left' },
+        { header: 'NIT/CI', dataKey: 'nit_ci', width: 70, alignment: 'center' },
+        { header: 'Teléfono', dataKey: 'telefono', width: 70, alignment: 'center' },
+        { header: 'Dirección', dataKey: 'direccion', width: 120, alignment: 'left' },
+        { header: 'Fecha', dataKey: 'creado_en', width: 70, alignment: 'center' },
+      ],
+      data: this.filteredClients().map((c, index) => ({
+        numero: index + 1,
+        id_cliente: c.id_cliente,
+        nombre: c.persona.nombre || 'N/A',
+        nit_ci: c.persona.nit_ci || 'N/A',
+        telefono: c.persona.telefono || 'N/A',
+        direccion: c.persona.direccion || 'N/A',
+        creado_en: this.formatDate(c.creado_en),
+      })),
+      fileName: 'Clientes',
+      pageOrientation: 'landscape', // Horizontal para más columnas
+      // headerColor: '#ff7676',
+      // alternateRowColor: '#f9f9f9',
+      showFooter: true,
+      footerText: 'Distribuidora A-E - Sistema de Gestión',
+    });
+  }
 }

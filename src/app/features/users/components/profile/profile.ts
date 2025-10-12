@@ -17,17 +17,20 @@ export class ProfileComponent {
   private fb = inject(FormBuilder);
   private userService = inject(UserService);
   private _notificationService = inject(NotificationService);
-  serverFile=environment.fileServer
+  serverFile = environment.fileServer;
   userId = 1; // ⚡ Cambiar dinámicamente según auth
 
   // Signals
   avatarFile = signal<File | null>(null);
   avatarUrlBackend = signal<string>('/assets/default.jpg');
+
   // Formulario reactivo
   profileForm = this.fb.group({
     fullName: this.fb.control('', Validators.required),
     username: this.fb.control('', Validators.required),
     telefono: this.fb.control('', Validators.required),
+    nit_ci: this.fb.control(''), // si quieres mostrar
+    direccion: this.fb.control(''), // si quieres mostrar
   });
 
   avatarPreview = computed(() => {
@@ -40,15 +43,18 @@ export class ProfileComponent {
 
   loadProfile() {
     this.userService.getProfile().subscribe((user) => {
+      // Ahora extraemos datos de la relación persona
+      const persona = user.persona || {};
       this.profileForm.patchValue({
-        fullName: user.fullName,
-        username: user.username,
-        telefono: user.telefono,
+        fullName: persona.nombre || '',
+        username: user.username || '',
+        telefono: persona.telefono || '',
+        nit_ci: persona.nit_ci || '',
+        direccion: persona.direccion || '',
       });
 
       if (user.avatarUrl) {
         this.avatarUrlBackend.set(`${this.serverFile}/${user.avatarUrl}`);
-            // this.avatarUrlBackend.set(`http://localhost:3000/${user.avatarUrl}`);
       } else {
         this.avatarUrlBackend.set('assets/default.jpg');
       }
@@ -71,6 +77,7 @@ export class ProfileComponent {
     Object.entries(this.profileForm.value).forEach(([key, value]) => {
       if (value) formData.append(key, value as string);
     });
+
     if (this.avatarFile()) formData.append('avatar', this.avatarFile()!);
 
     this.userService.updateProfile(this.userId, formData).subscribe({
@@ -78,7 +85,7 @@ export class ProfileComponent {
         this._notificationService.showAlert('Perfil actualizado ✅');
         this.loadProfile();
       },
-      error: (err) => alert('Error al actualizar: ' + err.message),
+      error: (err) => this._notificationService.showAlert('Error al actualizar: ' + err.message),
     });
   }
 
@@ -93,3 +100,4 @@ export class ProfileComponent {
     });
   }
 }
+

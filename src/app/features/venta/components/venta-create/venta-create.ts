@@ -25,7 +25,7 @@ import { VentaService } from '../../services/venta.service';
 
 
 import { ProductService } from '../../../../core/services/product.service';
-import { ClientDto } from '../../../../core/interfaces/client.interface';
+
 import { UserDto } from '../../../../core/interfaces/user.interface';
 import { ProductDto } from '../../../../core/interfaces/product.interface';
 import { AuthService } from '../../../../components/services/auth.service';
@@ -159,7 +159,7 @@ export class VentaCreateComponent implements OnInit {
       next: (clientes: ClientDto[]) => {
         const clientesOptions: ClienteOption[] = clientes.map((cliente) => ({
           id_cliente: cliente.id_cliente || 0,
-          nombre: cliente.nombre || 'Cliente sin nombre',
+          nombre: cliente.persona.nombre || 'Cliente sin nombre',
         }));
         this.clientes.set(clientesOptions);
         this.clientesFiltrados.set(clientesOptions);

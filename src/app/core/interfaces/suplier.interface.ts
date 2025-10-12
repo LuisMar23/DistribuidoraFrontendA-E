@@ -1,13 +1,13 @@
+import { PersonaDto } from "./persona.interface";
+
 export interface ProveedorDto {
   id_proveedor?: number;
-  nombre: string;
-  nit_ci: string;
-  telefono: string;
-  direccion: string;
+  personaId?: number;
+  persona: PersonaDto;  
   departamento: string;
-  email: string;
   isActive?: boolean;
   creado_en?: string;
+  uuid?: string;
 }
 
 export interface CountResponse {

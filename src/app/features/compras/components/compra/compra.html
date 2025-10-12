@@ -63,7 +63,7 @@
               >
                 <option value="">Seleccione un proveedor</option>
                 @for (p of proveedores; track $index) {
-                <option [value]="p.id_proveedor">{{ p.nombre }}</option>
+                <option [value]="p.id_proveedor">{{ p.persona.nombre }}</option>
                 }
               </select>
 

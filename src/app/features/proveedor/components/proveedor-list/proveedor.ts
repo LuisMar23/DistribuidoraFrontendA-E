@@ -53,7 +53,7 @@ export class ProveedorComponent {
     { key: 'nit_ci', label: 'NIT/CI' },
     { key: 'telefono', label: 'Teléfono' },
     { key: 'direccion', label: 'Dirección' },
-    { key: 'departamento', label: 'Departamento' }
+    { key: 'departamento', label: 'Departamento' },
   ];
 
   total = signal(0);
@@ -72,30 +72,34 @@ export class ProveedorComponent {
       telefono: ['', Validators.required],
       direccion: ['', Validators.required],
       departamento: ['', Validators.required],
-
     });
 
-    // Cargar proveedores al inicializar
     this.loadProveedores();
   }
   loadProveedores() {
     this.proveedorService.getAll(this.currentPage(), this.pageSize()).subscribe((res) => {
+      console.log(res);
       this.proveedores.set(res.data);
       this.total.set(res.total);
 
-      // aplicar sort si ya hay columna seleccionada
       if (this.sortColumn()) this.ordenarProveedores();
     });
   }
-
   filteredProveedores = computed(() => {
-    const term = this.searchTerm().toLowerCase();
-    return this.proveedores().filter(
-      (p) =>
-        p.nombre.toLowerCase().includes(term) ||
-        p.nit_ci.toLowerCase().includes(term) ||
-        p.telefono.toLowerCase().includes(term)
-    );
+    let arr = this.proveedores();
+
+    const term = (this.searchTerm() ?? '').toLowerCase();
+    if (!term) return arr;
+
+    return arr.filter((p) => {
+      const per = p.persona || {};
+      return (
+        (per.nombre || '').toLowerCase().includes(term) ||
+        (per.nit_ci || '').toLowerCase().includes(term) ||
+        (per.telefono || '').toLowerCase().includes(term) ||
+        (per.direccion || '').toLowerCase().includes(term)
+      );
+    });
   });
   submit() {
     if (this.form.invalid) return;
@@ -113,8 +117,7 @@ export class ProveedorComponent {
       }
     } else {
       this.proveedorService.create(data).subscribe(() => {
-
-        console.log(data)
+        console.log(data);
         this._notificationService.showSuccess(`Se ha creado al proveedor ${data.nombre}`);
         this.loadProveedores();
         this.cancelEdit();
@@ -125,7 +128,16 @@ export class ProveedorComponent {
     this.showModal.set(true);
     this.editMode.set(true);
     this.editId.set(proveedor.id_proveedor!);
-    this.form.patchValue(proveedor);
+
+    const per = proveedor.persona || {};
+
+    this.form.patchValue({
+      nombre: per.nombre || '',
+      nit_ci: per.nit_ci || '',
+      telefono: per.telefono || '',
+      direccion: per.direccion || '',
+      departamento: proveedor.departamento || '',
+    });
   }
   openModal() {
     this.showModal.set(true);
@@ -140,7 +152,6 @@ export class ProveedorComponent {
     this.form.reset();
   }
 
-  // Eliminar proveedor
   delete(data: any) {
     this._notificationService
       .confirmDelete(`Se eliminara al proveedor ${data.nombre}`)
@@ -149,7 +160,7 @@ export class ProveedorComponent {
           this._notificationService.showSuccess('Eliminado correctamente');
           this.proveedorService.delete(data.id_proveedor).subscribe(() => this.loadProveedores());
         }
-    });
+      });
   }
 
   ordenarProveedores() {
@@ -185,7 +196,6 @@ export class ProveedorComponent {
       this.sortDirection.set('asc');
     }
 
-    // Ordenar localmente, sin recargar desde backend
     this.ordenarProveedores();
   }
 

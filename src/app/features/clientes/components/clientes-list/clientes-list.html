@@ -1,10 +1,10 @@
-<div class="bg-[#fbfafa] text-black p-4 mb-6">
-  <div class="flex items-center gap-3">
-    <fa-icon [icon]="faUser" class="w-5 h-5"></fa-icon>
-    <h1 class="text-xl font-bold">Clientes</h1>
-  </div>
-</div>
 
+ <div class="bg-white rounded-2xl p-4 md:p-6 mb-6 flex items-center gap-4 shadow-sm">
+    <div class="bg-[#ff7676] text-white w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full">
+      <fa-icon [icon]="faUser" class="text-lg md:text-xl"></fa-icon>
+    </div>
+    <h2 class="text-lg md:text-xl font-bold font-sans text-gray-800">Clientes</h2>
+  </div>
 <div class="max-w-full mx-auto p-4 bg-gray-50">
   <!-- Buscador y botón -->
   <div class="flex flex-col lg:flex-row justify-between items-center gap-4 mb-6">
@@ -25,6 +25,14 @@
 
     <!-- Botones -->
     <div class="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
+
+        <button
+    (click)="downloadPDF()"
+    class="flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg shadow-lg transition-all duration-200 transform hover:scale-105"
+  >
+    <i class="fas fa-file-pdf"></i>
+    <span>Descargar PDF</span>
+  </button>
       <button
         (click)="downloadExcel()"
         class="flex items-center gap-2 bg-[#6ab9ab] hover:bg-[#5dccb8] text-white px-6 py-3 rounded-xl shadow-lg transition-all duration-200 transform hover:scale-105 w-full sm:w-auto justify-center"
@@ -49,44 +57,48 @@
         <table class="min-w-full">
           <thead>
             <tr class="bg-[#ff7676] text-white">
-              @for (col of columns; track col) {
-              <th
-                class="px-2 xl:px-4 py-4 text-left text-xs font-bold uppercase tracking-wider cursor-pointer"
-                (click)="sort(col.key)"
-              >
-                <div class="flex items-center space-x-2">
-                  <span
-                    [ngClass]="{
-                      'text-black': sortColumn() === col.key,
-                      'text-white': sortColumn() !== col.key
-                    }"
-                    class="text-sm font-medium"
-                  >
-                    {{ col.label }}
-                  </span>
-                  <div class="flex flex-col justify-center h-4">
-                    <span
-                      [ngClass]="{
-                        'text-black': sortColumn() === col.key && sortDirection() === 'asc',
-                        'text-white': !(sortColumn() === col.key && sortDirection() === 'asc')
-                      }"
-                      class="text-[10px] leading-none"
-                    >
-                      ▲
-                    </span>
-                    <span
-                      [ngClass]="{
-                        'text-black': sortColumn() === col.key && sortDirection() === 'desc',
-                        'text-white': !(sortColumn() === col.key && sortDirection() === 'desc')
-                      }"
-                      class="text-[10px] leading-none"
-                    >
-                      ▼
-                    </span>
-                  </div>
-                </div>
-              </th>
-              }
+             @for (col of columns; track col.key) {
+  <th
+    class="px-2 xl:px-4 py-4 text-left text-xs font-bold uppercase tracking-wider cursor-pointer select-none"
+    (click)="toggleSort(col.key)"
+  >
+    <div class="flex items-center space-x-2">
+      <!-- Nombre de la columna -->
+      <span
+        class="text-sm font-medium transition-colors"
+        [ngClass]="{
+          'text-black': sortColumn() === col.key,
+          'text-white': sortColumn() !== col.key
+        }"
+      >
+        {{ col.label }}
+      </span>
+
+      <!-- Iconos de orden -->
+      <div class="flex flex-col justify-center h-4 leading-none">
+        <span
+          class="text-[10px]"
+          [ngClass]="{
+            'text-black': sortColumn() === col.key && sortDirection() === 'asc',
+            'text-gray-400': !(sortColumn() === col.key && sortDirection() === 'asc')
+          }"
+        >
+          ▲
+        </span>
+        <span
+          class="text-[10px]"
+          [ngClass]="{
+            'text-black': sortColumn() === col.key && sortDirection() === 'desc',
+            'text-gray-400': !(sortColumn() === col.key && sortDirection() === 'desc')
+          }"
+        >
+          ▼
+        </span>
+      </div>
+    </div>
+  </th>
+}
+
               <th class="px-4 py-4 text-center text-xs font-bold uppercase tracking-wider">
                 Acciones
               </th>
@@ -97,19 +109,19 @@
             @for (c of filteredClients(); track $index) {
             <tr class="hover:bg-gray-50 transition-all duration-200 border-l-4 border-transparent">
               <td class="px-4 py-4">
-                <span class="font-semibold text-gray-700">{{ c.id_cliente }}</span>
+                <span class="font-semibold text-gray-700">{{$index+1 }}</span>
               </td>
               <td class="px-4 py-4">
-                <div class="font-bold text-gray-900 text-sm">{{ c.nombre || 'N/A' }}</div>
+                <div class="font-bold text-gray-900 text-sm">{{ c.persona.nombre || 'N/A' }}</div>
               </td>
               <td class="px-4 py-4">
-                <span class="font-medium text-gray-700">{{ c.nit_ci || 'N/A' }}</span>
+                <span class="font-medium text-gray-700">{{ c.persona.nit_ci || 'N/A' }}</span>
               </td>
               <td class="px-4 py-4">
-                <span class="font-medium text-gray-700">{{ c.telefono || 'N/A' }}</span>
+                <span class="font-medium text-gray-700">{{ c.persona.telefono || 'N/A' }}</span>
               </td>
               <td class="px-4 py-4">
-                <span class="font-medium text-gray-700">{{ c.direccion || 'N/A' }}</span>
+                <span class="font-medium text-gray-700">{{ c.persona.direccion || 'N/A' }}</span>
               </td>
               <td class="px-4 py-4">
                 <div class="flex items-center text-gray-700">
@@ -120,21 +132,21 @@
               <td class="px-4 py-4">
                 <div class="flex justify-center gap-3">
                   <button
-                    class="w-10 h-10 flex items-center justify-center rounded-2xl bg-green-500 hover:bg-green-600 text-white shadow-md transition transform hover:scale-110"
+                    class="w-10 h-10 flex items-center justify-center rounded-2xl bg-[#4B5563] hover:bg-gray-600 text-white shadow-md transition transform hover:scale-110"
                     title="Ver Detalle"
                     (click)="view(c)"
                   >
                     <fa-icon [icon]="faEye"></fa-icon>
                   </button>
                   <button
-                    class="w-10 h-10 flex items-center justify-center rounded-2xl bg-blue-500 hover:bg-blue-600 text-white shadow-md transition transform hover:scale-110"
+                    class="w-10 h-10 flex items-center justify-center rounded-2xl bg-[#3B82F6] hover:bg-blue-500 text-white shadow-md transition transform hover:scale-110"
                     title="Editar"
                     (click)="edit(c)"
                   >
                     <fa-icon [icon]="faPenToSquare"></fa-icon>
                   </button>
                   <button
-                    class="w-10 h-10 flex items-center justify-center rounded-2xl bg-red-500 hover:bg-red-600 text-white shadow-md transition transform hover:scale-110"
+                    class="w-10 h-10 flex items-center justify-center rounded-2xl bg-[#F87171] hover:bg-red-400 text-white shadow-md transition transform hover:scale-110"
                     title="Eliminar"
                     (click)="delete(c)"
                   >
@@ -170,8 +182,8 @@
       <div class="bg-[#ff7676] p-4">
         <div class="flex justify-between items-start">
           <div class="flex-1">
-            <h3 class="font-bold text-white text-lg leading-tight">{{ c.nombre || 'N/A' }}</h3>
-            <p class="text-red-100 text-sm mt-1">ID: {{ c.id_cliente }}</p>
+            <h3 class="font-bold text-white text-lg leading-tight">{{ c.persona.nombre || 'N/A' }}</h3>
+            <p class="text-red-100 text-sm mt-1">ID: {{ $index+1 }}</p>
           </div>
           <div class="flex items-center gap-2">
             <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-medium">
@@ -190,14 +202,14 @@
               <i class="fas fa-id-card text-xs mr-2"></i>
               <span class="text-xs font-medium uppercase tracking-wide">NIT/CI</span>
             </div>
-            <p class="font-semibold text-gray-800 text-sm">{{ c.nit_ci || 'N/A' }}</p>
+            <p class="font-semibold text-gray-800 text-sm">{{ c.persona.nit_ci || 'N/A' }}</p>
           </div>
           <div>
             <div class="flex items-center text-gray-600 mb-1">
               <i class="fas fa-phone text-xs mr-2"></i>
               <span class="text-xs font-medium uppercase tracking-wide">Teléfono</span>
             </div>
-            <p class="font-semibold text-gray-800 text-sm">{{ c.telefono || 'N/A' }}</p>
+            <p class="font-semibold text-gray-800 text-sm">{{ c.persona.telefono || 'N/A' }}</p>
           </div>
         </div>
 
@@ -207,7 +219,7 @@
             <i class="fas fa-map-marker-alt text-xs mr-2"></i>
             <span class="text-xs font-medium uppercase tracking-wide">Dirección</span>
           </div>
-          <p class="text-gray-800 text-sm leading-relaxed">{{ c.direccion || 'N/A' }}</p>
+          <p class="text-gray-800 text-sm leading-relaxed">{{ c.persona.direccion || 'N/A' }}</p>
         </div>
 
         <!-- Fila 3: Fecha de creación -->
@@ -223,21 +235,21 @@
         <div class="pt-3 border-t border-gray-100">
           <div class="grid grid-cols-3 gap-2">
             <button
-              class="flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white px-3 py-2.5 rounded-lg text-sm font-medium shadow-sm transition-all duration-200 transform hover:scale-105"
+              class="flex items-center justify-center gap-2 bg-[#4B5563] hover:bg-gray-600 text-white px-3 py-2.5 rounded-lg text-sm font-medium shadow-sm transition-all duration-200 transform hover:scale-105"
               (click)="view(c)"
             >
               <fa-icon [icon]="faEye" class="text-xs"></fa-icon>
               <span class="hidden sm:inline">Detalle</span>
             </button>
             <button
-              class="flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-600 text-white px-3 py-2.5 rounded-lg text-sm font-medium shadow-sm transition-all duration-200 transform hover:scale-105"
+              class="flex items-center justify-center gap-2 bg-[#3B82F6] hover:bg-blue-500 text-white px-3 py-2.5 rounded-lg text-sm font-medium shadow-sm transition-all duration-200 transform hover:scale-105"
               (click)="edit(c)"
             >
               <fa-icon [icon]="faPenToSquare" class="text-xs"></fa-icon>
               <span class="hidden sm:inline">Editar</span>
             </button>
             <button
-              class="flex items-center justify-center gap-2 bg-red-500 hover:bg-red-600 text-white px-3 py-2.5 rounded-lg text-sm font-medium shadow-sm transition-all duration-200 transform hover:scale-105"
+              class="flex items-center justify-center gap-2 bg-[#F87171] hover:bg-red-400 text-white px-3 py-2.5 rounded-lg text-sm font-medium shadow-sm transition-all duration-200 transform hover:scale-105"
               (click)="delete(c)"
             >
               <fa-icon [icon]="faTrash" class="text-xs"></fa-icon>
