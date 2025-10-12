@@ -1,152 +1,199 @@
-import { Component, computed, inject, signal } from '@angular/core';
-import { faCow, faEye, faPenToSquare, faSearch, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { Component, computed, effect, signal } from '@angular/core';
 
-import { FaenaService } from '../../services/faena.service';
-import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import {
+  faClipboardList,
+  faSearch,
+  faEye,
+  faPenToSquare,
+  faTrash,
+  faBoxOpen,
+} from '@fortawesome/free-solid-svg-icons';
+import { DetalleFaena } from '../../../../core/interfaces/faena.interface';
+import { DetalleFaenaService } from '../../services/faena.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+
 import { RouterModule } from '@angular/router';
-import { NotificationService } from '../../../../core/services/notification.service';
 
 @Component({
-  selector: 'app-faena-list',
-  imports: [CommonModule, FontAwesomeModule, RouterModule,FormsModule],
+  selector: 'app-detalle-faena',
   templateUrl: './faena-list.html',
-  styleUrl: './faena-list.css',
+  imports: [FontAwesomeModule, FormsModule, CommonModule, RouterModule],
+  styleUrls: ['./faena-list.css'],
 })
-export class FaenaList {
-  private faenaService = inject(FaenaService);
-
-  faenas = signal<any[]>([]);
-
-  currentPage = signal(1);
-  pageSize = signal(10);
-
-  // Iconos FontAwesome
+export class DetalleFaenaComponent {
+  // FontAwesome
+  faClipboardList = faClipboardList;
+  faSearch = faSearch;
   faEye = faEye;
   faPenToSquare = faPenToSquare;
   faTrash = faTrash;
-  faSearch = faSearch;
-  faCow=faCow;
+  faBoxOpen = faBoxOpen;
 
+  // Señales
+  faenas = signal<DetalleFaena[]>([]);
   searchTerm = signal('');
-  columns = [
-    { key: 'id', label: '#' },
-    { key: 'compraId', label: 'ID Compra' },
-    { key: 'propiedad', label: 'Propiedad' },
-    { key: 'numeroReses', label: 'Número de Reses' },
-    { key: 'precioDevolucion', label: 'Precio Devolución' },
-    { key: 'totalDevolucion', label: 'Total Devolución' },
-    { key: 'otrosGastos', label: 'Otros Gastos' },
-    { key: 'saldoDepositar', label: 'Saldo a Depositar' }
-  ];
+  itemsPerPage = 10;
+  currentPage = signal(1);
 
-  sortColumn = signal<string>('');
-  sortDirection = signal<'asc' | 'desc'>('asc');
-  _notificationService = inject(NotificationService);
-  constructor() {
+  // Modal
+  isModalOpen = signal(false);
+  editingFaena = signal<DetalleFaena | null>(null);
+
+  // Total de páginas dinámico
+  totalPages = computed(() => Math.ceil(this.total() / this.itemsPerPage));
+
+  constructor(private faenaService: DetalleFaenaService) {
     this.loadFaenas();
+
+    // Reset página al cambiar búsqueda
+    effect(() => {
+      this.searchTerm();
+      this.currentPage.set(1);
+    });
   }
 
   loadFaenas() {
-    this.faenaService.list().subscribe({
-      next: (res) => this.faenas.set(res),
-      error: (err) => console.error('Error cargando faenas', err),
-    });
-  }
-  ordenarProveedores() {
-    const col = this.sortColumn();
-    const dir = this.sortDirection();
-    if (!col) return;
-
-    const arr = [...this.faenas()];
-
-    arr.sort((a, b) => {
-      const valA = a[col as keyof any];
-      const valB = b[col as keyof any
-      ];
-
-      if (valA == null) return 1;
-      if (valB == null) return -1;
-
-      if (typeof valA === 'string' && typeof valB === 'string') {
-        return dir === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
-      }
-
-      return dir === 'asc' ? (valA < valB ? -1 : 1) : valA < valB ? 1 : -1;
-    });
-
-    this.faenas.set(arr);
+    this.faenaService.getAll(); // actualiza la señal interna automáticamente
+    // opcional: suscribirse si quieres copiar a tu señal local
+    this.faenaService.detallesFaena(); // read-only signal si necesitas usarla
   }
 
-  //paginador
-  sort(column: string) {
-    if (this.sortColumn() === column) {
-      this.sortDirection.set(this.sortDirection() === 'asc' ? 'desc' : 'asc');
-    } else {
-      this.sortColumn.set(column);
-      this.sortDirection.set('asc');
-    }
-
-    // Ordenar localmente, sin recargar desde backend
-    this.ordenarProveedores();
-  }
-  filteredFaenas = computed(() => {
-    const term = this.searchTerm().toLowerCase();
-    return this.faenas().filter(
-      (f) => f.propiedad.toLowerCase().includes(term) || f.compraId.toString().includes(term)
+  // Filtrado y paginación
+  filteredFaenas() {
+    const filtered = this.faenas().filter(f =>
+      f.propiedad.toLowerCase().includes(this.searchTerm().toLowerCase())
     );
-  });
-
-
-
-  totalPages() {
-   return Math.ceil(this.total() / this.pageSize());
-  }
-  nextPage() {
-    if (this.currentPage() < this.totalPages()) {
-      this.currentPage.update((v) => v + 1);
-      this.loadFaenas();
-    }
-  }
-  pageArray(): number[] {
-    return Array.from({ length: this.totalPages() }, (_, i) => i + 1);
-  }
-  prevPage() {
-    if (this.currentPage() > 1) {
-      this.currentPage.update((v) => v - 1);
-      this.loadFaenas();
-    }
-  }
-
-  goToPage(page: number) {
-    if (page >= 1 && page <= this.totalPages()) this.currentPage.set(page);
-  }
-
-  rangeStart(): number {
-    return (this.currentPage() - 1) * this.pageSize() + 1;
-  }
-
-  rangeEnd(): number {
-    const end = this.currentPage() * this.pageSize();
-    return end > this.total() ? this.total() : end;
+    const start = (this.currentPage() - 1) * this.itemsPerPage;
+    return filtered.slice(start, start + this.itemsPerPage);
   }
 
   total() {
-    return this.filteredFaenas().length;
+    return this.faenas().filter(f =>
+      f.propiedad.toLowerCase().includes(this.searchTerm().toLowerCase())
+    ).length;
   }
 
-  delete(data: any) {
-    this._notificationService.confirmDelete(`Se eliminara a  ${data}`).then((result) => {
-      if (result.isConfirmed) {
-        this.faenaService.delete(data.id).subscribe({
-          next: () => {
-            this.faenas.update((list) => list.filter((f) => f.id !== data.id));
-          },
-          error: (err) => console.error('Error eliminando faena', err),
-        });
-        this._notificationService.showSuccess('Eliminado correctamente');
-      }
-    });
+  rangeStart() {
+    return this.total() === 0 ? 0 : (this.currentPage() - 1) * this.itemsPerPage + 1;
   }
+
+  rangeEnd() {
+    return Math.min(this.currentPage() * this.itemsPerPage, this.total());
+  }
+
+  // Paginador
+  pageArray() {
+    return Array.from({ length: this.totalPages() }, (_, i) => i + 1);
+  }
+
+  goToPage(i: number) {
+    this.currentPage.set(i);
+  }
+
+  prevPage() {
+    if (this.currentPage() > 1) this.currentPage.update(v => v - 1);
+  }
+
+  nextPage() {
+    if (this.currentPage() < this.totalPages()) this.currentPage.update(v => v + 1);
+  }
+
+  // Modal
+  openModal(faena?: DetalleFaena) {
+    this.editingFaena.set(faena ? { ...faena } : null);
+    this.isModalOpen.set(true);
+  }
+
+  closeModal() {
+    this.editingFaena.set(null);
+    this.isModalOpen.set(false);
+  }
+
+  saveFaena(faena: DetalleFaena) {
+    if (this.editingFaena()) {
+      // Editar
+      this.faenaService.update(faena.id!, faena).subscribe({
+        next: () => {
+          this.loadFaenas();
+          this.closeModal();
+        },
+        error: err => console.error(err),
+      });
+    } else {
+      // Crear
+      this.faenaService.create(faena).subscribe({
+        next: () => {
+          this.loadFaenas();
+          this.closeModal();
+        },
+        error: err => console.error(err),
+      });
+    }
+  }
+
+  edit(faena: DetalleFaena) {
+    this.openModal(faena);
+  }
+
+  delete(faena: DetalleFaena) {
+    if (confirm(`¿Eliminar faena de ${faena.propiedad}?`)) {
+      this.faenaService.delete(faena.id!).subscribe({
+        next: () => this.loadFaenas(),
+        error: err => console.error(err),
+      });
+    }
+  }
+columns = [
+  {  key: 'fecha' ,label: 'Fecha'},
+  {  key: 'propiedad',label: 'Propiedad' },
+  {  key: 'numeroReses' ,label: 'Número de Reses'},
+  {  key: 'totalDevolucion', label: 'Total Devolución' },
+  { key: 'saldoDepositar',label: 'Saldo a Depositar' },
+];
+  sortColumn = signal<string>('');
+  sortDirection = signal<'asc' | 'desc'>('asc');
+
+ordenarFaenas() {
+  const col = this.sortColumn();
+  const dir = this.sortDirection();
+  if (!col) return;
+
+  const arr = [...this.faenas()];
+
+  arr.sort((a, b) => {
+    const valA = a[col as keyof DetalleFaena];
+    const valB = b[col as keyof DetalleFaena];
+
+    if (valA == null) return 1;
+    if (valB == null) return -1;
+
+    if (typeof valA === 'string' && typeof valB === 'string') {
+      return dir === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
+    }
+
+    return dir === 'asc' ? (valA < valB ? -1 : 1) : valA < valB ? 1 : -1;
+  });
+
+  this.faenas.set(arr);
+}
+
+// Paginador / click en encabezado
+sort(column: string) {
+  if (this.sortColumn() === column) {
+    this.sortDirection.set(this.sortDirection() === 'asc' ? 'desc' : 'asc');
+  } else {
+    this.sortColumn.set(column);
+    this.sortDirection.set('asc');
+  }
+
+  this.ordenarFaenas();
+}
+
+
+
+
+
+
 }

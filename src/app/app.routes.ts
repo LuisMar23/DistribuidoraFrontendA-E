@@ -7,7 +7,6 @@ import { RegisterComponent } from './components/auth/register/register';
 import { ChangePasswordComponent } from './components/auth/change-password/change-password';
 import { ProductComponent } from './product/product';
 
-import { ClientComponent } from './client/client';
 import { AuthGuard } from './core/guards/auth.guard';
 import { ProfileComponent } from './features/users/components/profile/profile';
 
@@ -27,13 +26,18 @@ export const routes: Routes = [
       { path: 'dashboard', component: DashboardComponent },
       {
         path: 'compras',
-        loadChildren: () => import('./features/compras/compras.routes').then((r)=>r.ComprasRoutingModule),
+        loadChildren: () =>
+          import('./features/compras/compras.routes').then((r) => r.ComprasRoutingModule),
       },
       {
-        path: 'users',
+        path: 'usuarios',
         loadChildren: () => import('./features/users/user.routes').then((r) => r.UserRoutingModule),
       },
-      { path: 'clientes', component: ClientComponent },
+      {
+        path: 'clientes',
+        loadChildren: () =>
+          import('./features/clientes/clientes.routes').then((r) => r.ClientesRoutingModule),
+      },
       {
         path: 'productos',
         loadChildren: () =>

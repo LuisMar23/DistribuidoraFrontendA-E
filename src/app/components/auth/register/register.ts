@@ -80,29 +80,23 @@ export class RegisterComponent {
     this.isLoading = true;
     this.errorMessage = '';
 
+    console.log(this.registerForm.value)
     this._authService.register(this.registerForm.value).subscribe({
       next: (resp) => {
-        console.log('Usuario registrado', resp);
+     
         this.isLoading = false;
         this._notificationService.showSuccess(`Usuario registrado exitosamente ${resp.fullName}`)
-        // Redirigir o mostrar mensaje de éxito
-        this.router.navigate(['/login']); // O la ruta que necesites
+     
+        this.router.navigate(['/login']); 
       },
-      error: (err) => {
-        console.error('Error al registrar usuario', err);
-        this.isLoading = false;
+    error: (err: any) => {
 
-        // Manejo de errores más específico
-        if (err.error?.message) {
-          this.errorMessage = err.error.message;
-        } else if (err.status === 400) {
-          this.errorMessage = 'Datos inválidos. Verifica la información ingresada.';
-        } else if (err.status === 409) {
-          this.errorMessage = 'El usuario ya existe.';
-        } else {
-          this.errorMessage = 'Error al crear la cuenta. Inténtalo nuevamente.';
-        }
-      },
+    this.isLoading = false;
+     this.errorMessage = err.error?.message || 'Error al crear la cuenta. Inténtalo nuevamente.';
+      this._notificationService.showError(`${this.errorMessage}`)
+    // Asignamos directamente el mensaje del backend
+   
+  }
     });
   }
 

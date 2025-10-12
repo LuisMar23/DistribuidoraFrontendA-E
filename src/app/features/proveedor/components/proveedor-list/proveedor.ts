@@ -78,6 +78,7 @@ export class ProveedorComponent {
     // Cargar proveedores al inicializar
     this.loadProveedores();
   }
+
   loadProveedores() {
     this.proveedorService.getAll(this.currentPage(), this.pageSize()).subscribe((res) => {
       this.proveedores.set(res.data);
@@ -97,6 +98,7 @@ export class ProveedorComponent {
         p.telefono.toLowerCase().includes(term)
     );
   });
+
   submit() {
     if (this.form.invalid) return;
 
@@ -113,23 +115,27 @@ export class ProveedorComponent {
       }
     } else {
       this.proveedorService.create(data).subscribe(() => {
+        console.log(data);
         this._notificationService.showSuccess(`Se ha creado al proveedor ${data.nombre}`);
         this.loadProveedores();
         this.cancelEdit();
       });
     }
   }
+
   edit(proveedor: ProveedorDto) {
     this.showModal.set(true);
     this.editMode.set(true);
     this.editId.set(proveedor.id_proveedor!);
     this.form.patchValue(proveedor);
   }
+
   openModal() {
     this.showModal.set(true);
     this.editMode.set(false);
     this.form.reset();
   }
+
   // Cancelar edición
   cancelEdit() {
     this.showModal.set(false);
@@ -141,7 +147,7 @@ export class ProveedorComponent {
   // Eliminar proveedor
   delete(data: any) {
     this._notificationService
-      .confirmDelete(`Se eliminara al proveedor ${data.nombre}`)
+      .confirmDelete(`Se eliminará al proveedor ${data.nombre}`)
       .then((result) => {
         if (result.isConfirmed) {
           this._notificationService.showSuccess('Eliminado correctamente');
@@ -149,7 +155,7 @@ export class ProveedorComponent {
         }
       });
   }
-  view(p: any) {}
+
   ordenarProveedores() {
     const col = this.sortColumn();
     const dir = this.sortDirection();
@@ -211,6 +217,7 @@ export class ProveedorComponent {
   totalPages() {
     return Math.ceil(this.total() / this.pageSize());
   }
+
   pageArray(): number[] {
     return Array.from({ length: this.totalPages() }, (_, i) => i + 1);
   }

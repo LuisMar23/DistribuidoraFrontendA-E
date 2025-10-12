@@ -41,7 +41,7 @@ export class Sidebar {
 
   @Output() sidebarToggled = new EventEmitter<boolean>();
 
-  imagen: string = 'assets/distributionae.jpg';
+  imagen: string = 'assets/logoSistemaVenta.png';
 
   isCollapsed = false;
   isMobileOpen = false;

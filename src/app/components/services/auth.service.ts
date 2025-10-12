@@ -40,10 +40,17 @@ export class AuthService {
   constructor(private http: HttpClient, private router: Router) {}
 
   login(data: LoginDto): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(`${this.apiUrl}/auth/login`, data).pipe(
+    // CORRECCIÓN: Transformar identifier a username
+    const loginData = {
+      username: data.identifier,
+      password: data.password,
+    };
+
+    return this.http.post<LoginResponse>(`${this.apiUrl}/auth/login`, loginData).pipe(
       tap((res) => {
-        console.log('lo q necesito');
-        console.log(res);
+        // SOLUCIÓN: No mostrar datos sensibles en consola
+        console.log('Login exitoso - Tokens recibidos');
+
         localStorage.setItem(this.tokenKey, res.data.accessToken);
         localStorage.setItem('refresh_token', res.data.refreshToken);
         localStorage.setItem(this.userKey, JSON.stringify(res.data.user));
@@ -59,7 +66,14 @@ export class AuthService {
   }
 
   register(data: RegisterDto): Observable<RegisterDto> {
-    console.log(data);
+    // SOLUCIÓN: Log seguro
+    console.log('Registro attempt:', {
+      username: data.username,
+      fullName: data.fullName,
+      ci: data.ci ? '***' : 'not-provided',
+      telefono: data.telefono ? '***' : 'not-provided',
+    });
+
     return this.http.post(`${this.apiUrl}/auth/register`, data).pipe(
       tap((res: any) => {
         if (res.access_token) {
