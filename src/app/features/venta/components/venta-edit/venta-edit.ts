@@ -23,15 +23,13 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 import { NotificationService } from '../../../../core/services/notification.service';
 import { VentaService } from '../../services/venta.service';
-
-
-import { ProductService } from '../../../../core/services/product.service';
 import { ClientDto } from '../../../../core/interfaces/client.interface';
 import { UserDto } from '../../../../core/interfaces/user.interface';
 import { ProductDto } from '../../../../core/interfaces/product.interface';
 import { AuthService } from '../../../../components/services/auth.service';
 import { UserService } from '../../../users/services/users.service';
 import { ClientService } from '../../../clientes/services/cliente.service';
+import { ProductService } from '../../../products/services/product.service';
 
 // Interfaces locales
 interface ClienteOption {
@@ -63,7 +61,6 @@ interface NuevoPago {
   standalone: true,
   imports: [ReactiveFormsModule, FontAwesomeModule, CommonModule, FormsModule],
   templateUrl: './venta-edit.html',
-  styleUrl: './venta-edit.css',
 })
 export class VentaEditComponent implements OnInit {
   // Iconos
@@ -128,7 +125,6 @@ export class VentaEditComponent implements OnInit {
   constructor() {
     this.form = this._fb.group({
       id_cliente: ['', Validators.required],
-      id_usuario: ['', Validators.required],
       fecha_venta: ['', Validators.required],
       subtotal: [0],
       descuento: [0],
@@ -491,7 +487,6 @@ export class VentaEditComponent implements OnInit {
       // Actualizar formulario
       this.form.patchValue({
         id_cliente: clienteId || '',
-        id_usuario: venta.id_usuario || venta.usuarioId || this.usuarioActual()?.id_usuario,
         fecha_venta: formattedDate,
         subtotal: venta.subtotal || 0,
         descuento: venta.descuento || 0,
@@ -539,25 +534,87 @@ export class VentaEditComponent implements OnInit {
   }
 
   private loadUsuarioActual() {
-    const usuario = this._authService.getCurrentUser();
-    console.log('Usuario actual:', usuario);
+    try {
+      console.log('Buscando usuario autenticado...');
 
-    if (usuario) {
-      const usuarioOption: UsuarioOption = {
-        id_usuario: usuario.id || usuario.id_usuario || usuario.userId || 1,
-        nombre: usuario.nombre || usuario.fullName || usuario.username || 'Usuario actual',
+      let usuario: any = null;
+
+      // Método 1: Intentar con el AuthService
+      if (this._authService && typeof this._authService.getCurrentUser === 'function') {
+        usuario = this._authService.getCurrentUser();
+        console.log('Usuario del AuthService:', usuario);
+      }
+
+      // Método 2: Buscar en localStorage
+      if (!usuario) {
+        const possibleKeys = ['currentUser', 'user', 'usuario', 'auth-user', 'userData'];
+        for (const key of possibleKeys) {
+          const storedUser = localStorage.getItem(key);
+          if (storedUser) {
+            try {
+              usuario = JSON.parse(storedUser);
+              console.log(`Usuario encontrado en localStorage con key: ${key}`, usuario);
+              break;
+            } catch (e) {
+              console.warn(`Error parseando usuario de ${key}:`, e);
+            }
+          }
+        }
+      }
+
+      // Método 3: Buscar en sessionStorage
+      if (!usuario) {
+        const possibleKeys = ['currentUser', 'user', 'usuario', 'auth-user', 'userData'];
+        for (const key of possibleKeys) {
+          const storedUser = sessionStorage.getItem(key);
+          if (storedUser) {
+            try {
+              usuario = JSON.parse(storedUser);
+              console.log(`Usuario encontrado en sessionStorage con key: ${key}`, usuario);
+              break;
+            } catch (e) {
+              console.warn(`Error parseando usuario de sessionStorage ${key}:`, e);
+            }
+          }
+        }
+      }
+
+      // Configurar usuario encontrado
+      if (usuario) {
+        const usuarioOption: UsuarioOption = {
+          id_usuario: usuario.id || usuario.id_usuario || usuario.userId || usuario.idUsuario || 1,
+          nombre:
+            usuario.nombre ||
+            usuario.fullName ||
+            usuario.username ||
+            usuario.nombreUsuario ||
+            'Usuario Sistema',
+        };
+
+        this.usuarioActual.set(usuarioOption);
+        console.log('Usuario configurado:', usuarioOption);
+      } else {
+        // Usuario por defecto para desarrollo
+        console.warn(
+          'No se encontró usuario autenticado, usando usuario por defecto para desarrollo'
+        );
+        const usuarioDefault: UsuarioOption = {
+          id_usuario: 1,
+          nombre: 'Usuario Sistema (Desarrollo)',
+        };
+
+        this.usuarioActual.set(usuarioDefault);
+      }
+    } catch (error) {
+      console.error('Error en loadUsuarioActual:', error);
+
+      // Fallback final
+      const usuarioDefault: UsuarioOption = {
+        id_usuario: 1,
+        nombre: 'Usuario Sistema',
       };
 
-      this.usuarioActual.set(usuarioOption);
-      this.form.patchValue({
-        id_usuario: usuarioOption.id_usuario,
-      });
-      console.log('Usuario configurado:', usuarioOption);
-    } else {
-      console.warn('No se encontró usuario autenticado');
-      this._notificationService.showError(
-        'No se pudo identificar al usuario. Por favor, inicie sesión nuevamente.'
-      );
+      this.usuarioActual.set(usuarioDefault);
     }
   }
 

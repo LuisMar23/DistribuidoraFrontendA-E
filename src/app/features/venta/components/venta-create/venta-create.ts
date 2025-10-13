@@ -1,7 +1,7 @@
-import { Component, inject, signal, OnInit, computed } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormArray } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Component, inject, signal } from '@angular/core';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormArray } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
 import {
@@ -22,17 +22,14 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 import { NotificationService } from '../../../../core/services/notification.service';
 import { VentaService } from '../../services/venta.service';
-
-
-import { ProductService } from '../../../../core/services/product.service';
 import { ClientDto } from '../../../../core/interfaces/client.interface';
 import { UserDto } from '../../../../core/interfaces/user.interface';
 import { ProductDto } from '../../../../core/interfaces/product.interface';
 import { AuthService } from '../../../../components/services/auth.service';
-import { UserService } from '../../../users/services/users.service';
 import { ClientService } from '../../../clientes/services/cliente.service';
+import { ProductService } from '../../../products/services/product.service';
 
-// Interfaces locales para adaptar los datos
+// Interfaces locales
 interface ClienteOption {
   id_cliente: number;
   nombre: string;
@@ -55,11 +52,10 @@ interface ProductoOption {
 @Component({
   selector: 'app-venta-create',
   standalone: true,
-  imports: [ReactiveFormsModule, FontAwesomeModule, CommonModule, FormsModule],
+  imports: [ReactiveFormsModule, FontAwesomeModule, CommonModule, FormsModule, RouterModule],
   templateUrl: './venta-create.html',
-  styleUrl: './venta-create.css',
 })
-export class VentaCreateComponent implements OnInit {
+export class VentaCreateComponent {
   // Iconos
   faShoppingCart = faShoppingCart;
   faArrowLeft = faArrowLeft;
@@ -78,7 +74,6 @@ export class VentaCreateComponent implements OnInit {
   private _notificationService = inject(NotificationService);
   private _router = inject(Router);
   private _clienteService = inject(ClientService);
-  private _usuarioService = inject(UserService);
   private _productoService = inject(ProductService);
   private _authService = inject(AuthService);
   private _ventaService = inject(VentaService);
@@ -102,13 +97,9 @@ export class VentaCreateComponent implements OnInit {
   // Form
   form: FormGroup;
 
-  // Computed values
-  detallesLength = computed(() => this.detalles.length);
-
   constructor() {
     this.form = this._fb.group({
       id_cliente: ['', Validators.required],
-      id_usuario: ['', Validators.required],
       fecha_venta: ['', Validators.required],
       subtotal: [0],
       descuento: [0],
@@ -133,23 +124,87 @@ export class VentaCreateComponent implements OnInit {
   }
 
   private loadUsuarioActual() {
-    const usuario = this._authService.getCurrentUser();
+    try {
+      console.log('Buscando usuario autenticado...');
 
-    if (usuario) {
-      const usuarioOption: UsuarioOption = {
-        id_usuario: usuario.id || usuario.id_usuario || usuario.userId || 1,
-        nombre: usuario.nombre || usuario.fullName || usuario.username || 'Usuario actual',
+      let usuario: any = null;
+
+      // Método 1: Intentar con el AuthService
+      if (this._authService && typeof this._authService.getCurrentUser === 'function') {
+        usuario = this._authService.getCurrentUser();
+        console.log('Usuario del AuthService:', usuario);
+      }
+
+      // Método 2: Buscar en localStorage
+      if (!usuario) {
+        const possibleKeys = ['currentUser', 'user', 'usuario', 'auth-user', 'userData'];
+        for (const key of possibleKeys) {
+          const storedUser = localStorage.getItem(key);
+          if (storedUser) {
+            try {
+              usuario = JSON.parse(storedUser);
+              console.log(`Usuario encontrado en localStorage con key: ${key}`, usuario);
+              break;
+            } catch (e) {
+              console.warn(`Error parseando usuario de ${key}:`, e);
+            }
+          }
+        }
+      }
+
+      // Método 3: Buscar en sessionStorage
+      if (!usuario) {
+        const possibleKeys = ['currentUser', 'user', 'usuario', 'auth-user', 'userData'];
+        for (const key of possibleKeys) {
+          const storedUser = sessionStorage.getItem(key);
+          if (storedUser) {
+            try {
+              usuario = JSON.parse(storedUser);
+              console.log(`Usuario encontrado en sessionStorage con key: ${key}`, usuario);
+              break;
+            } catch (e) {
+              console.warn(`Error parseando usuario de sessionStorage ${key}:`, e);
+            }
+          }
+        }
+      }
+
+      // Configurar usuario encontrado
+      if (usuario) {
+        const usuarioOption: UsuarioOption = {
+          id_usuario: usuario.id || usuario.id_usuario || usuario.userId || usuario.idUsuario || 1,
+          nombre:
+            usuario.nombre ||
+            usuario.fullName ||
+            usuario.username ||
+            usuario.nombreUsuario ||
+            'Usuario Sistema',
+        };
+
+        this.usuarioActual.set(usuarioOption);
+        console.log('Usuario configurado:', usuarioOption);
+      } else {
+        // Usuario por defecto para desarrollo
+        console.warn(
+          'No se encontró usuario autenticado, usando usuario por defecto para desarrollo'
+        );
+        const usuarioDefault: UsuarioOption = {
+          id_usuario: 1,
+          nombre: 'Usuario Sistema (Desarrollo)',
+        };
+
+        this.usuarioActual.set(usuarioDefault);
+      }
+    } catch (error) {
+      console.error('Error en loadUsuarioActual:', error);
+
+      // Fallback final
+      const usuarioDefault: UsuarioOption = {
+        id_usuario: 1,
+        nombre: 'Usuario Sistema',
       };
 
-      this.usuarioActual.set(usuarioOption);
-      this.form.patchValue({
-        id_usuario: usuarioOption.id_usuario,
-      });
-    } else {
-      console.warn('No se encontró usuario autenticado');
-      this._notificationService.showError(
-        'No se pudo identificar al usuario. Por favor, inicie sesión nuevamente.'
-      );
+      this.usuarioActual.set(usuarioDefault);
     }
   }
 
@@ -163,6 +218,7 @@ export class VentaCreateComponent implements OnInit {
         }));
         this.clientes.set(clientesOptions);
         this.clientesFiltrados.set(clientesOptions);
+        console.log(`${clientesOptions.length} clientes cargados`);
       },
       error: (error) => {
         console.error('Error loading clientes:', error);
@@ -170,7 +226,7 @@ export class VentaCreateComponent implements OnInit {
       },
     });
 
-    // Cargar productos
+    // Cargar productos EXISTENTES
     this._productoService.getAll().subscribe({
       next: (productos: ProductDto[]) => {
         const productosOptions: ProductoOption[] = productos
@@ -185,6 +241,7 @@ export class VentaCreateComponent implements OnInit {
           }));
         this.productos.set(productosOptions);
         this.productosFiltrados.set(productosOptions);
+        console.log(`${productosOptions.length} productos existentes cargados para la venta`);
       },
       error: (error) => {
         console.error('Error loading productos:', error);
@@ -197,12 +254,10 @@ export class VentaCreateComponent implements OnInit {
   onMetodoPagoChange() {
     const metodoPago = this.form.get('metodo_pago')?.value;
     if (metodoPago === 'credito') {
-      // Establecer validadores para plan de pago
       this.form.get('plazo')?.setValidators([Validators.required, Validators.min(1)]);
       this.form.get('fecha_inicio')?.setValidators([Validators.required]);
       this.form.get('periodicidad')?.setValidators([Validators.required]);
 
-      // Establecer fecha de inicio como la misma fecha de la venta
       const fechaVenta = this.form.get('fecha_venta')?.value;
       if (fechaVenta) {
         const fechaVentaDate = new Date(fechaVenta);
@@ -211,7 +266,6 @@ export class VentaCreateComponent implements OnInit {
         });
       }
     } else {
-      // Remover validadores
       this.form.get('plazo')?.clearValidators();
       this.form.get('fecha_inicio')?.clearValidators();
       this.form.get('periodicidad')?.clearValidators();
@@ -455,13 +509,9 @@ export class VentaCreateComponent implements OnInit {
   }
 
   submit() {
-    // Marcar todos los campos como touched para mostrar errores
     this.form.markAllAsTouched();
-
-    // Asegurar que los totales estén actualizados
     this.actualizarTotales();
 
-    // Validar detalles
     let detallesValidos = true;
     for (let i = 0; i < this.detalles.length; i++) {
       const detalle = this.detalles.at(i);
@@ -477,7 +527,6 @@ export class VentaCreateComponent implements OnInit {
       }
     }
 
-    // Validar plan de pago si es crédito
     if (this.form.get('metodo_pago')?.value === 'credito') {
       if (!this.form.get('plazo')?.value || !this.form.get('fecha_inicio')?.value) {
         this._notificationService.showError(
@@ -506,7 +555,6 @@ export class VentaCreateComponent implements OnInit {
       return;
     }
 
-    // Validar stock final antes de enviar
     for (let i = 0; i < this.detalles.length; i++) {
       if (!this.validarStock(i)) {
         return;
@@ -515,17 +563,15 @@ export class VentaCreateComponent implements OnInit {
 
     this.isLoading.set(true);
 
-    // Preparar datos para enviar
     const formData = this.form.value;
 
-    // Formatear fecha
     const fechaVentaFormateada =
       formData.fecha_venta.length === 16 ? formData.fecha_venta + ':00' : formData.fecha_venta;
 
-    // Preparar datos de la venta
+    // Preparar datos de la venta - SOLO se referencian productos existentes
     const ventaData: any = {
       id_cliente: parseInt(formData.id_cliente),
-      id_usuario: this.usuarioActual()!.id_usuario,
+      id_usuario: this.usuarioActual()!.id_usuario, // Se agrega automáticamente
       fecha_venta: fechaVentaFormateada,
       subtotal: parseFloat(formData.subtotal) || 0,
       descuento: parseFloat(formData.descuento) || 0,
@@ -533,7 +579,7 @@ export class VentaCreateComponent implements OnInit {
       metodo_pago: formData.metodo_pago,
       estado: formData.estado,
       detalles: formData.detalles.map((detalle: any) => ({
-        productoId: parseInt(detalle.id_producto),
+        productoId: parseInt(detalle.id_producto), // Solo se pasa el ID del producto existente
         cantidad: parseFloat(detalle.cantidad),
         precioUnitario: parseFloat(detalle.precio_unitario),
       })),
@@ -545,7 +591,7 @@ export class VentaCreateComponent implements OnInit {
         monto_inicial: parseFloat(formData.monto_inicial) || 0,
         plazo: parseInt(formData.plazo),
         periodicidad: formData.periodicidad,
-        fecha_inicio: formData.fecha_inicio + 'T00:00:00', // Formato ISO
+        fecha_inicio: formData.fecha_inicio + 'T00:00:00',
       };
     }
 

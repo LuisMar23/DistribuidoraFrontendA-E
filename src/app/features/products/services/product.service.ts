@@ -1,20 +1,19 @@
-import { HttpClient } from "@angular/common/http";
-import { inject, Injectable, signal } from "@angular/core";
-import { environment } from "../../../../environments/environment";
-import { ProductDto } from "../../../core/interfaces/product.interface";
-import { Observable } from "rxjs";
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { environment } from '../../../../environments/environment.prod';
+import { ProductDto } from '../../../core/interfaces/product.interface';
+// import { ProductDto } from '../interfaces/product.interface';
 
+@Injectable({
+  providedIn: 'root',
+})
+export class ProductService {
+  apiUrl = `${environment.apiUrl}/product`;
 
+  constructor(private http: HttpClient) {}
 
-
-@Injectable({providedIn:'root'})
-export class ProductService{
-
-    private http=inject(HttpClient)
-    private apiUrl=environment.apiUrl + '/product'
-  products = signal<ProductDto[]>([]);
-
-   list(): Observable<ProductDto[]> {
+  getAll(): Observable<ProductDto[]> {
     return this.http.get<ProductDto[]>(this.apiUrl);
   }
 
@@ -22,18 +21,15 @@ export class ProductService{
     return this.http.get<ProductDto>(`${this.apiUrl}/${id}`);
   }
 
-  create(data: ProductDto): Observable<ProductDto> {
-    return this.http.post<ProductDto>(this.apiUrl, data);
+  create(product: Partial<ProductDto>): Observable<ProductDto> {
+    return this.http.post<ProductDto>(this.apiUrl, product);
   }
 
-  update(id: number, data: Partial<ProductDto>): Observable<ProductDto> {
-    return this.http.put<ProductDto>(`${this.apiUrl}/${id}`, data);
+  update(id: number, product: Partial<ProductDto>): Observable<ProductDto> {
+    return this.http.patch<ProductDto>(`${this.apiUrl}/${id}`, product);
   }
 
-  remove(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  delete(id: number): Observable<ProductDto> {
+    return this.http.delete<ProductDto>(`${this.apiUrl}/${id}`);
   }
-
-
-
 }

@@ -28,7 +28,6 @@ interface ColumnConfig {
   standalone: true,
   imports: [FormsModule, FontAwesomeModule, CommonModule, RouterModule],
   templateUrl: './venta.html',
-  styleUrl: './venta.css',
 })
 export class VentaComponent {
   faShoppingCart = faShoppingCart;
@@ -134,12 +133,9 @@ export class VentaComponent {
 
   getEstadoClass(estado: string): string {
     const classes: { [key: string]: string } = {
-      pendiente:
-        'inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 capitalize',
-      pagado:
-        'inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 capitalize',
-      anulado:
-        'inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 capitalize',
+      pendiente: 'px-3 py-1 rounded-full text-xs font-bold bg-yellow-100 text-yellow-700',
+      pagado: 'px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700',
+      anulado: 'px-3 py-1 rounded-full text-xs font-bold bg-red-100 text-red-700',
     };
     return classes[estado] || classes['pendiente'];
   }
@@ -147,16 +143,14 @@ export class VentaComponent {
   // Nuevo método para colores de métodos de pago
   getMetodoPagoClass(metodoPago: string): string {
     const classes: { [key: string]: string } = {
-      efectivo:
-        'inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 capitalize',
-      tarjeta:
-        'inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 capitalize',
-      transferencia:
-        'inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800 capitalize',
-      credito:
-        'inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800 capitalize',
+      efectivo: 'px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700',
+      tarjeta: 'px-3 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-700',
+      transferencia: 'px-3 py-1 rounded-full text-xs font-bold bg-purple-100 text-purple-700',
+      credito: 'px-3 py-1 rounded-full text-xs font-bold bg-orange-100 text-orange-700',
     };
-    return classes[metodoPago] || 'inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800 capitalize';
+    return (
+      classes[metodoPago] || 'px-3 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-700'
+    );
   }
 
   formatDate(dateString: string | undefined): string {

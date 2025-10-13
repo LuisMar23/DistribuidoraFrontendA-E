@@ -33,7 +33,6 @@ import { VentaDto } from '../../../../core/interfaces/venta.interface';
   selector: 'app-venta-detalle',
   imports: [CommonModule, FontAwesomeModule, RouterModule],
   templateUrl: './venta-detalle.html',
-  styleUrl: './venta-detalle.css',
 })
 export class VentaDetalleComponent {
   faShoppingCart = faShoppingCart;

@@ -5,7 +5,6 @@ import { DashboardComponent } from './dashboard/dashboard';
 import { LayoutComponent } from './layout/layout';
 import { RegisterComponent } from './components/auth/register/register';
 import { ChangePasswordComponent } from './components/auth/change-password/change-password';
-import { ProductComponent } from './product/product';
 
 import { AuthGuard } from './core/guards/auth.guard';
 import { ProfileComponent } from './features/users/components/profile/profile';
