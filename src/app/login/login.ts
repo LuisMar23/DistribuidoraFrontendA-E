@@ -5,12 +5,12 @@ import { AuthService } from '../components/services/auth.service';
 import { Router, RouterModule } from '@angular/router';
 import { faEye, faEyeSlash, faLock, faUser } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { AppRoutingModule } from "../app.routes";
+import { AppRoutingModule } from '../app.routes';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FontAwesomeModule,RouterModule],
+  imports: [CommonModule, ReactiveFormsModule, FontAwesomeModule, RouterModule],
   templateUrl: './login.html',
   styleUrls: ['./login.css'],
 })
@@ -20,19 +20,17 @@ export class LoginComponent {
   faEye = faEye;
   faEyeSlash = faEyeSlash;
 
-
   loginForm: FormGroup;
-  showPassword: boolean = false; 
-  _authService = inject(AuthService)
-  
-  constructor(private fb: FormBuilder,private router:Router) {
+  showPassword: boolean = false;
+  _authService = inject(AuthService);
+
+  constructor(private fb: FormBuilder, private router: Router) {
     this.loginForm = this.fb.group({
       identifier: ['', [Validators.required]],
       password: ['', Validators.required],
       rememberMe: [false],
     });
   }
-  
 
   togglePasswordVisibility(): void {
     this.showPassword = !this.showPassword;
@@ -40,16 +38,23 @@ export class LoginComponent {
 
   async onSubmit() {
     if (this.loginForm.valid) {
-      console.log('Formulario válido', this.loginForm.value);
+      // SOLUCIÓN: Log seguro sin mostrar contraseña
+      const formData = this.loginForm.value;
+      console.log('Formulario válido', {
+        identifier: formData.identifier,
+        rememberMe: formData.rememberMe,
+        password: '***',
+      });
+
       const data = this.loginForm.getRawValue();
-      console.log(data);
+
       this._authService.login(data).subscribe({
         next: () => {
           this.router.navigate(['/dashboard']);
         },
-        error:()=>{
-          alert("No se encontro datos")
-        }
+        error: () => {
+          alert('No se encontro datos');
+        },
       });
     } else {
       Object.keys(this.loginForm.controls).forEach((key) => {

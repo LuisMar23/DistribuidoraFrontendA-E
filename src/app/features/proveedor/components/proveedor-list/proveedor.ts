@@ -1,3 +1,4 @@
+// src/proveedor/components/proveedor.component.ts
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import {
   FormBuilder,
@@ -76,6 +77,7 @@ export class ProveedorComponent {
 
     this.loadProveedores();
   }
+
   loadProveedores() {
     this.proveedorService.getAll(this.currentPage(), this.pageSize()).subscribe((res) => {
       console.log(res);
@@ -101,6 +103,7 @@ export class ProveedorComponent {
       );
     });
   });
+
   submit() {
     if (this.form.invalid) return;
 
@@ -124,6 +127,7 @@ export class ProveedorComponent {
       });
     }
   }
+
   edit(proveedor: ProveedorDto) {
     this.showModal.set(true);
     this.editMode.set(true);
@@ -139,11 +143,13 @@ export class ProveedorComponent {
       departamento: proveedor.departamento || '',
     });
   }
+
   openModal() {
     this.showModal.set(true);
     this.editMode.set(false);
     this.form.reset();
   }
+
   // Cancelar edición
   cancelEdit() {
     this.showModal.set(false);
@@ -154,7 +160,7 @@ export class ProveedorComponent {
 
   delete(data: any) {
     this._notificationService
-      .confirmDelete(`Se eliminara al proveedor ${data.nombre}`)
+      .confirmDelete(`Se eliminará al proveedor ${data.nombre}`)
       .then((result) => {
         if (result.isConfirmed) {
           this._notificationService.showSuccess('Eliminado correctamente');
@@ -223,6 +229,7 @@ export class ProveedorComponent {
   totalPages() {
     return Math.ceil(this.total() / this.pageSize());
   }
+
   pageArray(): number[] {
     return Array.from({ length: this.totalPages() }, (_, i) => i + 1);
   }

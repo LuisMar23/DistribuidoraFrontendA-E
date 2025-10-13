@@ -39,6 +39,7 @@ export class ClientComponent {
   faPenToSquare = faPenToSquare;
   faTrash = faTrash;
   faFileExcel = faFileExcel;
+
   clients = signal<ClientDto[]>([]);
   editId = signal<number | null>(null);
   searchTerm = signal('');
@@ -46,11 +47,11 @@ export class ClientComponent {
   form: FormGroup;
   editMode = signal(false);
 
-  clientes = signal<ClientDto[]>([]);
+  // ✅ Eliminada la señal duplicada: 'clientes'
 
   columns = [
-    { key: 'id', label: 'N°' },
-    { key: 'nombre', label: 'Nombre de Proveedor' },
+    { key: 'id_cliente', label: 'N°' },
+    { key: 'nombre', label: 'Nombre de Cliente' },
     { key: 'nit_ci', label: 'NIT/CI' },
     { key: 'telefono', label: 'Teléfono' },
     { key: 'direccion', label: 'Dirección' },
@@ -180,7 +181,7 @@ export class ClientComponent {
     const dir = this.sortDirection();
     if (!col) return;
 
-    const arr = [...this.clientes()];
+    const arr = [...this.clients()]; // ✅ Usa 'clients', no 'clientes'
 
     arr.sort((a, b) => {
       const valA = a[col as keyof ClientDto];
@@ -196,7 +197,7 @@ export class ClientComponent {
       return dir === 'asc' ? (valA < valB ? -1 : 1) : valA < valB ? 1 : -1;
     });
 
-    this.clientes.set(arr);
+    this.clients.set(arr); // ✅ Actualiza la señal correcta
   }
 
   submit() {
@@ -257,7 +258,7 @@ export class ClientComponent {
       nit_ci: '',
       telefono: '',
       direccion: '',
-      email: '',
+      // ✅ email eliminado
     });
   }
 
@@ -270,7 +271,7 @@ export class ClientComponent {
       nit_ci: '',
       telefono: '',
       direccion: '',
-      email: '',
+      // ✅ email eliminado
     });
   }
 

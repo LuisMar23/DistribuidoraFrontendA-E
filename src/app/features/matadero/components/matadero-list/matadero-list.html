@@ -1,0 +1,456 @@
+<div class="min-h-screen bg-gradient-to-br from-rose-50 via-red-50 to-pink-50 p-4 sm:p-6">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header -->
+        <div class="mb-6 sm:mb-8">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-4 sm:gap-0">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 bg-[#ff7676] rounded-2xl flex items-center justify-center shadow-lg">
+                        <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h1
+                            class="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+                            Matadero
+                        </h1>
+                        <p class="text-sm text-gray-600 mt-1">Listado y gestión de registros en matadero</p>
+                    </div>
+                </div>
+                <!-- Botones de acción -->
+                <div class="flex gap-3 w-full sm:w-auto">
+                    <button
+                        class="flex-1 sm:flex-initial bg-white hover:bg-gray-50 text-gray-700 px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl font-semibold border border-gray-200 shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707L14.293 13a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                        </svg>
+                        <span>Filtrar</span>
+                    </button>
+                    <button
+                        class="flex-1 sm:flex-initial bg-[#ff7676] hover:bg-red-600 text-white px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2"
+                        [routerLink]="['/mataderos/crear']">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                        <span>Nuevo</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vista de Tarjetas (Móvil) -->
+        <div class="block lg:hidden space-y-4">
+            @for (compra of comprasUnicas(); track compra.compra.id) {
+            <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+                <!-- Header de la tarjeta -->
+                <div class="bg-gradient-to-r from-red-50 to-rose-50 px-4 py-3 border-b border-gray-100">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-bold text-gray-500">Compra: {{ compra.compra.codigo }}</span>
+                        </div>
+                        <span class="px-3 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-700">
+                            {{ getMataderosPorCompra(compra.compra.id).length }} registros
+                        </span>
+                    </div>
+                </div>
+                <!-- Contenido de la tarjeta -->
+                <div class="p-4 space-y-3">
+                    <div class="flex items-center gap-2 text-sm">
+                        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        <span class="text-gray-600">{{ compra.creadoEn | date : 'dd/MM/yyyy' }}</span>
+                    </div>
+                    <div class="flex items-center gap-2 text-sm">
+                        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                        <span class="text-gray-900 font-medium">{{ compra.compra.proveedor.nombre }}</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3 pt-2 border-t border-gray-100">
+                        <div>
+                            <p class="text-xs text-gray-500 mb-1">Peso Total</p>
+                            <p class="text-sm font-semibold text-red-600">{{ compra.compra.pesoTotalMatadero | number
+                                : '1.2-2' }} Kg</p>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-500 mb-1">Registros</p>
+                            <p class="text-sm font-semibold text-gray-900">{{
+                                getMataderosPorCompra(compra.compra.id).length }}</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Acciones -->
+                <div class="px-4 py-3 bg-gray-50 border-t border-gray-100 flex gap-2">
+                    <!-- Botón Editar -->
+                    <button
+                        class="p-2.5 rounded-lg bg-green-50 text-green-600 hover:bg-green-100 transition flex items-center justify-center"
+                        [routerLink]="['/mataderos/editar', compra.id]" title="Editar">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                    </button>
+                    <button
+                        class="flex-1 p-2.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition flex items-center justify-center gap-2 text-sm font-semibold"
+                        (click)="verDetalles(compra)">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                        Ver Detalles
+                    </button>
+                    <button
+                        class="p-2.5 rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-100 transition flex items-center justify-center"
+                        (click)="eliminarMatadero(compra.compra.id)">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            } @empty {
+            <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
+                <div class="flex flex-col items-center gap-3 text-center">
+                    <svg class="w-16 h-16 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                    </svg>
+                    <p class="text-lg font-semibold text-gray-900">No hay registros en matadero</p>
+                    <p class="text-sm text-gray-500">Haz clic en "Nuevo" para comenzar</p>
+                </div>
+            </div>
+            }
+        </div>
+
+        <!-- Tabla (Desktop) -->
+        <div class="hidden lg:block bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
+            <div class="p-6 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
+                <h2 class="text-xl font-bold text-gray-900 flex items-center gap-2">
+                    <svg class="w-6 h-6 text-[#ff7676]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                    </svg>
+                    Registro de Matadero
+                </h2>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
+                        <tr>
+                            <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                                Compra
+                            </th>
+                            <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                                Fecha
+                            </th>
+                            <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                                Proveedor
+                            </th>
+                            <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                                Peso Total
+                            </th>
+                            <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                                Registros
+                            </th>
+                            <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                                Acciones
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-100">
+                        @for (compra of comprasUnicas(); track compra.compra.id) {
+                        <tr class="hover:bg-gray-50 transition-colors">
+                            <td class="px-6 py-4 whitespace-nowrap font-medium">{{ compra.compra.codigo }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">{{ compra.creadoEn | date : 'dd/MM/yyyy' }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">{{ compra.compra.proveedor.nombre }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap font-bold text-red-600">{{
+                                compra.compra.pesoTotalMatadero | number : '1.2-2' }} Kg</td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-3 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-700">
+                                    {{ getMataderosPorCompra(compra.compra.id).length }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex gap-2">
+                                    <!-- Botón Editar -->
+                                    <button
+                                        class="p-2 rounded-lg bg-green-50 text-green-600 hover:bg-green-100 transition"
+                                        [routerLink]="['/mataderos/editar', compra.id]" title="Editar">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                        </svg>
+                                    </button>
+                                    <button class="p-2 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition"
+                                        (click)="verDetalles(compra)" title="Ver Detalles">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                        </svg>
+                                    </button>
+                                    <button class="p-2 rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-100 transition"
+                                        (click)="eliminarMatadero(compra.compra.id)" title="Eliminar Compra">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        } @empty {
+                        <tr>
+                            <td colspan="6" class="px-6 py-16 text-center text-gray-500">
+                                <div class="flex flex-col items-center gap-3">
+                                    <svg class="w-16 h-16 text-gray-300" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                                    </svg>
+                                    <p class="text-lg font-semibold">No hay registros en matadero</p>
+                                    <p class="text-sm">Haz clic en "Nuevo" para comenzar</p>
+                                </div>
+                            </td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Paginación -->
+        @if (totalPages() > 1) {
+        <div class="flex justify-center mt-8">
+            <nav class="flex items-center gap-2">
+                <button (click)="cambiarPagina(page() - 1)" [disabled]="page() === 1"
+                    class="px-4 py-2 rounded-lg bg-white text-gray-700 border border-gray-200 shadow-sm hover:shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                    Anterior
+                </button>
+
+                @for (pagina of getPages(); track $index) {
+                <button (click)="cambiarPagina(pagina)"
+                    [class]="pagina === page() 
+              ? 'px-4 py-2 rounded-lg bg-[#ff7676] text-white shadow-md' 
+              : 'px-4 py-2 rounded-lg bg-white text-gray-700 border border-gray-200 shadow-sm hover:shadow-md transition-all'">
+                    {{ pagina }}
+                </button>
+                }
+
+                <button (click)="cambiarPagina(page() + 1)" [disabled]="page() === totalPages()"
+                    class="px-4 py-2 rounded-lg bg-white text-gray-700 border border-gray-200 shadow-sm hover:shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                    Siguiente
+                </button>
+            </nav>
+        </div>
+        }
+    </div>
+</div>
+
+<!-- Modal de Detalles -->
+@if (mostrarModal() && mataderoSeleccionado()) {
+<div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-3xl shadow-2xl max-w-6xl w-full max-h-[90vh] overflow-hidden">
+        <!-- Header del Modal -->
+        <div class="bg-gradient-to-r from-red-50 to-rose-50 px-6 py-4 border-b border-gray-200">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-[#ff7676] rounded-xl flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-bold text-gray-900">Detalles de la Compra</h2>
+                        <p class="text-sm text-gray-600">Compra: {{ mataderoSeleccionado()!.compra.codigo }}</p>
+                    </div>
+                </div>
+                <button (click)="cerrarModal()"
+                    class="p-2 rounded-lg bg-white text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Contenido del Modal -->
+        <div class="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+            <!-- Información General de la Compra -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                <div class="bg-gray-50 rounded-2xl p-5">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-[#ff7676]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        Información de la Compra
+                    </h3>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                            <span class="text-sm font-medium text-gray-500">Código:</span>
+                            <span class="text-sm font-semibold text-gray-900">{{ mataderoSeleccionado()!.compra.codigo
+                                }}</span>
+                        </div>
+                        <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                            <span class="text-sm font-medium text-gray-500">Fecha:</span>
+                            <span class="text-sm font-semibold text-gray-900">{{ mataderoSeleccionado()!.creadoEn | date
+                                : 'dd/MM/yyyy' }}</span>
+                        </div>
+                        <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                            <span class="text-sm font-medium text-gray-500">Proveedor:</span>
+                            <span class="text-sm font-semibold text-gray-900">{{
+                                mataderoSeleccionado()!.compra.proveedor.nombre }}</span>
+                        </div>
+                        <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                            <span class="text-sm font-medium text-gray-500">Peso Total:</span>
+                            <span class="text-sm font-semibold text-red-600">{{
+                                mataderoSeleccionado()!.compra.pesoTotalMatadero | number : '1.2-2' }} Kg</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Resumen de Registros -->
+                <div class="bg-gray-50 rounded-2xl p-5">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-[#ff7676]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                        </svg>
+                        Resumen de Registros
+                    </h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="text-center">
+                            <p class="text-2xl font-bold text-blue-600">{{ mataderosCompraSeleccionada().length }}</p>
+                            <p class="text-xs text-gray-600">Total Registros</p>
+                        </div>
+                        <div class="text-center">
+                            <p class="text-2xl font-bold text-green-600">{{ registrosConTipoRes() }}</p>
+                            <p class="text-xs text-gray-600">Con Tipo Res</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lista de Registros Individuales -->
+            <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+                <div class="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-[#ff7676]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                        </svg>
+                        Registros Individuales de Matadero
+                    </h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gray-50 border-b border-gray-200">
+                            <tr>
+                                <th
+                                    class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                                    ID
+                                </th>
+                                <th
+                                    class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                                    Tipo Res
+                                </th>
+                                <th
+                                    class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                                    Tipo Ingreso
+                                </th>
+                                <th
+                                    class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                                    Peso
+                                </th>
+                                <th
+                                    class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                                    SEC
+                                </th>
+                                <th
+                                    class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                                    ODD
+                                </th>
+                                <th
+                                    class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                                    EST
+                                </th>
+                                <th
+                                    class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                                    Acciones
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-100">
+                            @for (matadero of mataderosCompraSeleccionada(); track matadero.id) {
+                            <tr class="hover:bg-gray-50 transition-colors">
+                                <td class="px-6 py-4 whitespace-nowrap font-medium">{{ matadero.id }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-700">
+                                        {{ matadero.tipoRes }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">{{ matadero.tipoIngreso }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap font-bold text-red-600">{{ matadero.peso | number
+                                    : '1.2-2' }} Kg</td>
+                                <td class="px-6 py-4 whitespace-nowrap">{{ matadero.sec || '—' }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">{{ matadero.odd || '—' }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">{{ matadero.est || '—' }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex gap-2">
+                                        <!-- Botón Editar en el modal -->
+                                        <button
+                                            class="p-2 rounded-lg bg-green-50 text-green-600 hover:bg-green-100 transition"
+                                            [routerLink]="['/mataderos/editar', matadero.id]" title="Editar">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                            </svg>
+                                        </button>
+                                        <button
+                                            class="p-2 rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-100 transition"
+                                            (click)="eliminarDesdeModal()" title="Eliminar Registro">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer del Modal -->
+        <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-between items-center">
+            <button (click)="eliminarMatadero(mataderoSeleccionado()!.compra.id)"
+                class="px-6 py-3 rounded-xl bg-rose-50 text-rose-600 hover:bg-rose-100 font-semibold transition flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+                Eliminar Todos los Registros
+            </button>
+            <button (click)="cerrarModal()"
+                class="px-6 py-3 rounded-xl bg-gray-200 text-gray-700 hover:bg-gray-300 font-semibold transition">
+                Cerrar
+            </button>
+        </div>
+    </div>
+</div>
+}

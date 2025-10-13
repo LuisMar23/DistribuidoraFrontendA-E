@@ -49,6 +49,11 @@ export const routes: Routes = [
           import('./features/proveedor/proveedor.routes').then((r) => r.ProveedoresRoutingModule),
       },
       {
+        path: 'mataderos',
+        loadChildren: () =>
+          import('./features/matadero/matadero.routes').then((r) => r.MataderoRoutingModule),
+      },
+      {
         path: 'faenas',
         loadChildren: () =>
           import('./features/faenas/faenas.routes').then((r) => r.FaenasRoutingModule),
