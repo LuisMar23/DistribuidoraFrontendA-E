@@ -18,6 +18,7 @@ import {
   faUsers,
   faBoxes,
   faShoppingBasket,
+  faStickyNote,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
@@ -45,10 +46,10 @@ interface UsuarioOption {
 interface ProductoOption {
   id_producto: number;
   nombre: string;
-  precio_venta: number;
-  stock: number;
-  categoria: string;
-  unidad_medida: string;
+  precio: number;
+  peso: number;
+  codigo: string;
+  estado: boolean;
 }
 
 interface NuevoPago {
@@ -77,6 +78,7 @@ export class VentaEditComponent implements OnInit {
   faUsers = faUsers;
   faBoxes = faBoxes;
   faShoppingBasket = faShoppingBasket;
+  faStickyNote = faStickyNote;
 
   // Services
   private _notificationService = inject(NotificationService);
@@ -131,6 +133,7 @@ export class VentaEditComponent implements OnInit {
       total: [0],
       metodo_pago: ['efectivo', Validators.required],
       estado: ['pendiente', Validators.required],
+      observaciones: [''],
       detalles: this._fb.array([]),
     });
   }
@@ -187,10 +190,10 @@ export class VentaEditComponent implements OnInit {
                 .map((producto) => ({
                   id_producto: producto.id_producto || 0,
                   nombre: producto.nombre || 'Producto sin nombre',
-                  precio_venta: producto.precio_base || 0,
-                  stock: producto.stock_actual || 0,
-                  categoria: producto.categoria || '',
-                  unidad_medida: producto.unidad_medida || '',
+                  precio: producto.precio || 0,
+                  peso: producto.peso || 0,
+                  codigo: producto.codigo || '',
+                  estado: producto.estado || false,
                 }));
               this.productos.set(productosOptions);
               this.productosFiltrados.set(productosOptions);
@@ -405,32 +408,29 @@ export class VentaEditComponent implements OnInit {
     // Formatear fecha correctamente
     let fechaVentaFormateada: string;
     if (formData.fecha_venta) {
-      // Convertir de datetime-local a formato ISO
       const fecha = new Date(formData.fecha_venta);
       fechaVentaFormateada = fecha.toISOString();
     } else {
       fechaVentaFormateada = new Date().toISOString();
     }
 
-    // PREPARAR DATOS PARA ENVIAR AL BACKEND
+    // PREPARAR DATOS CORRECTAMENTE
     const ventaData: any = {
       id_cliente: parseInt(formData.id_cliente),
       fecha_venta: fechaVentaFormateada,
       metodo_pago: formData.metodo_pago,
       estado: formData.estado,
       descuento: parseFloat(formData.descuento) || 0,
+      observaciones: formData.observaciones || '',
     };
 
     // Solo incluir detalles si no hay pagos registrados
     if (!this.tienePlanPagoConPagos()) {
       ventaData.detalles = formData.detalles.map((detalle: any) => ({
-        productoId: parseInt(detalle.productoId),
+        productoId: parseInt(detalle.id_producto),
         cantidad: parseFloat(detalle.cantidad),
         precioUnitario: parseFloat(detalle.precioUnitario),
       }));
-    } else {
-      // Si hay pagos registrados, no enviar detalles ni descuento
-      delete ventaData.descuento;
     }
 
     return ventaData;
@@ -493,6 +493,7 @@ export class VentaEditComponent implements OnInit {
         total: venta.total || 0,
         metodo_pago: venta.metodo_pago || venta.metodoPago || 'efectivo',
         estado: venta.estado || 'pendiente',
+        observaciones: venta.observaciones || '',
       });
 
       console.log('Form después del patch:', this.form.value);
@@ -520,7 +521,7 @@ export class VentaEditComponent implements OnInit {
       );
 
       const detalleForm = this._fb.group({
-        productoId: [productoId ? productoId.toString() : '', Validators.required],
+        id_producto: [productoId ? productoId.toString() : '', Validators.required],
         cantidad: [cantidad, [Validators.required, Validators.min(0.01)]],
         precioUnitario: [precioUnitario, [Validators.required, Validators.min(0)]],
         subtotal: [subtotal, [Validators.required, Validators.min(0)]],
@@ -681,7 +682,7 @@ export class VentaEditComponent implements OnInit {
     const filtrados = this.productos().filter(
       (producto) =>
         producto.nombre.toLowerCase().includes(termino) ||
-        producto.categoria.toLowerCase().includes(termino) ||
+        producto.codigo.toLowerCase().includes(termino) ||
         producto.id_producto.toString().includes(termino)
     );
     this.productosFiltrados.set(filtrados);
@@ -693,8 +694,8 @@ export class VentaEditComponent implements OnInit {
       console.log(`Producto seleccionado para detalle ${index}:`, producto);
       const detalle = this.detalles.at(index);
       detalle.patchValue({
-        productoId: producto.id_producto,
-        precioUnitario: producto.precio_venta,
+        id_producto: producto.id_producto,
+        precioUnitario: producto.precio,
       });
       this.calcularSubtotalDetalle(index);
     }
@@ -703,10 +704,10 @@ export class VentaEditComponent implements OnInit {
 
   getProductoSeleccionadoNombre(index: number): string {
     const detalle = this.detalles.at(index);
-    const productoId = detalle.get('productoId')?.value;
+    const idProducto = detalle.get('id_producto')?.value;
 
-    if (productoId) {
-      const producto = this.productos().find((p) => p.id_producto === parseInt(productoId));
+    if (idProducto) {
+      const producto = this.productos().find((p) => p.id_producto === parseInt(idProducto));
       return producto ? producto.nombre : '';
     }
     return '';
@@ -747,7 +748,7 @@ export class VentaEditComponent implements OnInit {
     }
 
     const detalleForm = this._fb.group({
-      productoId: ['', Validators.required],
+      id_producto: ['', Validators.required],
       cantidad: [1, [Validators.required, Validators.min(0.01)]],
       precioUnitario: [0, [Validators.required, Validators.min(0)]],
       subtotal: [0, [Validators.required, Validators.min(0)]],
@@ -770,19 +771,19 @@ export class VentaEditComponent implements OnInit {
     this.actualizarTotales();
   }
 
-  // Validar stock disponible
-  validarStock(index: number): boolean {
+  // Validar peso disponible
+  validarPeso(index: number): boolean {
     const detalle = this.detalles.at(index);
-    const productoId = detalle.get('productoId')?.value;
+    const idProducto = detalle.get('id_producto')?.value;
     const cantidad = detalle.get('cantidad')?.value || 0;
 
-    if (productoId) {
-      const producto = this.productos().find((p) => p.id_producto === parseInt(productoId));
-      if (producto && cantidad > producto.stock) {
+    if (idProducto) {
+      const producto = this.productos().find((p) => p.id_producto === parseInt(idProducto));
+      if (producto && cantidad > producto.peso) {
         this._notificationService.showError(
-          `Stock insuficiente. Solo hay ${producto.stock} unidades disponibles.`
+          `Peso insuficiente. Solo hay ${producto.peso} unidades disponibles.`
         );
-        detalle.patchValue({ cantidad: producto.stock });
+        detalle.patchValue({ cantidad: producto.peso });
         this.calcularSubtotalDetalle(index);
         return false;
       }
@@ -829,8 +830,8 @@ export class VentaEditComponent implements OnInit {
 
       if (detalle.invalid) {
         detallesValidos = false;
-        const productoId = detalle.get('productoId')?.value;
-        if (!productoId) {
+        const idProducto = detalle.get('id_producto')?.value;
+        if (!idProducto) {
           this._notificationService.showError(`Seleccione un producto para la línea ${i + 1}`);
           return;
         }
@@ -853,7 +854,7 @@ export class VentaEditComponent implements OnInit {
     }
 
     for (let i = 0; i < this.detalles.length; i++) {
-      if (!this.validarStock(i)) {
+      if (!this.validarPeso(i)) {
         return;
       }
     }

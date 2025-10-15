@@ -126,6 +126,14 @@
                                 <p class="text-lg sm:text-xl font-bold text-purple-700 capitalize">{{
                                     venta()?.metodo_pago || 'N/A' }}</p>
                             </div>
+
+                            <!-- Observaciones -->
+                            <div class="bg-white rounded-lg p-4 shadow lg:col-span-3">
+                                <p class="text-xs sm:text-sm text-gray-600 mb-1">Observaciones</p>
+                                <p class="text-sm sm:text-base font-medium text-gray-800 break-words">
+                                    {{ venta()?.observaciones || 'Sin observaciones' }}
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>
