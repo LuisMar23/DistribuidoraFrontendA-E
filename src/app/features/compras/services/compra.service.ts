@@ -2,25 +2,8 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { environment } from '../../../../environments/environment';
+import { PersonaDto } from '../../../core/interfaces/persona.interface';
 
-export interface Parte {
-  nombre: string;
-  pesoNeto: number;
-  precioUnit: number;
-  observaciones?: string;
-}
-
-export interface Res {
-  numero: number;
-  partes: Parte[];
-}
-
-export interface Transporte {
-  tipo: 'LOCAL' | 'DEPARTAMENTAL';
-  descripcion?: string;
-  costo: number;
-  observaciones?: string;
-}
 
 export interface DetalleCompra {
   pesoNeto: number;
@@ -32,11 +15,10 @@ export interface DetalleCompra {
 
 export interface CreateCompraDto {
   proveedorId: number;
-  usuarioId: number;
   observaciones?: string;
   otrosGastos?: number;
   detalles?: DetalleCompra[];
-  transportes?: Transporte[];
+  transportes?: number;
 }
 
 export interface Compra {
@@ -45,11 +27,11 @@ export interface Compra {
   creado_en: string;
   proveedor: {
     id_proveedor: number;
-    nombre: string;
-    telefono?: string;
+    persona:PersonaDto
+
   };
   detalles: DetalleCompra[];
-  transportes: Transporte[];
+  transportes: number;
   PagoCompra: any[];
   estado: string;
   otrosGastos?: number;
@@ -85,35 +67,28 @@ export class CompraService {
   private http = inject(HttpClient);
 
   create(compra: CreateCompraDto): Observable<CreateCompraResponse> {
-    console.log('Enviando compra a:', `${this.baseUrl}`, compra);
     return this.http.post<CreateCompraResponse>(`${this.baseUrl}`, compra);
   }
 
   getAll(page: number = 1, pageSize: number = 10): Observable<any> {
     const url = `${this.baseUrl}?page=${page}&pageSize=${pageSize}`;
-    console.log('Solicitando compras desde:', url);
+
 
     return this.http.get<any>(url).pipe(
-      tap((response) => {
-        console.log('Respuesta del backend:', response);
-        console.log('Tipo de respuesta:', typeof response);
-        console.log('Es array:', Array.isArray(response));
-      })
+  
     );
   }
 
-  getById(id: number): Observable<Compra> {
-    console.log('Solicitando compra ID:', id);
-    return this.http.get<Compra>(`${this.baseUrl}/${id}`);
+  getById(id: number): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}/${id}`);
   }
 
   update(id: number, compra: Partial<CreateCompraDto>): Observable<any> {
-    console.log('Actualizando compra ID:', id);
     return this.http.patch(`${this.baseUrl}/${id}`, compra);
   }
 
   delete(id: number): Observable<any> {
-    console.log('Eliminando compra ID:', id);
+ 
     return this.http.delete(`${this.baseUrl}/${id}`);
   }
 }

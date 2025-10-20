@@ -50,7 +50,6 @@ export class Sidebar {
     { label: 'Dashboard', icon: faTachometerAlt, route: '/dashboard' },
     { label: 'Proveedores', icon: faStore, route: '/proveedores' },
     { label: 'Compras', icon: faShoppingBag, route: '/compras' },
-    { label: 'Mataderos', icon: faCow, route: '/mataderos' },
     { label: 'Faenas', icon: faCow, route: '/faenas' },
     { label: 'Ventas', icon: faShoppingCart, route: '/ventas' },
     { label: 'Productos', icon: faBox, route: '/productos' },
@@ -58,7 +57,7 @@ export class Sidebar {
     { label: 'Transporte', icon: faTruck, route: '/transporte' },
     { label: 'Pagos', icon: faCreditCard, route: '/pagos' },
     { label: 'Caja', icon: faCashRegister, route: '/caja' },
-    { label: 'Usuarios', icon: faUsers, route: '/users' },
+    { label: 'Usuarios', icon: faUsers, route: '/usuarios' },
     { label: 'Ajustes', icon: faCog, route: '/ajustes' },
   ];
 

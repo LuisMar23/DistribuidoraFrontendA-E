@@ -112,18 +112,28 @@ export class ProveedorComponent {
     if (this.editMode()) {
       const id = this.editId();
       if (id != null) {
-        this.proveedorService.update(id, data).subscribe(() => {
-          this._notificationService.showSuccess(`Se ha actualizado al proveedor`);
-          this.loadProveedores();
-          this.cancelEdit();
+        this.proveedorService.update(id, data).subscribe({
+          next: () => {
+            this._notificationService.showSuccess(`Se ha actualizado al proveedor`);
+            this.loadProveedores();
+            this.cancelEdit();
+          },
+          error: (error) => {
+            this._notificationService.showError(`Error al actualizar cliente: ${error}`);
+          },
         });
       }
     } else {
-      this.proveedorService.create(data).subscribe(() => {
-        console.log(data);
-        this._notificationService.showSuccess(`Se ha creado al proveedor ${data.nombre}`);
-        this.loadProveedores();
-        this.cancelEdit();
+      this.proveedorService.create(data).subscribe({
+        next: () => {
+          this._notificationService.showSuccess(`Se ha creado al proveedor ${data.nombre}`);
+          this.loadProveedores();
+          this.cancelEdit();
+        },
+        error: (error) => {
+          const msg = error.error?.message || 'Error al crear proveedor';
+          this._notificationService.showError(msg);
+        },
       });
     }
   }

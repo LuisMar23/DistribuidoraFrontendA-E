@@ -1,4 +1,4 @@
-import { Component, computed, effect, signal } from '@angular/core';
+import { Component, computed, effect, inject, input, signal } from '@angular/core';
 
 import {
   faClipboardList,
@@ -14,7 +14,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
-import { RouterModule } from '@angular/router';
+import { ActivatedRoute, RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-detalle-faena',
@@ -30,39 +30,54 @@ export class DetalleFaenaComponent {
   faPenToSquare = faPenToSquare;
   faTrash = faTrash;
   faBoxOpen = faBoxOpen;
+  detalleFaena: [] = [];
 
-  // Señales
   faenas = signal<DetalleFaena[]>([]);
   searchTerm = signal('');
   itemsPerPage = 10;
   currentPage = signal(1);
+  id = input.required<number, string>({
+    transform: (value: string) => parseInt(value, 10),
+  });
 
-  // Modal
+
   isModalOpen = signal(false);
   editingFaena = signal<DetalleFaena | null>(null);
 
-  // Total de páginas dinámico
+
   totalPages = computed(() => Math.ceil(this.total() / this.itemsPerPage));
+
+  private route = inject(ActivatedRoute);
+  compraId = computed(() => this.id());
 
   constructor(private faenaService: DetalleFaenaService) {
     this.loadFaenas();
+    this.route.paramMap.subscribe((params) => {
+      const id = parseInt(params.get('id') || '0', 10);
+    });
 
-    // Reset página al cambiar búsqueda
+
     effect(() => {
+      console.log('ID cambió:', this.compraId());
       this.searchTerm();
       this.currentPage.set(1);
     });
   }
 
   loadFaenas() {
-    this.faenaService.getAll(); // actualiza la señal interna automáticamente
-    // opcional: suscribirse si quieres copiar a tu señal local
-    this.faenaService.detallesFaena(); // read-only signal si necesitas usarla
+    this.faenaService.getAll().subscribe({
+      next: (resp) => {
+        console.log(resp.data);
+        this.faenas.set(resp.data);
+      },
+    }); 
+  
+    this.faenaService.detallesFaena(); 
   }
 
-  // Filtrado y paginación
+
   filteredFaenas() {
-    const filtered = this.faenas().filter(f =>
+    const filtered = this.faenas().filter((f) =>
       f.propiedad.toLowerCase().includes(this.searchTerm().toLowerCase())
     );
     const start = (this.currentPage() - 1) * this.itemsPerPage;
@@ -70,7 +85,7 @@ export class DetalleFaenaComponent {
   }
 
   total() {
-    return this.faenas().filter(f =>
+    return this.faenas().filter((f) =>
       f.propiedad.toLowerCase().includes(this.searchTerm().toLowerCase())
     ).length;
   }
@@ -83,7 +98,7 @@ export class DetalleFaenaComponent {
     return Math.min(this.currentPage() * this.itemsPerPage, this.total());
   }
 
-  // Paginador
+
   pageArray() {
     return Array.from({ length: this.totalPages() }, (_, i) => i + 1);
   }
@@ -93,14 +108,13 @@ export class DetalleFaenaComponent {
   }
 
   prevPage() {
-    if (this.currentPage() > 1) this.currentPage.update(v => v - 1);
+    if (this.currentPage() > 1) this.currentPage.update((v) => v - 1);
   }
 
   nextPage() {
-    if (this.currentPage() < this.totalPages()) this.currentPage.update(v => v + 1);
+    if (this.currentPage() < this.totalPages()) this.currentPage.update((v) => v + 1);
   }
 
-  // Modal
   openModal(faena?: DetalleFaena) {
     this.editingFaena.set(faena ? { ...faena } : null);
     this.isModalOpen.set(true);
@@ -113,22 +127,22 @@ export class DetalleFaenaComponent {
 
   saveFaena(faena: DetalleFaena) {
     if (this.editingFaena()) {
-      // Editar
+
       this.faenaService.update(faena.id!, faena).subscribe({
         next: () => {
           this.loadFaenas();
           this.closeModal();
         },
-        error: err => console.error(err),
+        error: (err) => console.error(err),
       });
     } else {
-      // Crear
+
       this.faenaService.create(faena).subscribe({
         next: () => {
           this.loadFaenas();
           this.closeModal();
         },
-        error: err => console.error(err),
+        error: (err) => console.error(err),
       });
     }
   }
@@ -141,59 +155,54 @@ export class DetalleFaenaComponent {
     if (confirm(`¿Eliminar faena de ${faena.propiedad}?`)) {
       this.faenaService.delete(faena.id!).subscribe({
         next: () => this.loadFaenas(),
-        error: err => console.error(err),
+        error: (err) => console.error(err),
       });
     }
   }
-columns = [
-  {  key: 'fecha' ,label: 'Fecha'},
-  {  key: 'propiedad',label: 'Propiedad' },
-  {  key: 'numeroReses' ,label: 'Número de Reses'},
-  {  key: 'totalDevolucion', label: 'Total Devolución' },
-  { key: 'saldoDepositar',label: 'Saldo a Depositar' },
-];
+  columns = [
+    { key: '#', label: 'N' },
+    { key: 'fecha', label: 'Fecha' },
+    { key: 'propiedad', label: 'Propiedad' },
+    { key: 'numeroReses', label: 'Número de Reses' },
+    { key: 'totalDevolucion', label: 'Total Devolución' },
+    { key: 'saldoDepositar', label: 'Saldo a Depositar' },
+  ];
   sortColumn = signal<string>('');
   sortDirection = signal<'asc' | 'desc'>('asc');
 
-ordenarFaenas() {
-  const col = this.sortColumn();
-  const dir = this.sortDirection();
-  if (!col) return;
+  ordenarFaenas() {
+    const col = this.sortColumn();
+    const dir = this.sortDirection();
+    if (!col) return;
 
-  const arr = [...this.faenas()];
+    const arr = [...this.faenas()];
 
-  arr.sort((a, b) => {
-    const valA = a[col as keyof DetalleFaena];
-    const valB = b[col as keyof DetalleFaena];
+    arr.sort((a, b) => {
+      const valA = a[col as keyof DetalleFaena];
+      const valB = b[col as keyof DetalleFaena];
 
-    if (valA == null) return 1;
-    if (valB == null) return -1;
+      if (valA == null) return 1;
+      if (valB == null) return -1;
 
-    if (typeof valA === 'string' && typeof valB === 'string') {
-      return dir === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
-    }
+      if (typeof valA === 'string' && typeof valB === 'string') {
+        return dir === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
+      }
 
-    return dir === 'asc' ? (valA < valB ? -1 : 1) : valA < valB ? 1 : -1;
-  });
+      return dir === 'asc' ? (valA < valB ? -1 : 1) : valA < valB ? 1 : -1;
+    });
 
-  this.faenas.set(arr);
-}
-
-// Paginador / click en encabezado
-sort(column: string) {
-  if (this.sortColumn() === column) {
-    this.sortDirection.set(this.sortDirection() === 'asc' ? 'desc' : 'asc');
-  } else {
-    this.sortColumn.set(column);
-    this.sortDirection.set('asc');
+    this.faenas.set(arr);
   }
 
-  this.ordenarFaenas();
-}
 
+  sort(column: string) {
+    if (this.sortColumn() === column) {
+      this.sortDirection.set(this.sortDirection() === 'asc' ? 'desc' : 'asc');
+    } else {
+      this.sortColumn.set(column);
+      this.sortDirection.set('asc');
+    }
 
-
-
-
-
+    this.ordenarFaenas();
+  }
 }

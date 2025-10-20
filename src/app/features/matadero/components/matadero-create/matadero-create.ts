@@ -1,7 +1,7 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, effect, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { RouterModule, Router } from '@angular/router';
+import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { MataderoService } from '../../services/matadero.service';
 import { CompraService } from '../../../compras/services/compra.service';
 import { NotificationService } from '../../../../core/services/notification.service';
@@ -22,6 +22,11 @@ export class MataderoCreate implements OnInit {
   compraIdSeleccionada: number | null = null;
   enviando = signal<boolean>(false);
 
+
+  private route = inject(ActivatedRoute);
+    compraId = signal<number>(0);
+
+
   private fb = inject(FormBuilder);
   private mataderoSvc = inject(MataderoService);
   private compraSvc = inject(CompraService);
@@ -30,24 +35,26 @@ export class MataderoCreate implements OnInit {
 
   constructor() {
     this.mataderoForm = this.crearFormularioMatadero();
+
+   this.route.paramMap.subscribe(params => {
+      const id = parseInt(params.get('id') || '0', 10);
+      this.compraId.set(id);
+    });
+    
+    // Reaccionar a cambios
+    effect(() => {
+      console.log('ID cambió:', this.compraId());
+     
+    });
+
   }
 
   ngOnInit(): void {
-    this.probarConexion();
+
     this.obtenerCompras();
   }
 
-  probarConexion() {
-    this.mataderoSvc.testConnection().subscribe({
-      next: (response) => {
-        console.log('Conexión con backend exitosa:', response);
-      },
-      error: (error) => {
-        console.error('Error de conexión con backend:', error);
-        this.error.set('No se pudo conectar con el servidor');
-      },
-    });
-  }
+ 
 
   obtenerCompras() {
     this.cargando.set(true);

@@ -5,25 +5,20 @@ import { Observable } from 'rxjs';
 import { DetalleFaena } from '../../../core/interfaces/faena.interface';
 import { environment } from '../../../../environments/environment';
 
-
-
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class DetalleFaenaService {
-  private apiUrl = environment.apiUrl +'/detalle-faena'
+  private apiUrl = environment.apiUrl + '/detalle-faena';
 
   private _detallesFaena = signal<DetalleFaena[]>([]);
   detallesFaena: Signal<DetalleFaena[]> = this._detallesFaena.asReadonly();
 
   constructor(private http: HttpClient) {}
 
-
-  getAll(): void {
-    this.http.get<DetalleFaena[]>(this.apiUrl)
-      .subscribe(data => this._detallesFaena.set(data));
+  getAll(): Observable<any> {
+    return this.http.get<DetalleFaena>(`${this.apiUrl}`);
   }
-
 
   getById(id: number): Observable<DetalleFaena> {
     return this.http.get<DetalleFaena>(`${this.apiUrl}/${id}`);

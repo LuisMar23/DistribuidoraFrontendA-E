@@ -5,7 +5,6 @@ import { DashboardComponent } from './dashboard/dashboard';
 import { LayoutComponent } from './layout/layout';
 import { RegisterComponent } from './components/auth/register/register';
 import { ChangePasswordComponent } from './components/auth/change-password/change-password';
-import { ProductComponent } from './product/product';
 
 import { AuthGuard } from './core/guards/auth.guard';
 import { ProfileComponent } from './features/users/components/profile/profile';
@@ -49,11 +48,6 @@ export const routes: Routes = [
           import('./features/proveedor/proveedor.routes').then((r) => r.ProveedoresRoutingModule),
       },
       {
-        path: 'mataderos',
-        loadChildren: () =>
-          import('./features/matadero/matadero.routes').then((r) => r.MataderoRoutingModule),
-      },
-      {
         path: 'faenas',
         loadChildren: () =>
           import('./features/faenas/faenas.routes').then((r) => r.FaenasRoutingModule),
@@ -71,6 +65,10 @@ export const routes: Routes = [
       {
         path: 'caja',
         loadChildren: () => import('./features/caja/caja.routes').then((r) => r.CajaRoutingModule),
+      },
+      {
+        path: 'pagos',
+        loadChildren: () => import('./features/pagos/pago.routes').then((r) => r.PagoRoutingModule),
       },
     ],
   },

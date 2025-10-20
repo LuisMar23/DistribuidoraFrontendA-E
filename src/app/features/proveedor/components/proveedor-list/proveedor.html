@@ -42,7 +42,7 @@
       <div class="overflow-x-auto table-container">
         <table class="min-w-full table-compact">
           <thead>
-            <tr class="bg-[#2196f3] text-white">
+            <tr class="bg-[#ff7676] text-white">
               @for (col of columns; track col) {
               <th
                 class="px-2 xl:px-4 py-4 text-left text-xs font-bold uppercase tracking-wider cursor-pointer"
@@ -152,7 +152,6 @@
   </div>
 
   <!-- Vista Mobile/Tablet - Cards -->
-  <!-- Vista Mobile/Tablet - Cards -->
   <div class="xl:hidden space-y-4">
     @for (p of filteredProveedores(); track $index) {
     <div
@@ -173,9 +172,7 @@
         </div>
       </div>
 
-      <!-- Contenido de la card -->
       <div class="p-4 space-y-3">
-        <!-- Fila 1: NIT y Departamento -->
         <div class="grid grid-cols-2 gap-4">
           <div>
             <div class="flex items-center text-gray-600 mb-1">
@@ -197,7 +194,6 @@
           </div>
         </div>
 
-        <!-- Fila 2: Teléfono -->
         <div>
           <div class="flex items-center text-gray-600 mb-1">
             <i class="fas fa-phone text-xs mr-2"></i>
@@ -242,9 +238,7 @@
           </div>
         </div>
       </div>
-      <!-- cierre del contenido -->
     </div>
-    <!-- cierre de la card -->
     }
 
     <!-- Mensaje cuando no hay datos -->
@@ -256,15 +250,6 @@
     </div>
     }
   </div>
-
-  <!-- Mensaje cuando no hay datos -->
-  @if (filteredProveedores().length === 0) {
-  <div class="bg-white rounded-xl p-8 text-center">
-    <fa-icon [icon]="faBoxOpen" class="text-5xl text-gray-300 mb-4"></fa-icon>
-    <p class="text-lg font-semibold text-gray-700 mb-2">No se encontraron proveedores</p>
-    <p class="text-sm text-gray-500">Agrega un nuevo proveedor para comenzar</p>
-  </div>
-  }
 </div>
 
 <!-- Paginación -->

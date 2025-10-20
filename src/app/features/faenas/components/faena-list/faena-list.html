@@ -29,7 +29,7 @@
 
     <!-- Botón nueva faena -->
     <button
-    [routerLink]="['/faenas/crear']"
+    [routerLink]="['/faenas/crear',compraId()]"
       class="flex items-center gap-2 bg-gray-400 hover:bg-gray-500 text-white px-6 py-3 rounded-xl shadow-lg transition-all duration-200 transform hover:scale-105 w-full lg:w-auto justify-center lg:justify-start"
     >
       <i class="fas fa-plus"></i> Nueva Faena
@@ -94,10 +94,10 @@
               <td class="px-2 xl:px-4 py-4">{{ faena.propiedad }}</td>
               <td class="px-2 xl:px-4 py-4">{{ faena.numeroReses }}</td>
               <td class="px-2 xl:px-4 py-4">
-                {{ faena.totalDevolucion | currency : 'USD' : 'symbol' }}
+                Bs.{{ faena.totalDevolucion | number : '1.2-2' }}
               </td>
               <td class="px-2 xl:px-4 py-4">
-                {{ faena.saldoDepositar | currency : 'USD' : 'symbol' }}
+                Bs.{{ faena.saldoDepositar |number : '1.2-2' }}
               </td>
               <td class="px-2 xl:px-4 py-4 flex justify-center gap-2">
                 <button
@@ -139,7 +139,7 @@
     
       class="bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden"
     >
-      <div class="bg-gradient-to-r from-blue-500 to-blue-600 p-4 flex justify-between items-center">
+      <div class="bg-[#ff7676]  from-red-400 to-red-300 p-4 flex justify-between items-center">
         <div>
           <h3 class="font-bold text-white text-lg leading-tight">{{ faena.propiedad }}</h3>
           <p class="text-blue-100 text-sm mt-1">Fecha: {{ faena.fecha | date : 'dd/MM/yyyy' }}</p>

@@ -1,164 +1,170 @@
-import { Component, inject, signal, OnInit, computed } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { Component, inject, signal, computed, effect, input } from '@angular/core';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  faSearch,
+  faBox,
+  faBoxOpen,
+  faPenToSquare,
+  faTrash,
+  faEye,
+  faPlus,
+} from '@fortawesome/free-solid-svg-icons';
 import { MataderoService } from '../../services/matadero.service';
 import { Matadero } from '../../../../core/interfaces/matadero.interface';
+import { RouterModule } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NotificationService } from '../../../../core/services/notification.service';
 
 @Component({
-  selector: 'app-matadero-list',
+  selector: 'app-matadero',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [RouterModule, CommonModule, ReactiveFormsModule, FontAwesomeModule],
   templateUrl: './matadero-list.html',
-  styleUrls: ['./matadero-list.css'],
 })
-export class MataderoList implements OnInit {
+export class MataderoComponent {
+  private fb = inject(FormBuilder);
+  private service = inject(MataderoService);
+
+  // Íconos FontAwesome
+  faSearch = faSearch;
+  faBox = faBox;
+  faBoxOpen = faBoxOpen;
+  faPenToSquare = faPenToSquare;
+  faTrash = faTrash;
+  faEye = faEye;
+  faPlus = faPlus;
+
+  id = input.required<number, string>({
+    transform: (value: string) => parseInt(value, 10),
+  });
+  compraId = computed(() => this.id());
+
   mataderos = signal<Matadero[]>([]);
-  cargando = signal<boolean>(true);
-  error = signal<string | null>(null);
-  page = signal<number>(1);
-  pageSize = signal<number>(10);
-  totalPages = signal<number>(1);
-  mataderoSeleccionado = signal<Matadero | null>(null);
-  mostrarModal = signal<boolean>(false);
+  searchTerm = signal('');
+  showModal = signal(false);
+  editMode = signal(false);
+  selectedId = signal<number | null>(null);
+  codigo = signal<String|null>(null);
+  currentPage = signal(1);
+  itemsPerPage = 10;
 
-  // Computed para compras únicas
-  comprasUnicas = computed(() => {
-    const comprasVistas = new Set<number>();
-    const comprasUnicas: Matadero[] = [];
+  private notificationService=inject(NotificationService)
+  total = computed(() => this.filteredMataderos().length);
+  totalPages = computed(() => Math.ceil(this.total() / this.itemsPerPage));
+  rangeStart = computed(() => (this.currentPage() - 1) * this.itemsPerPage + 1);
+  rangeEnd = computed(() => Math.min(this.currentPage() * this.itemsPerPage, this.total()));
+  columns = [
+    { key: 'id', label: '#' },
+    { key: 'fechaFaena', label: 'Fecha Faena' },
+    { key: 'cantidad', label: 'Cantidad' },
+    { key: 'tipoRes', label: 'Tipo Res' },
+    { key: 'tipoIngreso', label: 'Tipo Ingreso' },
+    { key: 'totalKilos', label: 'Total Kilos' },
+  ];
 
-    this.mataderos().forEach((matadero) => {
-      if (!comprasVistas.has(matadero.compra.id)) {
-        comprasVistas.add(matadero.compra.id);
-        comprasUnicas.push(matadero);
+  form: FormGroup = this.fb.group({
+    cantidad: [null, [Validators.required]],
+    fechaFaena: [null, [Validators.required]],
+    tipoRes: ['', [Validators.required]],
+    tipoIngreso: [''],
+    observaciones: [''],
+    totalKilos: [null, [Validators.required]],
+    compraId: [null],
+  });
+
+  constructor() {
+    this.loadMataderos();
+    effect(() => {
+      console.log('ID cambió:', this.compraId());
+    });
+  }
+
+  loadMataderos() {
+    this.service.findAll().subscribe({
+      next: (res) => {
+       const firstCodigo = res[0]?.compra?.codigo ?? '';
+        this.codigo.set(firstCodigo)
+        console.log(res)
+        this.mataderos.set(res)
       }
     });
+  }
 
-    return comprasUnicas;
+  filteredMataderos = computed(() => {
+    const term = this.searchTerm().toLowerCase();
+    return this.mataderos().filter((m) => m.tipoRes.toLowerCase().includes(term));
   });
 
-  // Computed para mataderos de la compra seleccionada
-  mataderosCompraSeleccionada = computed(() => {
-    const seleccionado = this.mataderoSeleccionado();
-    if (!seleccionado) return [];
-    return this.mataderos().filter((m) => m.compra.id === seleccionado.compra.id);
+  paginatedMataderos = computed(() => {
+    const start = (this.currentPage() - 1) * this.itemsPerPage;
+    return this.filteredMataderos().slice(start, start + this.itemsPerPage);
   });
 
-  // Computed para contar registros con tipoRes
-  registrosConTipoRes = computed(() => {
-    return this.mataderosCompraSeleccionada().filter((m) => m.tipoRes).length;
-  });
 
-  private mataderoSvc = inject(MataderoService);
-  private notificationService = inject(NotificationService);
-
-  ngOnInit(): void {
-    this.obtenerMataderos();
+  pageArray = computed(() => Array.from({ length: this.totalPages() }, (_, i) => i + 1));
+  prevPage() {
+    if (this.currentPage() > 1) this.currentPage.update((p) => p - 1);
+  }
+  nextPage() {
+    if (this.currentPage() < this.totalPages()) this.currentPage.update((p) => p + 1);
+  }
+  goToPage(i: number) {
+    this.currentPage.set(i);
   }
 
-  obtenerMataderos(page: number = 1) {
-    this.cargando.set(true);
-    this.error.set(null);
-    this.mataderoSvc.getAll(page, this.pageSize()).subscribe({
-      next: (resp) => {
-        console.log('Respuesta del servicio:', resp);
-        if (resp && resp.data) {
-          this.mataderos.set(resp.data);
-          this.totalPages.set(resp.meta?.totalPages || 1);
-        } else {
-          this.mataderos.set([]);
-        }
-        this.cargando.set(false);
-      },
-      error: (err) => {
-        console.error('Error al cargar mataderos:', err);
-        this.error.set('No se pudieron cargar los registros del matadero');
-        this.cargando.set(false);
-      },
-    });
+  openModal() {
+    this.showModal.set(true);
+    this.form.reset();
+    this.editMode.set(false);
   }
 
-  cambiarPagina(nuevaPagina: number) {
-    if (nuevaPagina >= 1 && nuevaPagina <= this.totalPages()) {
-      this.page.set(nuevaPagina);
-      this.obtenerMataderos(nuevaPagina);
-    }
+  edit(m: Matadero) {
+    this.showModal.set(true);
+    this.editMode.set(true);
+    this.selectedId.set(m.id);
+    this.form.patchValue(m);
   }
 
-  verDetalles(matadero: Matadero) {
-    this.mataderoSeleccionado.set(matadero);
-    this.mostrarModal.set(true);
+  cancelEdit() {
+    this.showModal.set(false);
+    this.form.reset();
+    this.editMode.set(false);
+    this.selectedId.set(null);
   }
 
-  cerrarModal() {
-    this.mostrarModal.set(false);
-    this.mataderoSeleccionado.set(null);
-  }
-
-  eliminarMatadero(id: number) {
-    if (
-      confirm(
-        '¿Está seguro que desea eliminar TODOS los registros de matadero de esta compra? Esta acción no se puede deshacer.'
-      )
-    ) {
-      this.mataderoSvc.delete(id).subscribe({
-        next: (response) => {
-          this.mataderos.update((list) => list.filter((m) => m.id !== id));
-          this.notificationService.showSuccess(
-            response.message || 'Registro eliminado correctamente'
-          );
-          if (this.mataderoSeleccionado()?.id === id) {
-            this.cerrarModal();
-          }
+  submit() {
+    if (this.form.invalid) return;
+    const fechaFaena = new Date(this.form.value.fechaFaena);
+    this.form.get('fechaFaena')?.setValue(fechaFaena);
+    this.form.get('compraId')?.setValue(this.compraId());
+    const data = this.form.value;
+    if (this.editMode()) {
+      this.service.update(this.selectedId()!, data).subscribe({
+        next: () => {
+          this.notificationService.showSuccess(`Se ha actualizado correctamente`)
+          this.loadMataderos();
+          this.cancelEdit();
         },
-        error: (err) => {
-          console.error('Error al eliminar matadero:', err);
-          this.notificationService.showError(
-            err.error?.message || 'No se pudo eliminar el registro'
-          );
+      });
+    } else {
+
+      this.service.create(data).subscribe({
+        next: () => {
+          this.notificationService.showSuccess("Se ha creado correctamente el registro :)")
+          this.loadMataderos();
+          this.cancelEdit();
         },
       });
     }
   }
 
-  eliminarDesdeModal() {
-    const matadero = this.mataderoSeleccionado();
-    if (
-      matadero &&
-      confirm('¿Está seguro que desea eliminar este registro individual de matadero?')
-    ) {
-      this.mataderoSvc.delete(matadero.id).subscribe({
-        next: (response) => {
-          this.mataderos.update((list) => list.filter((m) => m.id !== matadero.id));
-          this.notificationService.showSuccess(
-            response.message || 'Registro eliminado correctamente'
-          );
-          this.cerrarModal();
-        },
-        error: (err) => {
-          console.error('Error al eliminar matadero:', err);
-          this.notificationService.showError(
-            err.error?.message || 'No se pudo eliminar el registro'
-          );
-        },
-      });
-    }
-  }
-
-  getPages(): number[] {
-    const pages = [];
-    const startPage = Math.max(1, this.page() - 2);
-    const endPage = Math.min(this.totalPages(), startPage + 4);
-
-    for (let i = startPage; i <= endPage; i++) {
-      pages.push(i);
-    }
-
-    return pages;
-  }
-
-  // Método para obtener mataderos por compra (para uso interno)
-  getMataderosPorCompra(compraId: number): Matadero[] {
-    return this.mataderos().filter((m) => m.compra.id === compraId);
+  delete(m: Matadero) {
+    this.notificationService.confirmDelete(`¿Eliminar registro del matadero ${m.id}?`).then((result)=>{
+      if (result.isConfirmed) {
+        this.notificationService.showSuccess('Eliminado Correctamente')
+        this.service.delete(m.id).subscribe(()=>this.loadMataderos())
+      }
+    })
   }
 }

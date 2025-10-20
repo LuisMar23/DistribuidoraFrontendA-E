@@ -47,7 +47,6 @@ export class ClientComponent {
   form: FormGroup;
   editMode = signal(false);
 
-  // ✅ Eliminada la señal duplicada: 'clientes'
 
   columns = [
     { key: 'id_cliente', label: 'N°' },
@@ -85,61 +84,7 @@ export class ClientComponent {
       });
   }
 
-  // filteredClients = computed(() => {
-  //   let arr = this.clients();
 
-  //   // Primero ordenar
-  //   const col = this.sortColumn();
-  //   const dir = this.sortDirection();
-
-  //   if (col) {
-  //     arr = [...arr].sort((a, b) => {
-  //       // Acceder a las propiedades a través de persona
-  //       let valA: any;
-  //       let valB: any;
-
-  //       if (col === 'id_cliente') {
-  //         valA = a.id_cliente;
-  //         valB = b.id_cliente;
-  //       } else if (col === 'creado_en') {
-  //         valA = a.creado_en;
-  //         valB = b.creado_en;
-  //       } else {
-  //         // Para nombre, nit_ci, telefono, direccion
-  //         valA = a.persona?.[col as keyof typeof a.persona];
-  //         valB = b.persona?.[col as keyof typeof b.persona];
-  //       }
-
-  //       if (valA == null) return 1;
-  //       if (valB == null) return -1;
-
-  //       if (typeof valA === 'string' && typeof valB === 'string') {
-  //         return dir === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
-  //       }
-
-  //       // Para fechas y números
-  //       if (valA instanceof Date && valB instanceof Date) {
-  //         return dir === 'asc' ? valA.getTime() - valB.getTime() : valB.getTime() - valA.getTime();
-  //       }
-
-  //       return dir === 'asc' ? (valA < valB ? -1 : 1) : valA < valB ? 1 : -1;
-  //     });
-  //   }
-
-  //   // Luego filtrar
-  //   const term = this.searchTerm().toLowerCase();
-  //   if (!term) return arr;
-
-  //   return arr.filter((c) => {
-  //     const p = c.persona;
-  //     return (
-  //       (p.nombre || '').toLowerCase().includes(term) ||
-  //       (p.nit_ci || '').toLowerCase().includes(term) ||
-  //       (p.telefono || '').toLowerCase().includes(term) ||
-  //       (p.direccion || '').toLowerCase().includes(term)
-  //     );
-  //   });
-  // });
   private dataTable = inject(DataTableService);
 
   tableState: TableState<any> = {
@@ -341,16 +286,12 @@ export class ClientComponent {
     return end > this.total() ? this.total() : end;
   }
 
-  // formatDate(dateString: string | undefined): string {
-  //   if (!dateString) return 'N/A';
-  //   return new Date(dateString).toLocaleString();
-  // }
+
 
   downloadExcel() {
     const workbook = new Workbook();
     const worksheet = workbook.addWorksheet('Clientes');
 
-    // Definir columnas
     worksheet.columns = [
       { header: 'N°', key: 'numero', width: 8 },
       { header: 'ID Cliente', key: 'id_cliente', width: 12 },
@@ -393,7 +334,6 @@ export class ClientComponent {
         creado_en: this.formatDate(cliente.creado_en),
       });
 
-      // Centrar la columna N°
       row.getCell('numero').alignment = {
         vertical: 'middle',
         horizontal: 'center',
@@ -487,9 +427,8 @@ export class ClientComponent {
         creado_en: this.formatDate(c.creado_en),
       })),
       fileName: 'Clientes',
-      pageOrientation: 'landscape', // Horizontal para más columnas
-      // headerColor: '#ff7676',
-      // alternateRowColor: '#f9f9f9',
+      pageOrientation: 'landscape', 
+
       showFooter: true,
       footerText: 'Distribuidora A-E - Sistema de Gestión',
     });
