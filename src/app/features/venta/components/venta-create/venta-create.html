@@ -310,6 +310,28 @@
                 </div>
                 }
 
+                <!-- Observaciones -->
+                <div class="mb-8">
+                    <h2
+                        class="text-lg sm:text-xl font-semibold text-black mb-4 flex items-center gap-2 border-b-2 border-red-200 pb-2">
+                        <fa-icon [icon]="faStickyNote" class="w-5 h-5 sm:w-6 sm:h-6"></fa-icon>
+                        Observaciones
+                    </h2>
+                    <div class="to-white border-2 border-red-200 rounded-xl p-4 sm:p-6">
+                        <div class="grid grid-cols-1 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    Observaciones (Opcional)
+                                </label>
+                                <textarea formControlName="observaciones" rows="4"
+                                    placeholder="Agregue cualquier observación adicional sobre la venta..."
+                                    class="w-full px-4 py-2.5 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-200 text-sm sm:text-base resize-none"></textarea>
+                                <p class="mt-1 text-xs text-gray-500">Información adicional sobre la venta</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Montos -->
                 <div class="mb-8">
                     <h2
@@ -516,18 +538,17 @@
                         <div>
                             <div class="font-semibold text-gray-800">{{ producto.nombre }}</div>
                             <div class="text-sm text-gray-600 mt-1">
-                                <span class="font-medium">Precio: {{ producto.precio_venta | number:'1.2-2' }}
-                                    Bs.</span> •
-                                <span>Stock: {{ producto.stock }}</span> •
-                                <span>Categoría: {{ producto.categoria || 'N/A' }}</span>
+                                <span class="font-medium">Precio: {{ producto.precio | number:'1.2-2' }} Bs.</span> •
+                                <span>Stock: {{ producto.peso }}</span> •
+                                <span>Código: {{ producto.codigo || 'N/A' }}</span>
                             </div>
                         </div>
                         <div class="text-right">
                             <div class="text-sm font-semibold text-green-600">
-                                {{ producto.precio_venta | number:'1.2-2' }} Bs.
+                                {{ producto.precio | number:'1.2-2' }} Bs.
                             </div>
                             <div class="text-xs text-gray-500 mt-1">
-                                Stock: {{ producto.stock }}
+                                Stock: {{ producto.peso }}
                             </div>
                         </div>
                     </div>

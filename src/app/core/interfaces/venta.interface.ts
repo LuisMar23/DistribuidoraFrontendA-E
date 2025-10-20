@@ -10,6 +10,7 @@ export interface VentaDto {
   total: number;
   metodo_pago: 'efectivo' | 'tarjeta' | 'transferencia' | 'credito';
   estado: 'pendiente' | 'pagado' | 'anulado';
+  observaciones?: string;
   cliente?: any;
   usuario?: any;
   detalles?: DetalleVentaDto[];

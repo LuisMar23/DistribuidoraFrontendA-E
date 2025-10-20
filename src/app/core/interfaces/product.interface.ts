@@ -1,12 +1,11 @@
-
 export interface ProductDto {
   id_producto: number;
-  uuid: string;
+  codigo: string;
   nombre: string;
-  categoria: string;
-  unidad_medida: string;
-  stock_actual: number;
-  precio_base: number;
+  peso: number;
+  precio: number; 
   estado: boolean;
+  observacion?: string; 
+  fecha_llegada: string; 
   creado_en: string;
 }

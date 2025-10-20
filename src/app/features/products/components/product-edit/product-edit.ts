@@ -62,22 +62,26 @@ export class ProductEdit implements OnInit {
   crearFormularioProducto(): FormGroup {
     return this.fb.group({
       nombre: ['', [Validators.required, Validators.minLength(2)]],
-      categoria: ['', [Validators.required, Validators.minLength(2)]],
-      unidad_medida: ['', [Validators.required, Validators.minLength(1)]],
-      stock_actual: [0, [Validators.required, Validators.min(0)]],
-      precio_base: [0, [Validators.required, Validators.min(0.01)]],
+      peso: [0, [Validators.required, Validators.min(0)]],
+      precio: [0, [Validators.required, Validators.min(0.01)]], // Cambiado de precio_base a precio
       estado: [true],
+      observacion: [''], // Nuevo campo
+      fecha_llegada: ['', Validators.required], // Nuevo campo
     });
   }
 
   cargarDatosFormulario(product: any): void {
+    const fechaLlegada = product.fecha_llegada
+      ? new Date(product.fecha_llegada).toISOString().split('T')[0]
+      : new Date().toISOString().split('T')[0];
+
     this.productForm.patchValue({
       nombre: product.nombre || '',
-      categoria: product.categoria || '',
-      unidad_medida: product.unidad_medida || '',
-      stock_actual: product.stock_actual || 0,
-      precio_base: product.precio_base || 0,
+      peso: product.peso || 0,
+      precio: product.precio || 0, // Cambiado de precio_base a precio
       estado: product.estado ?? true,
+      observacion: product.observacion || '',
+      fecha_llegada: fechaLlegada,
     });
   }
 
@@ -96,8 +100,9 @@ export class ProductEdit implements OnInit {
     this.enviando.set(true);
     const dataActualizada = {
       ...this.productForm.value,
-      stock_actual: Number(this.productForm.value.stock_actual),
-      precio_base: Number(this.productForm.value.precio_base),
+      peso: Number(this.productForm.value.peso),
+      precio: Number(this.productForm.value.precio), // Cambiado de precio_base a precio
+      fecha_llegada: new Date(this.productForm.value.fecha_llegada),
     };
 
     this.productSvc.update(this.productId, dataActualizada).subscribe({

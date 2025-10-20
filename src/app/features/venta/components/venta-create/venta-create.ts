@@ -17,6 +17,7 @@ import {
   faClock,
   faSyncAlt,
   faCalendarCheck,
+  faStickyNote,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
@@ -43,10 +44,9 @@ interface UsuarioOption {
 interface ProductoOption {
   id_producto: number;
   nombre: string;
-  precio_venta: number;
-  stock: number;
-  categoria: string;
-  unidad_medida: string;
+  precio: number; // CAMBIADO: precio_venta -> precio
+  peso: number;
+  codigo: string; // NUEVO: código del producto
 }
 
 @Component({
@@ -69,6 +69,7 @@ export class VentaCreateComponent {
   faClock = faClock;
   faSyncAlt = faSyncAlt;
   faCalendarCheck = faCalendarCheck;
+  faStickyNote = faStickyNote;
 
   // Services
   private _notificationService = inject(NotificationService);
@@ -106,6 +107,7 @@ export class VentaCreateComponent {
       total: [0],
       metodo_pago: ['efectivo', Validators.required],
       estado: ['pendiente', Validators.required],
+      observaciones: [''],
       // Campos para plan de pago
       monto_inicial: [0],
       plazo: [''],
@@ -234,10 +236,9 @@ export class VentaCreateComponent {
           .map((producto) => ({
             id_producto: producto.id_producto || 0,
             nombre: producto.nombre || 'Producto sin nombre',
-            precio_venta: producto.precio_base || 0,
-            stock: producto.stock_actual || 0,
-            categoria: producto.categoria || '',
-            unidad_medida: producto.unidad_medida || '',
+            precio: producto.precio || 0, // CAMBIADO: precio_base -> precio
+            peso: producto.peso || 0,
+            codigo: producto.codigo || '', // NUEVO: código del producto
           }));
         this.productos.set(productosOptions);
         this.productosFiltrados.set(productosOptions);
@@ -380,7 +381,7 @@ export class VentaCreateComponent {
     const filtrados = this.productos().filter(
       (producto) =>
         producto.nombre.toLowerCase().includes(termino) ||
-        producto.categoria.toLowerCase().includes(termino) ||
+        producto.codigo.toLowerCase().includes(termino) || // NUEVO: buscar por código
         producto.id_producto.toString().includes(termino)
     );
     this.productosFiltrados.set(filtrados);
@@ -392,7 +393,7 @@ export class VentaCreateComponent {
       const detalle = this.detalles.at(index);
       detalle.patchValue({
         id_producto: producto.id_producto,
-        precio_unitario: producto.precio_venta,
+        precio_unitario: producto.precio, // CAMBIADO: precio_venta -> precio
       });
       this.calcularSubtotalDetalle(index);
     }
@@ -452,19 +453,19 @@ export class VentaCreateComponent {
     this.actualizarTotales();
   }
 
-  // Validar stock disponible
-  validarStock(index: number): boolean {
+  // Validar peso disponible
+  validarPeso(index: number): boolean {
     const detalle = this.detalles.at(index);
     const idProducto = detalle.get('id_producto')?.value;
     const cantidad = detalle.get('cantidad')?.value || 0;
 
     if (idProducto) {
       const producto = this.productos().find((p) => p.id_producto === parseInt(idProducto));
-      if (producto && cantidad > producto.stock) {
+      if (producto && cantidad > producto.peso) {
         this._notificationService.showError(
-          `Stock insuficiente. Solo hay ${producto.stock} unidades disponibles.`
+          `Stock insuficiente. Solo hay ${producto.peso} unidades disponibles.`
         );
-        detalle.patchValue({ cantidad: producto.stock });
+        detalle.patchValue({ cantidad: producto.peso });
         this.calcularSubtotalDetalle(index);
         return false;
       }
@@ -556,7 +557,7 @@ export class VentaCreateComponent {
     }
 
     for (let i = 0; i < this.detalles.length; i++) {
-      if (!this.validarStock(i)) {
+      if (!this.validarPeso(i)) {
         return;
       }
     }
@@ -578,6 +579,7 @@ export class VentaCreateComponent {
       total: parseFloat(formData.total) || 0,
       metodo_pago: formData.metodo_pago,
       estado: formData.estado,
+      observaciones: formData.observaciones || '',
       detalles: formData.detalles.map((detalle: any) => ({
         productoId: parseInt(detalle.id_producto), // Solo se pasa el ID del producto existente
         cantidad: parseFloat(detalle.cantidad),

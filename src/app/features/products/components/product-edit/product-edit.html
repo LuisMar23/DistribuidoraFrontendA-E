@@ -76,6 +76,11 @@
                             <input type="text" [value]="productData.id_producto || 'N/A'" readonly
                                 class="w-full px-3 py-2.5 border-2 border-gray-300 rounded-lg bg-gray-100 text-gray-600 text-sm sm:text-base" />
                         </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Código</label>
+                            <input type="text" [value]="productData.codigo || 'N/A'" readonly
+                                class="w-full px-3 py-2.5 border-2 border-gray-300 rounded-lg bg-gray-100 text-gray-600 text-sm sm:text-base" />
+                        </div>
                     </div>
                 </div>
             </div>
@@ -107,56 +112,48 @@
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">
-                                    Categoría <span class="text-red-500">*</span>
+                                    Peso <span class="text-red-500">*</span>
                                 </label>
-                                <input type="text" formControlName="categoria"
-                                    class="w-full px-4 py-2.5 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-200 text-sm sm:text-base"
-                                    placeholder="Categoría del producto" />
-                                @if (productForm.get('categoria')?.invalid && productForm.get('categoria')?.touched) {
-                                <p class="mt-1 text-xs text-red-600">La categoría es requerida</p>
-                                }
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">
-                                    Cantidad Actual <span class="text-red-500">*</span>
-                                </label>
-                                <input type="number" step="0.01" formControlName="stock_actual"
+                                <input type="number" step="0.01" formControlName="peso"
                                     class="w-full px-4 py-2.5 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-200 text-sm sm:text-base"
                                     placeholder="0.00" />
-                                @if (productForm.get('stock_actual')?.invalid &&
-                                productForm.get('stock_actual')?.touched) {
-                                <p class="mt-1 text-xs text-red-600">El stock es requerido</p>
+                                @if (productForm.get('peso')?.invalid && productForm.get('peso')?.touched) {
+                                <p class="mt-1 text-xs text-red-600">El peso es requerido</p>
                                 }
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">
-                                    Unidad de Medida <span class="text-red-500">*</span>
-                                </label>
-                                <select formControlName="unidad_medida"
-                                    class="w-full px-4 py-2.5 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-200 text-sm sm:text-base">
-                                    <option value="">Seleccione unidad</option>
-                                    <option value="kg">Kilogramos (kg)</option>
-                                    <option value="g">Gramos (g)</option>
-                                </select>
-                                @if (productForm.get('unidad_medida')?.invalid &&
-                                productForm.get('unidad_medida')?.touched) {
-                                <p class="mt-1 text-xs text-red-600">La unidad de medida es requerida</p>
-                                }
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">
-                                    Precio Base <span class="text-red-500">*</span>
+                                    Precio <span class="text-red-500">*</span>
                                 </label>
                                 <div class="flex items-center">
                                     <span class="absolute left-3 text-gray-500 font-medium">Bs</span>
-                                    <input type="number" step="0.01" formControlName="precio_base"
+                                    <input type="number" step="0.01" formControlName="precio"
                                         class="w-full pl-12 pr-4 py-2.5 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-200 text-sm sm:text-base"
                                         placeholder="0.00" />
                                 </div>
-                                @if (productForm.get('precio_base')?.invalid && productForm.get('precio_base')?.touched)
+                                @if (productForm.get('precio')?.invalid && productForm.get('precio')?.touched)
                                 {
-                                <p class="mt-1 text-xs text-red-600">El precio base es requerido</p>
+                                <p class="mt-1 text-xs text-red-600">El precio es requerido</p>
                                 }
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    Fecha de Llegada <span class="text-red-500">*</span>
+                                </label>
+                                <input type="date" formControlName="fecha_llegada"
+                                    class="w-full px-4 py-2.5 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-200 text-sm sm:text-base" />
+                                @if (productForm.get('fecha_llegada')?.invalid &&
+                                productForm.get('fecha_llegada')?.touched) {
+                                <p class="mt-1 text-xs text-red-600">La fecha de llegada es requerida</p>
+                                }
+                            </div>
+                            <div class="sm:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    Observación
+                                </label>
+                                <textarea formControlName="observacion" rows="3"
+                                    class="w-full px-4 py-2.5 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-200 text-sm sm:text-base"
+                                    placeholder="Observaciones adicionales..."></textarea>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Estado</label>
