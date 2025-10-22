@@ -20,7 +20,7 @@ loadByCaja(cajaId: number) {
       this.movimientos.set(caja);
     });
 }
-  addMovimiento(payload: Partial<Movimiento>) {
+  addMovimiento(payload: Partial<Movimiento>|any) {
     this.http.post<Movimiento>(this.apiUrl, payload)
       .subscribe((mov) => this.movimientos.update(prev => [mov, ...prev]));
   }

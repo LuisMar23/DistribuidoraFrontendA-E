@@ -17,11 +17,17 @@ export class CompraList implements OnInit {
   compras = signal<Compra[]>([]);
   cargando = signal<boolean>(true);
   error = signal<string | null>(null);
-  private compraSvc = inject(CompraService);
-  private notificationService = inject(NotificationService);
+  total = signal(0);
+  pageSize = signal(10);
+  currentPage = signal(1);
+  sortColumn = signal<string>('');
+  sortDirection = signal<'asc' | 'desc'>('asc');
   faFileExcel = faFileExcel;
 
   searchTerm = signal('');
+
+  private compraSvc = inject(CompraService);
+  private notificationService = inject(NotificationService);
 
   ngOnInit(): void {
     this.obtenerCompras();
@@ -66,7 +72,7 @@ export class CompraList implements OnInit {
           console.log('No se encontraron compras');
           this.compras.set([]);
         }
-         this.total.set(resp.total);
+        this.total.set(resp.total);
         this.cargando.set(false);
         if (this.sortColumn()) this.ordenarCompras();
       },
@@ -181,14 +187,6 @@ export class CompraList implements OnInit {
         return 'bg-green-100 text-green-700';
     }
   }
-
-
-
-  total = signal(0);
-  pageSize = signal(10);
-  currentPage = signal(1);
-  sortColumn = signal<string>('');
-  sortDirection = signal<'asc' | 'desc'>('asc');
 
   sort(column: string) {
     if (this.sortColumn() === column) {

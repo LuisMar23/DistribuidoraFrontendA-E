@@ -5,13 +5,13 @@ import { AuthGuard } from '../../core/guards/auth.guard';
 
 import { DetalleFaenaComponent } from './components/faena-list/faena-list';
 import { DetalleFaenaFormComponent } from './components/faena-create/faena-create';
+import { DetalleFaenaDetalleComponent } from './components/detalle-faena/detalle-faena';
 
 const routes: Routes = [
   { path: '', component: DetalleFaenaComponent, canActivate: [AuthGuard] },
-  { path: 'crear/:id', component: DetalleFaenaFormComponent, canActivate: [AuthGuard] },
-  // { path: 'editar/:id', component: DetalleFaenaFormComponent, canActivate: [AuthGuard] },
-  { path: ':id', component: DetalleFaenaComponent, canActivate: [AuthGuard] },
-  //   { path: 'detalle/:id', component: , canActivate: [AuthGuard] },
+  { path: 'crear', component: DetalleFaenaFormComponent, canActivate: [AuthGuard] },
+  { path: 'editar/:id', component: DetalleFaenaFormComponent, canActivate: [AuthGuard] },
+  { path: 'detalle/:id', component: DetalleFaenaDetalleComponent, canActivate: [AuthGuard] },
 ];
 
 @NgModule({

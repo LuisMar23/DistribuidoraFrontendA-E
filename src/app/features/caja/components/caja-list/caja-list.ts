@@ -6,11 +6,12 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faCashRegister } from '@fortawesome/free-solid-svg-icons';
 import { AppRoutingModule } from "../../../../app.routes";
 import { RouterModule } from '@angular/router';
+import { MovimientoModalComponent } from "../movimiento/movimiento";
 
 @Component({
   selector: 'app-caja-list',
   standalone:true,
-  imports: [CommonModule, ReactiveFormsModule, FontAwesomeModule, RouterModule],
+  imports: [CommonModule, ReactiveFormsModule, FontAwesomeModule, RouterModule,MovimientoModalComponent],
   templateUrl: './caja-list.html',
   styleUrl: './caja-list.css'
 })

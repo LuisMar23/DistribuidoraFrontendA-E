@@ -1,0 +1,211 @@
+<div class="min-h-screen bg-gray-50 py-8 px-4">
+  <div class="max-w-5xl mx-auto bg-white rounded-2xl shadow-lg p-6 border border-gray-200">
+    <div class="flex items-center justify-between mb-6">
+      <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-2">
+        <i class="fas fa-cow text-[#ff7676]"></i> Detalle de Faena
+      </h2>
+      <button
+        [routerLink]="['/faenas']"
+        class="bg-[#ff7676] text-white px-4 py-2 rounded-lg hover:bg-red-500 transition-all"
+      >
+        <fa-icon [icon]="faArrow" class="text-lg md:text-xl"></fa-icon>
+        Volver
+      </button>
+    </div>
+
+    @if (!isLoading()) {
+    <ng-container >
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <p class="text-sm text-gray-500">Fecha:</p>
+          <p class="font-semibold text-gray-800">{{ faena()?.fecha | date : 'dd/MM/yyyy' }}</p>
+        </div>
+
+        <div>
+          <p class="text-sm text-gray-500">Propiedad:</p>
+          <p class="font-semibold text-gray-800">{{ faena()?.propiedad || 'Sin propiedad' }}</p>
+        </div>
+
+        <div>
+          <p class="text-sm text-gray-500">Número de reses:</p>
+          <p class="font-semibold text-gray-800">{{ faena()?.numeroReses }}</p>
+        </div>
+
+        <div>
+          <p class="text-sm text-gray-500">Precio devolución:</p>
+          <p class="font-semibold text-gray-800">
+            {{ faena()?.precioDevolucion | currency : 'BOB' : 'symbol' : '1.2-2' }}
+          </p>
+        </div>
+
+        <div>
+          <p class="text-sm text-gray-500">Total devolución:</p>
+          <p class="font-semibold text-gray-800">
+            {{ faena()?.totalDevolucion | currency : 'BOB' : 'symbol' : '1.2-2' }}
+          </p>
+        </div>
+
+        <div>
+          <p class="text-sm text-gray-500">Transporte:</p>
+          <p class="font-semibold text-gray-800">
+            {{ faena()?.transporte | currency : 'BOB' : 'symbol' : '1.2-2' }}
+          </p>
+        </div>
+
+        <div>
+          <p class="text-sm text-gray-500">Otros gastos:</p>
+          <p class="font-semibold text-gray-800">
+            {{ faena()?.otrosGastos | currency : 'BOB' : 'symbol' : '1.2-2' }}
+          </p>
+        </div>
+
+        <div>
+          <p class="text-sm text-gray-500">Saldo a depositar:</p>
+          <p class="font-bold text-[#ff7676]">
+            {{ faena()?.saldoDepositar | currency : 'BOB' : 'symbol' : '1.2-2' }}
+          </p>
+        </div>
+
+        <div>
+          <p class="text-sm text-gray-500">Estado del pago:</p>
+          <span
+            class="px-3 py-1 text-sm rounded-full"
+            [ngClass]="
+              faena()?.estadoPago === 'PAGADO'
+                ? 'bg-green-100 text-green-700'
+                : 'bg-yellow-100 text-yellow-700'
+            "
+          >
+            {{ faena()?.estadoPago }}
+          </span>
+        </div>
+
+        @if (faena()?.fechaPago) {
+        <div>
+          <p class="text-sm text-gray-500">Fecha de pago:</p>
+          <p class="font-semibold text-gray-800">{{ faena()?.fechaPago | date : 'dd/MM/yyyy' }}</p>
+        </div>
+        } @if (faena()?.formaPago) {
+        <div>
+          <p class="text-sm text-gray-500">Forma de pago:</p>
+          <p class="font-semibold text-gray-800">{{ faena()?.formaPago }}</p>
+        </div>
+        }
+      </div>
+
+      <!-- Recibos -->
+      <div class="mt-8 border-t border-gray-200 pt-6">
+        <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+          <i class="fas fa-file-invoice text-[#ff7676]"></i> Recibos asociados
+        </h3>
+
+        @if (faena()?.recibos?.length) {
+     <ng-container  >
+          <div class="space-y-3">
+            <div
+              *ngFor="let r of faena()?.recibos"
+              class="flex justify-between items-center bg-gray-50 border border-gray-200 rounded-lg p-3 hover:shadow-md transition"
+            >
+              <div>
+                <p class="font-medium text-gray-800">Recibo #{{ r.id }}</p>
+                <p class="text-sm text-gray-500">{{ r.creado_en | date : 'dd/MM/yyyy HH:mm' }}</p>
+              </div>
+
+              <div class="flex gap-2 items-center">
+                <a
+                  [href]="url + r.urlArchivo"
+                  target="_blank"
+                  class="text-[#ff7676] hover:text-red-500 text-sm font-semibold"
+                >
+                  Ver archivo
+                </a>
+
+                <!-- Botón reemplazar -->
+                <button
+                  class="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-xs"
+                  (click)="abrirModalReemplazar(r)"
+                >
+                  Reemplazar
+                </button>
+
+                <!-- Botón eliminar -->
+                <button class="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-xs">
+                  Eliminar
+                </button>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+        }@else {
+        <ng-template #noRecibos>
+          <p class="text-gray-500 text-sm">No hay recibos registrados para esta faena.</p>
+        </ng-template>
+        }
+   
+
+
+      </div>
+    </ng-container>
+    }@else {
+
+    <ng-template #loading>
+      <div class="flex justify-center py-10">
+        <i class="fas fa-spinner fa-spin text-[#ff7676] text-2xl"></i>
+      </div>
+    </ng-template>
+    }
+
+
+  </div>
+</div>
+<!-- Modal Reemplazar Recibo -->
+@if (modalReemplazarVisible()) {
+<div
+
+  class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+>
+  <div class="bg-white rounded-xl p-6 w-full max-w-md border border-gray-200 shadow-lg">
+    <h2 class="text-xl font-bold mb-4 text-[#ff7676]">Reemplazar Recibo</h2>
+
+    <form [formGroup]="formPago" class="space-y-4">
+      <div>
+        <label class="block mb-1 text-gray-600">Fecha de Pago</label>
+        <input type="date" formControlName="fechaPago" class="border rounded w-full p-2" />
+      </div>
+
+      <div>
+        <label class="block mb-1 text-gray-600">Forma de Pago</label>
+        <select formControlName="formaPago" class="border rounded w-full p-2">
+          <option value="EFECTIVO">EFECTIVO</option>
+          <option value="TRANSFERENCIA">TRANSFERENCIA</option>
+          <option value="CHEQUE">CHEQUE</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block mb-1 text-gray-600">Nuevo comprobante (opcional)</label>
+        <input type="file" (change)="onFileSeleccionado($event)" class="w-full" />
+      </div>
+
+      <div class="flex justify-end gap-2 mt-4">
+        <button
+          type="button"
+          (click)="cerrarModal()"
+          class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
+        >
+          Cancelar
+        </button>
+        <button
+          type="button"
+          (click)="reemplazarRecibo()"
+          class="px-4 py-2 bg-[#ff7676] text-white rounded hover:bg-red-500"
+        >
+          Reemplazar
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+}
+
+

@@ -50,7 +50,7 @@ export class Sidebar {
     { label: 'Dashboard', icon: faTachometerAlt, route: '/dashboard' },
     { label: 'Proveedores', icon: faStore, route: '/proveedores' },
     { label: 'Compras', icon: faShoppingBag, route: '/compras' },
-    { label: 'Faenas', icon: faCow, route: '/faenas' },
+    { label: 'Menudo', icon: faCow, route: '/faenas' },
     { label: 'Ventas', icon: faShoppingCart, route: '/ventas' },
     { label: 'Productos', icon: faBox, route: '/productos' },
     { label: 'Clientes', icon: faUsers, route: '/clientes' },
