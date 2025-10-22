@@ -8,7 +8,7 @@ import { ProductDto } from '../../../core/interfaces/product.interface';
   providedIn: 'root',
 })
 export class ProductService {
-  apiUrl = `${environment.apiUrl}/product`;
+  apiUrl = `${environment.apiUrl}/products`;
 
   constructor(private http: HttpClient) {}
 

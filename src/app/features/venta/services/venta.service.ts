@@ -1,3 +1,4 @@
+// venta.service.ts
 import { Injectable } from '@angular/core';
 import { environment } from '../../../../environments/environment';
 import { HttpClient } from '@angular/common/http';
@@ -32,16 +33,16 @@ export class VentaService {
     return this.http.delete<VentaDto>(`${this.apiUrl}/${id}`);
   }
 
-  // NUEVOS MÉTODOS PARA PAGOS
-  registrarPagoPlanPago(pagoData: any): Observable<any> {
+  // Métodos para planes de pago
+  registrarPagoPlan(pagoData: any): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/plan-pago/pagar`, pagoData);
-  }
-
-  eliminarPagoPlanPago(pagoId: number): Observable<any> {
-    return this.http.delete<any>(`${this.apiUrl}/pago-plan/${pagoId}`);
   }
 
   obtenerResumenPlanPago(planPagoId: number): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/plan-pago/${planPagoId}/resumen`);
+  }
+
+  obtenerPlanesPagoActivos(): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/planes-pago/activos`);
   }
 }

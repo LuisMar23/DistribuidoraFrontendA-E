@@ -8,6 +8,9 @@ import {
   faSearch,
   faTrash,
   faPlus,
+  faCalendarAlt,
+  faDollarSign,
+  faUser,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { VentaDto } from '../../../../core/interfaces/venta.interface';
@@ -30,17 +33,20 @@ interface ColumnConfig {
   templateUrl: './venta.html',
 })
 export class VentaComponent {
+  // Iconos - SOLO los necesarios para el listado
   faShoppingCart = faShoppingCart;
   faEye = faEye;
   faPenToSquare = faPenToSquare;
   faTrash = faTrash;
   faSearch = faSearch;
   faPlus = faPlus;
+  faCalendarAlt = faCalendarAlt;
+  faDollarSign = faDollarSign;
+  faUser = faUser;
 
   ventas = signal<VentaDto[]>([]);
+  allVentas = signal<VentaDto[]>([]);
   searchTerm = signal('');
-  ventaSeleccionada = signal<VentaDto | null>(null);
-  mostrarModalEditar = signal(false);
 
   // Usar la interfaz ColumnConfig para asegurar tipos
   columns: ColumnConfig[] = [
@@ -57,24 +63,59 @@ export class VentaComponent {
   total = signal(0);
   pageSize = signal(10);
   currentPage = signal(1);
-  sortColumn = signal<keyof VentaDto>('id_venta'); // Por defecto ordenar por ID
-  sortDirection = signal<'asc' | 'desc'>('desc'); // Por defecto descendente
+  sortColumn = signal<keyof VentaDto>('id_venta');
+  sortDirection = signal<'asc' | 'desc'>('desc');
 
   _notificationService = inject(NotificationService);
   private router = inject(Router);
+  private ventaService = inject(VentaService);
 
-  constructor(private ventaService: VentaService) {
+  constructor() {
     this.loadVentas();
   }
 
   loadVentas() {
-    this.ventaService.getAll().subscribe((ventas: VentaDto[]) => {
-      // Aplicar ordenamiento por defecto (por ID descendente)
-      const ventasOrdenadas = this.sortVentas(ventas);
-      const paginatedVentas = this.paginateVentas(ventasOrdenadas);
-      this.ventas.set(paginatedVentas);
-      this.total.set(ventas.length);
+    this.ventaService.getAll().subscribe({
+      next: (ventas: VentaDto[]) => {
+        // CORRECCIÓN: Aplicar cálculo correcto del total a todas las ventas
+        const ventasCorregidas = ventas.map((venta) => ({
+          ...venta,
+          // FORZAR el cálculo correcto: total = subtotal - descuento
+          total: this.calcularTotalCorrecto(venta),
+        }));
+
+        this.allVentas.set(ventasCorregidas);
+        this.total.set(ventasCorregidas.length);
+        this.applyFilterAndSort();
+      },
+      error: (error) => {
+        console.error('Error loading ventas:', error);
+        this._notificationService.showError('Error al cargar las ventas');
+      },
     });
+  }
+
+  private applyFilterAndSort() {
+    let filtered = this.allVentas();
+
+    // Aplicar filtro de búsqueda
+    const term = this.searchTerm().toLowerCase();
+    if (term) {
+      filtered = filtered.filter(
+        (v) =>
+          this.getClienteNombre(v).toLowerCase().includes(term) ||
+          v.metodo_pago.toLowerCase().includes(term) ||
+          v.estado.toLowerCase().includes(term) ||
+          v.id_venta?.toString().includes(term)
+      );
+    }
+
+    // Aplicar ordenamiento
+    const sorted = this.sortVentas(filtered);
+
+    // Aplicar paginación
+    const paginated = this.paginateVentas(sorted);
+    this.ventas.set(paginated);
   }
 
   // Ordenar ventas manualmente
@@ -117,19 +158,30 @@ export class VentaComponent {
   }
 
   filteredVentas = computed(() => {
-    const term = this.searchTerm().toLowerCase();
-    if (!term) {
-      return this.ventas();
+    return this.ventas();
+  });
+
+  // CORRECCIÓN: Obtener nombre del cliente igual que en otros componentes
+  getClienteNombre(venta: VentaDto): string {
+    const cliente = venta.cliente;
+    if (!cliente) return 'Cliente N/A';
+
+    // Si tiene persona con nombre y apellido
+    if (cliente.persona?.nombre) {
+      const nombreCompleto = cliente.persona.nombre
+        ? `${cliente.persona.nombre} ${cliente.persona.apellido || ''}`.trim()
+        : 'Cliente sin nombre';
+      return nombreCompleto;
     }
 
-    return this.ventas().filter(
-      (v) =>
-        (v.cliente?.nombre || '').toLowerCase().includes(term) ||
-        v.metodo_pago.toLowerCase().includes(term) ||
-        v.estado.toLowerCase().includes(term) ||
-        v.id_venta?.toString().includes(term)
-    );
-  });
+    // Si tiene nombre directo (sin 'persona')
+    if (cliente.nombre) {
+      return cliente.nombre;
+    }
+
+    // Fallback
+    return 'Cliente ' + (venta.id_cliente || 'N/A');
+  }
 
   getEstadoClass(estado: string): string {
     const classes: { [key: string]: string } = {
@@ -140,12 +192,10 @@ export class VentaComponent {
     return classes[estado] || classes['pendiente'];
   }
 
-  // Nuevo método para colores de métodos de pago
   getMetodoPagoClass(metodoPago: string): string {
     const classes: { [key: string]: string } = {
       efectivo: 'px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700',
-      tarjeta: 'px-3 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-700',
-      transferencia: 'px-3 py-1 rounded-full text-xs font-bold bg-purple-100 text-purple-700',
+      transferencia: 'px-3 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-700',
       credito: 'px-3 py-1 rounded-full text-xs font-bold bg-orange-100 text-orange-700',
     };
     return (
@@ -165,52 +215,61 @@ export class VentaComponent {
     });
   }
 
+  // CORRECCIÓN PRINCIPAL: Calcular total correctamente (subtotal - descuento)
+  calcularTotalCorrecto(venta: VentaDto): number {
+    const subtotal = Number(venta.subtotal) || 0;
+    const descuento = Number(venta.descuento) || 0;
+    return Math.max(0, subtotal - descuento);
+  }
+
+  // CORRECCIÓN: Obtener el total a mostrar (SIEMPRE usar el calculado)
+  getTotalAMostrar(venta: VentaDto): number {
+    return this.calcularTotalCorrecto(venta);
+  }
+
+  // CORRECCIÓN: Calcular saldo pendiente correctamente
+  getSaldoPendiente(venta: VentaDto): number {
+    if (!venta.planPago || !venta.planPago.pagos) return 0;
+
+    const totalVenta = this.getTotalAMostrar(venta);
+    const totalPagado = venta.planPago.pagos.reduce(
+      (sum: number, pago: any) => sum + Number(pago.monto),
+      0
+    );
+
+    return Math.max(0, totalVenta - totalPagado);
+  }
+
   // Redirigir a la vista de creación
   createVenta() {
     this.router.navigate(['/ventas/crear']);
   }
 
-  // MODIFICADO: Redirigir a la vista de edición
+  // Redirigir a la vista de edición
   edit(venta: VentaDto) {
     this.router.navigate(['/ventas/editar', venta.id_venta]);
   }
 
-  // Cerrar modal de edición (ya no se usa pero lo dejo por si acaso)
-  cerrarModalEditar() {
-    this.mostrarModalEditar.set(false);
-    this.ventaSeleccionada.set(null);
-  }
-
-  // Guardar cambios del modal (ya no se usa pero lo dejo por si acaso)
-  guardarCambios(ventaActualizada: VentaDto) {
-    // Esta función ya no se usa ya que la edición se hace en otro componente
-    this.ventaService.update(ventaActualizada.id_venta!, ventaActualizada).subscribe({
-      next: () => {
-        this._notificationService.showSuccess('Venta actualizada correctamente');
-        this.cerrarModalEditar();
-        this.loadVentas(); // Recargar la lista
-      },
-      error: (error) => {
-        this._notificationService.showError('Error al actualizar la venta');
-        console.error('Error updating venta:', error);
-      },
-    });
-  }
-
   delete(venta: VentaDto) {
     this._notificationService
-      .confirmDelete(`Se eliminará la venta #${venta.id_venta}`)
+      .confirmDelete(`¿Está seguro de eliminar la venta #${venta.id_venta}?`)
       .then((result) => {
         if (result.isConfirmed) {
-          this.ventaService.delete(venta.id_venta!).subscribe(() => {
-            this._notificationService.showSuccess('Eliminado correctamente');
-            this.loadVentas();
+          this.ventaService.delete(venta.id_venta!).subscribe({
+            next: () => {
+              this._notificationService.showSuccess('Venta eliminada correctamente');
+              this.loadVentas();
+            },
+            error: (error) => {
+              console.error('Error deleting venta:', error);
+              this._notificationService.showError('Error al eliminar la venta');
+            },
           });
         }
       });
   }
 
-  // Paginación - SOLO se ordena cuando el usuario hace clic
+  // Métodos de ordenamiento y paginación
   sort(column: keyof VentaDto) {
     if (this.sortColumn() === column) {
       this.sortDirection.set(this.sortDirection() === 'asc' ? 'desc' : 'asc');
@@ -218,32 +277,47 @@ export class VentaComponent {
       this.sortColumn.set(column);
       this.sortDirection.set('desc');
     }
-    this.loadVentas(); // Recargar con el nuevo ordenamiento
+    this.applyFilterAndSort();
+  }
+
+  onSearchChange() {
+    this.currentPage.set(1);
+    this.applyFilterAndSort();
   }
 
   nextPage() {
     if (this.currentPage() < this.totalPages()) {
       this.currentPage.update((v) => v + 1);
-      this.loadVentas();
+      this.applyFilterAndSort();
     }
   }
 
   prevPage() {
     if (this.currentPage() > 1) {
       this.currentPage.update((v) => v - 1);
-      this.loadVentas();
+      this.applyFilterAndSort();
     }
   }
 
   goToPage(page: number) {
     if (page >= 1 && page <= this.totalPages()) {
       this.currentPage.set(page);
-      this.loadVentas();
+      this.applyFilterAndSort();
     }
   }
 
   totalPages() {
-    return Math.ceil(this.total() / this.pageSize());
+    const filteredLength = this.searchTerm()
+      ? this.allVentas().filter(
+          (v) =>
+            this.getClienteNombre(v).toLowerCase().includes(this.searchTerm().toLowerCase()) ||
+            v.metodo_pago.toLowerCase().includes(this.searchTerm().toLowerCase()) ||
+            v.estado.toLowerCase().includes(this.searchTerm().toLowerCase()) ||
+            v.id_venta?.toString().includes(this.searchTerm())
+        ).length
+      : this.allVentas().length;
+
+    return Math.ceil(filteredLength / this.pageSize());
   }
 
   pageArray(): number[] {
@@ -255,7 +329,30 @@ export class VentaComponent {
   }
 
   rangeEnd(): number {
+    const filteredLength = this.searchTerm()
+      ? this.allVentas().filter(
+          (v) =>
+            this.getClienteNombre(v).toLowerCase().includes(this.searchTerm().toLowerCase()) ||
+            v.metodo_pago.toLowerCase().includes(this.searchTerm().toLowerCase()) ||
+            v.estado.toLowerCase().includes(this.searchTerm().toLowerCase()) ||
+            v.id_venta?.toString().includes(this.searchTerm())
+        ).length
+      : this.allVentas().length;
+
     const end = this.currentPage() * this.pageSize();
-    return end > this.total() ? this.total() : end;
+    return end > filteredLength ? filteredLength : end;
+  }
+
+  getTotalFiltered(): number {
+    if (this.searchTerm()) {
+      return this.allVentas().filter(
+        (v) =>
+          this.getClienteNombre(v).toLowerCase().includes(this.searchTerm().toLowerCase()) ||
+          v.metodo_pago.toLowerCase().includes(this.searchTerm().toLowerCase()) ||
+          v.estado.toLowerCase().includes(this.searchTerm().toLowerCase()) ||
+          v.id_venta?.toString().includes(this.searchTerm())
+      ).length;
+    }
+    return this.allVentas().length;
   }
 }

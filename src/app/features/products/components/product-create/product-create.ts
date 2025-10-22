@@ -26,12 +26,10 @@ export class ProductCreate {
 
   crearFormularioProducto(): FormGroup {
     return this.fb.group({
-      nombre: ['', [Validators.required, Validators.minLength(2)]],
-      peso: [0, [Validators.required, Validators.min(0)]],
-      precio: [0, [Validators.required, Validators.min(0.01)]], // Cambiado de precio_base a precio
+      peso: [0, [Validators.required, Validators.min(0.01)]],
       estado: [true],
-      observacion: [''], // Nuevo campo
-      fecha_llegada: [new Date().toISOString().split('T')[0], Validators.required], // Nuevo campo
+      observacion: [''],
+      fecha_llegada: [new Date().toISOString().split('T')[0], Validators.required],
     });
   }
 
@@ -47,7 +45,6 @@ export class ProductCreate {
     const productData = {
       ...this.productForm.value,
       peso: Number(this.productForm.value.peso),
-      precio: Number(this.productForm.value.precio), // Cambiado de precio_base a precio
       fecha_llegada: new Date(this.productForm.value.fecha_llegada),
     };
 
