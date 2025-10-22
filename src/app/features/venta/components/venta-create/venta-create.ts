@@ -18,14 +18,18 @@ import {
   faSyncAlt,
   faCalendarCheck,
   faStickyNote,
+  faUser,
+  faBox,
+  faWeightHanging,
+  faDollarSign,
+  faCalendarAlt,
+  faPercent,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 import { NotificationService } from '../../../../core/services/notification.service';
 import { VentaService } from '../../services/venta.service';
 
-import { UserDto } from '../../../../core/interfaces/user.interface';
-import { ProductDto } from '../../../../core/interfaces/product.interface';
 import { AuthService } from '../../../../components/services/auth.service';
 import { ClientService } from '../../../clientes/services/cliente.service';
 import { ProductService } from '../../../products/services/product.service';
@@ -33,20 +37,25 @@ import { ProductService } from '../../../products/services/product.service';
 // Interfaces locales
 interface ClienteOption {
   id_cliente: number;
+  personaId: number;
   nombre: string;
+  apellido?: string;
+  nombreCompleto: string;
+  nit_ci: string;
+  telefono: string;
 }
 
 interface UsuarioOption {
-  id_usuario: number;
-  nombre: string;
+  id: number;
+  fullName: string;
 }
 
 interface ProductoOption {
   id_producto: number;
-  nombre: string;
-  precio: number; // CAMBIADO: precio_venta -> precio
+  codigo: string;
   peso: number;
-  codigo: string; // NUEVO: código del producto
+  estado: boolean;
+  peso_disponible: number;
 }
 
 @Component({
@@ -70,6 +79,12 @@ export class VentaCreateComponent {
   faSyncAlt = faSyncAlt;
   faCalendarCheck = faCalendarCheck;
   faStickyNote = faStickyNote;
+  faUser = faUser;
+  faBox = faBox;
+  faWeightHanging = faWeightHanging;
+  faDollarSign = faDollarSign;
+  faCalendarAlt = faCalendarAlt;
+  faPercent = faPercent;
 
   // Services
   private _notificationService = inject(NotificationService);
@@ -108,11 +123,11 @@ export class VentaCreateComponent {
       metodo_pago: ['efectivo', Validators.required],
       estado: ['pendiente', Validators.required],
       observaciones: [''],
-      // Campos para plan de pago
-      monto_inicial: [0],
-      plazo: [''],
-      periodicidad: ['DIAS'],
-      fecha_inicio: [''],
+      // Campos para plan de pago - PARA TODOS LOS MÉTODOS
+      monto_inicial: [0, [Validators.required, Validators.min(0)]],
+      plazo: [30, [Validators.required, Validators.min(1)]], // Plazo manual
+      periodicidad: ['DIAS', Validators.required], // Select de periodicidad
+      fecha_inicio: ['', Validators.required], // Fecha editable
       detalles: this._fb.array([]),
     });
 
@@ -127,14 +142,11 @@ export class VentaCreateComponent {
 
   private loadUsuarioActual() {
     try {
-      console.log('Buscando usuario autenticado...');
-
       let usuario: any = null;
 
       // Método 1: Intentar con el AuthService
       if (this._authService && typeof this._authService.getCurrentUser === 'function') {
         usuario = this._authService.getCurrentUser();
-        console.log('Usuario del AuthService:', usuario);
       }
 
       // Método 2: Buscar en localStorage
@@ -145,7 +157,6 @@ export class VentaCreateComponent {
           if (storedUser) {
             try {
               usuario = JSON.parse(storedUser);
-              console.log(`Usuario encontrado en localStorage con key: ${key}`, usuario);
               break;
             } catch (e) {
               console.warn(`Error parseando usuario de ${key}:`, e);
@@ -154,58 +165,28 @@ export class VentaCreateComponent {
         }
       }
 
-      // Método 3: Buscar en sessionStorage
-      if (!usuario) {
-        const possibleKeys = ['currentUser', 'user', 'usuario', 'auth-user', 'userData'];
-        for (const key of possibleKeys) {
-          const storedUser = sessionStorage.getItem(key);
-          if (storedUser) {
-            try {
-              usuario = JSON.parse(storedUser);
-              console.log(`Usuario encontrado en sessionStorage con key: ${key}`, usuario);
-              break;
-            } catch (e) {
-              console.warn(`Error parseando usuario de sessionStorage ${key}:`, e);
-            }
-          }
-        }
-      }
-
       // Configurar usuario encontrado
       if (usuario) {
         const usuarioOption: UsuarioOption = {
-          id_usuario: usuario.id || usuario.id_usuario || usuario.userId || usuario.idUsuario || 1,
-          nombre:
-            usuario.nombre ||
-            usuario.fullName ||
-            usuario.username ||
-            usuario.nombreUsuario ||
-            'Usuario Sistema',
+          id: usuario.id || 1,
+          fullName: usuario.fullName || usuario.nombre || 'Usuario Sistema',
         };
 
         this.usuarioActual.set(usuarioOption);
-        console.log('Usuario configurado:', usuarioOption);
       } else {
         // Usuario por defecto para desarrollo
-        console.warn(
-          'No se encontró usuario autenticado, usando usuario por defecto para desarrollo'
-        );
         const usuarioDefault: UsuarioOption = {
-          id_usuario: 1,
-          nombre: 'Usuario Sistema (Desarrollo)',
+          id: 1,
+          fullName: 'Usuario Sistema (Desarrollo)',
         };
-
         this.usuarioActual.set(usuarioDefault);
       }
     } catch (error) {
       console.error('Error en loadUsuarioActual:', error);
-
-      // Fallback final
       const usuarioDefault: UsuarioOption = {
-        id_usuario: 1,
-        nombre: 'Usuario Sistema',
+        id: 1,
+        fullName: 'Usuario Sistema',
       };
-
       this.usuarioActual.set(usuarioDefault);
     }
   }
@@ -213,14 +194,25 @@ export class VentaCreateComponent {
   private loadDatos() {
     // Cargar clientes
     this._clienteService.getAll().subscribe({
-      next: (clientes: ClientDto[]) => {
-        const clientesOptions: ClienteOption[] = clientes.map((cliente) => ({
-          id_cliente: cliente.id_cliente || 0,
-          nombre: cliente.persona.nombre || 'Cliente sin nombre',
-        }));
+      next: (clientes: any[]) => {
+        const clientesOptions: ClienteOption[] = clientes.map((cliente) => {
+          const persona = cliente.persona || {};
+          const nombreCompleto = persona.nombre
+            ? `${persona.nombre} ${persona.apellido || ''}`.trim()
+            : 'Cliente sin nombre';
+
+          return {
+            id_cliente: cliente.id_cliente || 0,
+            personaId: persona.id || 0,
+            nombre: persona.nombre || 'Cliente sin nombre',
+            apellido: persona.apellido || '',
+            nombreCompleto: nombreCompleto,
+            nit_ci: persona.nit_ci || '',
+            telefono: persona.telefono || '',
+          };
+        });
         this.clientes.set(clientesOptions);
         this.clientesFiltrados.set(clientesOptions);
-        console.log(`${clientesOptions.length} clientes cargados`);
       },
       error: (error) => {
         console.error('Error loading clientes:', error);
@@ -230,19 +222,18 @@ export class VentaCreateComponent {
 
     // Cargar productos EXISTENTES
     this._productoService.getAll().subscribe({
-      next: (productos: ProductDto[]) => {
+      next: (productos: any[]) => {
         const productosOptions: ProductoOption[] = productos
           .filter((producto) => producto.estado)
           .map((producto) => ({
             id_producto: producto.id_producto || 0,
-            nombre: producto.nombre || 'Producto sin nombre',
-            precio: producto.precio || 0, // CAMBIADO: precio_base -> precio
+            codigo: producto.codigo || '',
             peso: producto.peso || 0,
-            codigo: producto.codigo || '', // NUEVO: código del producto
+            estado: producto.estado || false,
+            peso_disponible: producto.peso || 0,
           }));
         this.productos.set(productosOptions);
         this.productosFiltrados.set(productosOptions);
-        console.log(`${productosOptions.length} productos existentes cargados para la venta`);
       },
       error: (error) => {
         console.error('Error loading productos:', error);
@@ -254,26 +245,27 @@ export class VentaCreateComponent {
   // Métodos para el plan de pago
   onMetodoPagoChange() {
     const metodoPago = this.form.get('metodo_pago')?.value;
-    if (metodoPago === 'credito') {
-      this.form.get('plazo')?.setValidators([Validators.required, Validators.min(1)]);
-      this.form.get('fecha_inicio')?.setValidators([Validators.required]);
-      this.form.get('periodicidad')?.setValidators([Validators.required]);
 
-      const fechaVenta = this.form.get('fecha_venta')?.value;
-      if (fechaVenta) {
-        const fechaVentaDate = new Date(fechaVenta);
-        this.form.patchValue({
-          fecha_inicio: fechaVentaDate.toISOString().split('T')[0],
-        });
-      }
-    } else {
-      this.form.get('plazo')?.clearValidators();
-      this.form.get('fecha_inicio')?.clearValidators();
-      this.form.get('periodicidad')?.clearValidators();
+    // NO ajustar automáticamente el monto inicial - el usuario lo ingresa manualmente
+    // Solo mantener la fecha actual como sugerencia
+    const fechaVenta = this.form.get('fecha_venta')?.value;
+    if (fechaVenta && !this.form.get('fecha_inicio')?.value) {
+      const fechaVentaDate = new Date(fechaVenta);
+      this.form.patchValue({
+        fecha_inicio: fechaVentaDate.toISOString().split('T')[0],
+      });
     }
-    this.form.get('plazo')?.updateValueAndValidity();
-    this.form.get('fecha_inicio')?.updateValueAndValidity();
-    this.form.get('periodicidad')?.updateValueAndValidity();
+  }
+
+  // Cuando cambia la fecha de inicio, recalcular vencimiento
+  onFechaInicioChange() {
+    // Recalcular automáticamente la fecha de vencimiento
+    this.calcularFechaVencimiento();
+  }
+
+  // Cuando cambia el plazo o periodicidad, recalcular vencimiento
+  onPlazoChange() {
+    this.calcularFechaVencimiento();
   }
 
   calcularFechaVencimiento(): string {
@@ -306,10 +298,6 @@ export class VentaCreateComponent {
     const total = this.form.get('total')?.value || 0;
     const montoInicial = this.form.get('monto_inicial')?.value || 0;
     return Math.max(0, total - montoInicial);
-  }
-
-  calcularSaldoPendiente(): number {
-    return this.calcularTotalFinanciar();
   }
 
   getPeriodicidadTexto(): string {
@@ -346,7 +334,10 @@ export class VentaCreateComponent {
 
     const filtrados = this.clientes().filter(
       (cliente) =>
+        cliente.nombreCompleto.toLowerCase().includes(termino) ||
         cliente.nombre.toLowerCase().includes(termino) ||
+        cliente.nit_ci.includes(termino) ||
+        cliente.telefono.includes(termino) ||
         cliente.id_cliente.toString().includes(termino)
     );
     this.clientesFiltrados.set(filtrados);
@@ -380,8 +371,7 @@ export class VentaCreateComponent {
 
     const filtrados = this.productos().filter(
       (producto) =>
-        producto.nombre.toLowerCase().includes(termino) ||
-        producto.codigo.toLowerCase().includes(termino) || // NUEVO: buscar por código
+        producto.codigo.toLowerCase().includes(termino) ||
         producto.id_producto.toString().includes(termino)
     );
     this.productosFiltrados.set(filtrados);
@@ -392,23 +382,38 @@ export class VentaCreateComponent {
     if (index !== null) {
       const detalle = this.detalles.at(index);
       detalle.patchValue({
-        id_producto: producto.id_producto,
-        precio_unitario: producto.precio, // CAMBIADO: precio_venta -> precio
+        productoId: producto.id_producto,
+        producto_codigo: producto.codigo,
+        // NO establecer nombre_producto automáticamente - el usuario lo ingresa manualmente
+        precio_por_kilo: 0,
       });
-      this.calcularSubtotalDetalle(index);
+
+      // Actualizar validación de stock
+      this.validarPeso(index);
     }
     this.cerrarBuscadorProductos();
   }
 
-  getProductoSeleccionadoNombre(index: number): string {
+  getProductoSeleccionadoCodigo(index: number): string {
     const detalle = this.detalles.at(index);
-    const idProducto = detalle.get('id_producto')?.value;
+    const idProducto = detalle.get('productoId')?.value;
 
     if (idProducto) {
       const producto = this.productos().find((p) => p.id_producto === parseInt(idProducto));
-      return producto ? producto.nombre : '';
+      return producto ? producto.codigo : '';
     }
     return '';
+  }
+
+  getPesoDisponibleProducto(index: number): number {
+    const detalle = this.detalles.at(index);
+    const idProducto = detalle.get('productoId')?.value;
+
+    if (idProducto) {
+      const producto = this.productos().find((p) => p.id_producto === parseInt(idProducto));
+      return producto ? producto.peso_disponible : 0;
+    }
+    return 0;
   }
 
   // Getter para el FormArray de detalles
@@ -416,32 +421,77 @@ export class VentaCreateComponent {
     return this.form.get('detalles') as FormArray;
   }
 
-  // Calcular subtotal total de todos los productos
+  // Calcular subtotal de un detalle - CORREGIDO
+  calcularSubtotalDetalle(index: number) {
+    if (index < 0 || index >= this.detalles.length) return;
+
+    const detalle = this.detalles.at(index);
+    const precioPorKilo = Number(detalle.get('precio_por_kilo')?.value) || 0;
+    const pesoOriginal = Number(detalle.get('peso_original')?.value) || 0;
+    const descuentoPeso = Number(detalle.get('descuento_peso')?.value) || 0;
+
+    // Cálculo según backend: peso_final = peso_original - descuento_peso
+    const pesoFinal = Math.max(0, pesoOriginal - descuentoPeso);
+
+    // Cálculo según backend: subtotal = precio_por_kilo * peso_final
+    const subtotal = precioPorKilo * pesoFinal;
+
+    detalle.patchValue(
+      {
+        peso_final: pesoFinal,
+        subtotal: subtotal,
+      },
+      { emitEvent: false }
+    );
+
+    this.actualizarTotales();
+  }
+
+  // Calcular descuento en dinero - CORREGIDO
+  calcularDescuentoEnDinero(): number {
+    let descuentoTotal = 0;
+    for (let i = 0; i < this.detalles.length; i++) {
+      const detalle = this.detalles.at(i);
+      const precioPorKilo = Number(detalle.get('precio_por_kilo')?.value) || 0;
+      const descuentoPeso = Number(detalle.get('descuento_peso')?.value) || 0;
+
+      // Cálculo según backend: descuento_monetario = precio_por_kilo * descuento_peso
+      descuentoTotal += precioPorKilo * descuentoPeso;
+    }
+    return descuentoTotal;
+  }
+
+  // Calcular subtotal total de todos los productos - CORREGIDO
   calcularSubtotalTotal(): number {
     let total = 0;
     for (let i = 0; i < this.detalles.length; i++) {
       const detalle = this.detalles.at(i);
-      const cantidad = Number(detalle.get('cantidad')?.value) || 0;
-      const precioUnitario = Number(detalle.get('precio_unitario')?.value) || 0;
-      total += cantidad * precioUnitario;
+      const subtotal = Number(detalle.get('subtotal')?.value) || 0;
+      total += subtotal;
     }
     return total;
   }
 
-  // Calcular total general
+  // Calcular total general - CORREGIDO
   calcularTotalGeneral(): number {
     const subtotal = this.calcularSubtotalTotal();
-    const descuento = Number(this.form.get('descuento')?.value) || 0;
+    const descuento = this.calcularDescuentoEnDinero();
+
+    // CORRECCIÓN: El total SÍ debe ser subtotal - descuento
     return Math.max(0, subtotal - descuento);
   }
 
   // Agregar detalle
   agregarDetalle() {
     const detalleForm = this._fb.group({
-      id_producto: ['', Validators.required],
-      cantidad: [1, [Validators.required, Validators.min(0.01)]],
-      precio_unitario: [0, [Validators.required, Validators.min(0)]],
-      subtotal: [0, [Validators.required, Validators.min(0)]],
+      productoId: [''],
+      producto_codigo: ['', Validators.required],
+      nombre_producto: ['', Validators.required],
+      precio_por_kilo: [0, [Validators.required, Validators.min(0)]],
+      peso_original: [0, [Validators.required, Validators.min(0.01)]],
+      descuento_peso: [0, [Validators.required, Validators.min(0)]],
+      peso_final: [0],
+      subtotal: [0],
     });
 
     this.detalles.push(detalleForm);
@@ -456,16 +506,16 @@ export class VentaCreateComponent {
   // Validar peso disponible
   validarPeso(index: number): boolean {
     const detalle = this.detalles.at(index);
-    const idProducto = detalle.get('id_producto')?.value;
-    const cantidad = detalle.get('cantidad')?.value || 0;
+    const idProducto = detalle.get('productoId')?.value;
+    const pesoOriginal = detalle.get('peso_original')?.value || 0;
 
     if (idProducto) {
       const producto = this.productos().find((p) => p.id_producto === parseInt(idProducto));
-      if (producto && cantidad > producto.peso) {
+      if (producto && pesoOriginal > producto.peso_disponible) {
         this._notificationService.showError(
-          `Stock insuficiente. Solo hay ${producto.peso} unidades disponibles.`
+          `Stock insuficiente. Solo hay ${producto.peso_disponible} kg disponibles.`
         );
-        detalle.patchValue({ cantidad: producto.peso });
+        detalle.patchValue({ peso_original: producto.peso_disponible });
         this.calcularSubtotalDetalle(index);
         return false;
       }
@@ -473,28 +523,25 @@ export class VentaCreateComponent {
     return true;
   }
 
-  // Calcular subtotal de un detalle
-  calcularSubtotalDetalle(index: number) {
-    if (index < 0 || index >= this.detalles.length) return;
-
-    const detalle = this.detalles.at(index);
-    const cantidad = Number(detalle.get('cantidad')?.value) || 0;
-    const precioUnitario = Number(detalle.get('precio_unitario')?.value) || 0;
-    const subtotal = cantidad * precioUnitario;
-
-    detalle.patchValue({ subtotal: subtotal }, { emitEvent: false });
-    this.actualizarTotales();
-  }
-
-  // Actualizar totales
+  // Actualizar totales - CORREGIDO
   actualizarTotales() {
     const subtotal = this.calcularSubtotalTotal();
+    const descuento = this.calcularDescuentoEnDinero();
     const total = this.calcularTotalGeneral();
 
     this.form.patchValue({
       subtotal: subtotal,
+      descuento: descuento,
       total: total,
     });
+
+    // NO ajustar automáticamente el monto inicial - el usuario lo ingresa manualmente
+    // Solo validar que no sea mayor al total
+    const montoInicial = this.form.get('monto_inicial')?.value || 0;
+    if (montoInicial > total) {
+      // Mostrar advertencia pero no ajustar automáticamente
+      console.warn('Monto inicial mayor al total, pero se mantiene para que el usuario lo corrija');
+    }
   }
 
   onDescuentoChange() {
@@ -506,6 +553,7 @@ export class VentaCreateComponent {
     const formattedDate = now.toISOString().slice(0, 16);
     this.form.patchValue({
       fecha_venta: formattedDate,
+      fecha_inicio: now.toISOString().split('T')[0], // Fecha actual como sugerencia
     });
   }
 
@@ -520,18 +568,20 @@ export class VentaCreateComponent {
 
       if (detalle.invalid) {
         detallesValidos = false;
-        const idProducto = detalle.get('id_producto')?.value;
-        if (!idProducto) {
-          this._notificationService.showError(`Seleccione un producto para la línea ${i + 1}`);
+        const producto_codigo = detalle.get('producto_codigo')?.value;
+        const nombre_producto = detalle.get('nombre_producto')?.value;
+        if (!producto_codigo || !nombre_producto) {
+          this._notificationService.showError(`Complete todos los campos para la línea ${i + 1}`);
           return;
         }
       }
-    }
 
-    if (this.form.get('metodo_pago')?.value === 'credito') {
-      if (!this.form.get('plazo')?.value || !this.form.get('fecha_inicio')?.value) {
+      // Validar que el descuento no sea mayor al peso original
+      const pesoOriginal = detalle.get('peso_original')?.value || 0;
+      const descuentoPeso = detalle.get('descuento_peso')?.value || 0;
+      if (descuentoPeso > pesoOriginal) {
         this._notificationService.showError(
-          'Para ventas a crédito, complete todos los campos del plan de pago'
+          `El descuento en peso no puede ser mayor al peso original en la línea ${i + 1}`
         );
         return;
       }
@@ -562,40 +612,43 @@ export class VentaCreateComponent {
       }
     }
 
+    // Validar que el monto inicial no sea mayor al total
+    const montoInicial = this.form.get('monto_inicial')?.value || 0;
+    const total = this.form.get('total')?.value || 0;
+    if (montoInicial > total) {
+      this._notificationService.showError(
+        `El monto inicial (Bs. ${montoInicial}) no puede ser mayor al total de la venta (Bs. ${total})`
+      );
+      return;
+    }
+
     this.isLoading.set(true);
 
     const formData = this.form.value;
 
-    const fechaVentaFormateada =
-      formData.fecha_venta.length === 16 ? formData.fecha_venta + ':00' : formData.fecha_venta;
-
-    // Preparar datos de la venta - SOLO se referencian productos existentes
+    // Preparar datos de la venta según el backend corregido
     const ventaData: any = {
       id_cliente: parseInt(formData.id_cliente),
-      id_usuario: this.usuarioActual()!.id_usuario, // Se agrega automáticamente
-      fecha_venta: fechaVentaFormateada,
-      subtotal: parseFloat(formData.subtotal) || 0,
-      descuento: parseFloat(formData.descuento) || 0,
-      total: parseFloat(formData.total) || 0,
+      id_usuario: this.usuarioActual()!.id,
+      fecha_venta: formData.fecha_venta,
       metodo_pago: formData.metodo_pago,
       estado: formData.estado,
       observaciones: formData.observaciones || '',
-      detalles: formData.detalles.map((detalle: any) => ({
-        productoId: parseInt(detalle.id_producto), // Solo se pasa el ID del producto existente
-        cantidad: parseFloat(detalle.cantidad),
-        precioUnitario: parseFloat(detalle.precio_unitario),
+      productos: formData.detalles.map((detalle: any) => ({
+        productoId: detalle.productoId ? parseInt(detalle.productoId) : undefined,
+        producto_codigo: detalle.producto_codigo,
+        nombre_producto: detalle.nombre_producto,
+        precio_por_kilo: parseFloat(detalle.precio_por_kilo),
+        peso_original: parseFloat(detalle.peso_original),
+        descuento_peso: parseFloat(detalle.descuento_peso),
       })),
-    };
-
-    // Agregar plan de pago si es crédito
-    if (formData.metodo_pago === 'credito') {
-      ventaData.plan_pago = {
+      plan_pago: {
         monto_inicial: parseFloat(formData.monto_inicial) || 0,
         plazo: parseInt(formData.plazo),
         periodicidad: formData.periodicidad,
-        fecha_inicio: formData.fecha_inicio + 'T00:00:00',
-      };
-    }
+        fecha_inicio: formData.fecha_inicio,
+      },
+    };
 
     console.log('Datos a enviar al backend:', ventaData);
 

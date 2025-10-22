@@ -1,3 +1,4 @@
+<!-- venta-detalle.html -->
 <div class="min-h-screen bg-gradient-to-br from-red-50 via-white to-red-50 py-4 px-2 sm:px-4 lg:px-8">
     <div class="max-w-8xl mx-auto">
         <!-- Breadcrumb -->
@@ -27,7 +28,7 @@
                     <span class="mx-2 text-gray-400">/</span>
                     <span class="inline-flex items-center text-gray-700 gap-2">
                         <fa-icon [icon]="faReceipt" class="text-sm"></fa-icon>
-                        Venta #{{ venta()?.id_venta }}
+                        Venta #{{ getVentaId() }}
                     </span>
                 </li>
                 }
@@ -35,7 +36,7 @@
         </nav>
 
         <!-- Loading State -->
-        @if ( loading() ) {
+        @if (loading()) {
         <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 text-center">
             <div class="flex flex-col items-center gap-3">
                 <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-[#ff7676]"></div>
@@ -46,28 +47,32 @@
         }
 
         <!-- Venta Details -->
-        @if(!loading() && venta()){
+        @if (!loading() && venta()) {
         <div class="bg-white rounded-b-2xl shadow-xl overflow-hidden">
             <!-- Header -->
             <div class="bg-[#ff7676] rounded-t-2xl shadow-lg p-4 sm:p-6">
                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div class="flex items-center gap-3">
-                        <svg class="w-8 h-8 sm:w-10 sm:h-10 text-white" fill="none" stroke="currentColor"
-                            viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                        </svg>
+                        <fa-icon [icon]="faReceipt" class="w-8 h-8 sm:w-10 sm:h-10 text-white"></fa-icon>
                         <div>
-                            <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold text-white">Detalle de Venta</h1>
-                            <p class="text-red-100 text-xs sm:text-sm mt-1">
-                                Cliente: {{ venta()?.cliente?.nombre || 'Cliente ' + venta()?.id_cliente }}
+                            <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold text-white">Detalle de Venta #{{
+                                getVentaId() }}</h1>
+                            <p class="text-red-100 text-xs sm:text-sm mt-1 flex items-center gap-1">
+                                <fa-icon [icon]="faUser" class="text-xs"></fa-icon>
+                                Cliente: {{ getClienteNombre() }}
                             </p>
                         </div>
                     </div>
-                    <span [class]="getEstadoClass(venta()?.estado)"
-                        class="px-4 py-2 rounded-full text-sm font-medium capitalize shadow-md">
-                        {{ venta()?.estado || 'N/A' }}
-                    </span>
+                    <div class="flex flex-col sm:flex-row items-center gap-3">
+                        <span [class]="getEstadoClass(getEstado())"
+                            class="px-4 py-2 rounded-full text-sm font-medium capitalize shadow-md">
+                            {{ getEstado() }}
+                        </span>
+                        <span
+                            class="px-4 py-2 bg-white text-[#ff7676] rounded-full text-sm font-medium capitalize shadow-md">
+                            {{ getMetodoPago() }}
+                        </span>
+                    </div>
                 </div>
             </div>
 
@@ -77,61 +82,67 @@
                 <div class="mb-8">
                     <h2
                         class="text-lg sm:text-xl font-semibold text-black mb-4 flex items-center gap-2 border-b-2 border-red-200 pb-2">
-                        <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd"
-                                d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z"
-                                clip-rule="evenodd" />
-                        </svg>
+                        <fa-icon [icon]="faList" class="w-5 h-5 sm:w-6 sm:h-6"></fa-icon>
                         Información Principal
                     </h2>
                     <div class="to-white border-2 border-red-200 rounded-xl p-4 sm:p-6">
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             <!-- ID Venta -->
-                            <div class="bg-white rounded-lg p-4 shadow">
-                                <p class="text-xs sm:text-sm text-gray-600 mb-1">N° Venta</p>
-                                <p class="text-lg sm:text-xl font-bold text-blue-700">#{{ venta()?.id_venta }}</p>
-                            </div>
-
-                            <!-- ID Cliente -->
-                            <div class="bg-white rounded-lg p-4 shadow">
-                                <p class="text-xs sm:text-sm text-gray-600 mb-1">ID Cliente</p>
-                                <p class="text-lg sm:text-xl font-bold text-purple-700">{{ venta()?.id_cliente || 'N/A'
-                                    }}</p>
+                            <div class="bg-white rounded-lg p-4 shadow border border-gray-200">
+                                <p class="text-xs sm:text-sm text-gray-600 mb-1 flex items-center gap-1">
+                                    <fa-icon [icon]="faReceipt" class="text-xs text-blue-600"></fa-icon>
+                                    N° Venta
+                                </p>
+                                <p class="text-lg sm:text-xl font-bold text-blue-700">#{{ getVentaId() }}</p>
                             </div>
 
                             <!-- Cliente -->
-                            <div class="bg-white rounded-lg p-4 shadow">
-                                <p class="text-xs sm:text-sm text-gray-600 mb-1">Cliente</p>
-                                <p class="text-lg sm:text-xl font-bold text-green-700">{{ venta()?.cliente?.nombre ||
-                                    'N/A' }}</p>
-                            </div>
-
-                            <!-- ID Usuario -->
-                            <div class="bg-white rounded-lg p-4 shadow">
-                                <p class="text-xs sm:text-sm text-gray-600 mb-1">ID Usuario</p>
-                                <p class="text-lg sm:text-xl font-bold text-orange-700">{{ venta()?.id_usuario || 'N/A'
-                                    }}</p>
+                            <div class="bg-white rounded-lg p-4 shadow border border-gray-200">
+                                <p class="text-xs sm:text-sm text-gray-600 mb-1 flex items-center gap-1">
+                                    <fa-icon [icon]="faUser" class="text-xs text-green-600"></fa-icon>
+                                    Cliente
+                                </p>
+                                <p class="text-lg sm:text-xl font-bold text-green-700">{{ getClienteNombre() }}</p>
+                                <p class="text-xs text-gray-500 mt-1">ID: {{ getIdCliente() }}</p>
                             </div>
 
                             <!-- Fecha Venta -->
-                            <div class="bg-white rounded-lg p-4 shadow">
-                                <p class="text-xs sm:text-sm text-gray-600 mb-1">Fecha de Venta</p>
-                                <p class="text-lg sm:text-xl font-bold text-red-700">{{ formatDate(venta()?.fecha_venta)
-                                    }}</p>
+                            <div class="bg-white rounded-lg p-4 shadow border border-gray-200">
+                                <p class="text-xs sm:text-sm text-gray-600 mb-1 flex items-center gap-1">
+                                    <fa-icon [icon]="faCalendarAlt" class="text-xs text-red-600"></fa-icon>
+                                    Fecha de Venta
+                                </p>
+                                <p class="text-lg sm:text-xl font-bold text-red-700">{{ formatDate(getFechaVenta()) }}
+                                </p>
                             </div>
 
                             <!-- Método de Pago -->
-                            <div class="bg-white rounded-lg p-4 shadow">
-                                <p class="text-xs sm:text-sm text-gray-600 mb-1">Método de Pago</p>
-                                <p class="text-lg sm:text-xl font-bold text-purple-700 capitalize">{{
-                                    venta()?.metodo_pago || 'N/A' }}</p>
+                            <div class="bg-white rounded-lg p-4 shadow border border-gray-200">
+                                <p class="text-xs sm:text-sm text-gray-600 mb-1 flex items-center gap-1">
+                                    <fa-icon [icon]="faCreditCard" class="text-xs text-purple-600"></fa-icon>
+                                    Método de Pago
+                                </p>
+                                <p class="text-lg sm:text-xl font-bold text-purple-700 capitalize">{{ getMetodoPago() }}
+                                </p>
+                            </div>
+
+                            <!-- Estado -->
+                            <div class="bg-white rounded-lg p-4 shadow border border-gray-200">
+                                <p class="text-xs sm:text-sm text-gray-600 mb-1 flex items-center gap-1">
+                                    <fa-icon [icon]="faTag" class="text-xs text-orange-600"></fa-icon>
+                                    Estado
+                                </p>
+                                <p class="text-lg sm:text-xl font-bold text-orange-700 capitalize">{{ getEstado() }}</p>
                             </div>
 
                             <!-- Observaciones -->
-                            <div class="bg-white rounded-lg p-4 shadow lg:col-span-3">
-                                <p class="text-xs sm:text-sm text-gray-600 mb-1">Observaciones</p>
+                            <div class="bg-white rounded-lg p-4 shadow border border-gray-200 lg:col-span-3">
+                                <p class="text-xs sm:text-sm text-gray-600 mb-1 flex items-center gap-1">
+                                    <fa-icon [icon]="faList" class="text-xs text-gray-600"></fa-icon>
+                                    Observaciones
+                                </p>
                                 <p class="text-sm sm:text-base font-medium text-gray-800 break-words">
-                                    {{ venta()?.observaciones || 'Sin observaciones' }}
+                                    {{ getObservaciones() }}
                                 </p>
                             </div>
                         </div>
@@ -142,70 +153,106 @@
                 <div class="mb-8">
                     <h2
                         class="text-lg sm:text-xl font-semibold text-black mb-4 flex items-center gap-2 border-b-2 border-red-200 pb-2">
-                        <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd"
-                                d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z"
-                                clip-rule="evenodd" />
-                        </svg>
+                        <fa-icon [icon]="faMoneyBillWave" class="w-5 h-5 sm:w-6 sm:h-6"></fa-icon>
                         Resumen de Montos
                     </h2>
                     <div class="to-white border-2 border-red-200 rounded-xl p-4 sm:p-6">
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <!-- Subtotal -->
-                            <div class="bg-white rounded-lg p-4 shadow">
-                                <p class="text-xs sm:text-sm text-gray-600 mb-1">Subtotal</p>
-                                <p class="text-lg sm:text-xl font-bold text-blue-700">{{ venta()?.subtotal |
-                                    number:'1.2-2' }} Bs.</p>
+                            <div class="bg-white rounded-lg p-4 shadow border border-gray-200">
+                                <p class="text-xs sm:text-sm text-gray-600 mb-1 flex items-center gap-1">
+                                    <fa-icon [icon]="faDollarSign" class="text-xs text-blue-600"></fa-icon>
+                                    Subtotal
+                                </p>
+                                <p class="text-lg sm:text-xl font-bold text-blue-700">{{ getSubtotal() | number:'1.2-2'
+                                    }} Bs.</p>
                             </div>
 
                             <!-- Descuento -->
-                            <div class="bg-white rounded-lg p-4 shadow">
-                                <p class="text-xs sm:text-sm text-gray-600 mb-1">Descuento</p>
-                                <p class="text-lg sm:text-xl font-bold text-red-700">{{ venta()?.descuento |
-                                    number:'1.2-2' }} Bs.</p>
+                            <div class="bg-white rounded-lg p-4 shadow border border-gray-200">
+                                <p class="text-xs sm:text-sm text-gray-600 mb-1 flex items-center gap-1">
+                                    <fa-icon [icon]="faTag" class="text-xs text-red-600"></fa-icon>
+                                    Descuento
+                                </p>
+                                <p class="text-lg sm:text-xl font-bold text-red-700">{{ getDescuento() | number:'1.2-2'
+                                    }} Bs.</p>
                             </div>
 
                             <!-- Total -->
-                            <div class="bg-white rounded-lg p-4 shadow">
-                                <p class="text-xs sm:text-sm text-gray-600 mb-1">Total</p>
-                                <p class="text-lg sm:text-xl font-bold text-green-700">{{ venta()?.total |
-                                    number:'1.2-2' }} Bs.</p>
+                            <div class="bg-white rounded-lg p-4 shadow border border-gray-200">
+                                <p class="text-xs sm:text-sm text-gray-600 mb-1 flex items-center gap-1">
+                                    <fa-icon [icon]="faMoneyBillWave" class="text-xs text-green-600"></fa-icon>
+                                    Total
+                                </p>
+                                <p class="text-lg sm:text-xl font-bold text-green-700">{{ getTotal() | number:'1.2-2' }}
+                                    Bs.</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Sección de Plan de Pago (Solo para ventas a crédito) -->
-                @if (tienePlanPago() && venta()?.metodo_pago?.toLowerCase() === 'credito') {
+                @if (tienePlanPago() && esCredito()) {
                 <div class="mb-8">
                     <h2
                         class="text-lg sm:text-xl font-semibold text-black mb-4 flex items-center gap-2 border-b-2 border-red-200 pb-2">
-                        <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd"
-                                d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z"
-                                clip-rule="evenodd" />
-                        </svg>
+                        <fa-icon [icon]="faCreditCard" class="w-5 h-5 sm:w-6 sm:h-6"></fa-icon>
                         Plan de Pago
                     </h2>
                     <div class="to-white border-2 border-red-200 rounded-xl p-4 sm:p-6">
                         <!-- Resumen del Plan de Pago -->
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                            <div class="bg-white rounded-lg p-4 shadow">
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                            <div class="bg-white rounded-lg p-4 shadow border border-gray-200">
                                 <p class="text-xs sm:text-sm text-blue-600 mb-1">Total del Plan</p>
                                 <p class="text-lg sm:text-xl font-bold text-blue-700">
-                                    {{ getPlanPago()?.total | number:'1.2-2' }} Bs.
+                                    {{ getTotal() | number:'1.2-2' }} Bs.
                                 </p>
                             </div>
-                            <div class="bg-white rounded-lg p-4 shadow">
+                            <div class="bg-white rounded-lg p-4 shadow border border-gray-200">
                                 <p class="text-xs sm:text-sm text-green-600 mb-1">Total Pagado</p>
                                 <p class="text-lg sm:text-xl font-bold text-green-700">
                                     {{ calcularTotalPagado() | number:'1.2-2' }} Bs.
                                 </p>
                             </div>
-                            <div class="bg-white rounded-lg p-4 shadow">
+                            <div class="bg-white rounded-lg p-4 shadow border border-gray-200">
                                 <p class="text-xs sm:text-sm text-orange-600 mb-1">Saldo Pendiente</p>
                                 <p class="text-lg sm:text-xl font-bold text-orange-700">
                                     {{ calcularSaldoPendiente() | number:'1.2-2' }} Bs.
+                                </p>
+                            </div>
+                            <div class="bg-white rounded-lg p-4 shadow border border-gray-200">
+                                <p class="text-xs sm:text-sm text-purple-600 mb-1">Progreso</p>
+                                <div class="w-full bg-gray-200 rounded-full h-2.5 mb-2">
+                                    <div class="bg-purple-600 h-2.5 rounded-full"
+                                        [style.width]="calcularPorcentajePagado() + '%'"></div>
+                                </div>
+                                <p class="text-sm font-bold text-purple-700">
+                                    {{ calcularPorcentajePagado() | number:'1.0-0' }}%
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Información del Plan -->
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                            <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                                <p class="text-xs text-gray-600 mb-1">Monto Inicial</p>
+                                <p class="text-sm font-semibold text-gray-800">
+                                    {{ getPlanPago()?.monto_inicial | number:'1.2-2' }} Bs.
+                                </p>
+                            </div>
+                            <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                                <p class="text-xs text-gray-600 mb-1">Plazo</p>
+                                <p class="text-sm font-semibold text-gray-800">
+                                    {{ getPlanPago()?.plazo }}
+                                    @if (getPlanPago()?.periodicidad === 'DIAS') { días }
+                                    @if (getPlanPago()?.periodicidad === 'SEMANAS') { semanas }
+                                    @if (getPlanPago()?.periodicidad === 'MESES') { meses }
+                                </p>
+                            </div>
+                            <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                                <p class="text-xs text-gray-600 mb-1">Fecha Vencimiento</p>
+                                <p class="text-sm font-semibold text-gray-800">
+                                    {{ formatDate(getPlanPago()?.fecha_vencimiento) }}
                                 </p>
                             </div>
                         </div>
@@ -214,11 +261,7 @@
                         @if (getPlanPago()?.pagos && getPlanPago()!.pagos.length > 0) {
                         <div class="bg-gray-50 rounded-xl p-4 border-2 border-gray-200">
                             <h4 class="text-md font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                                <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd"
-                                        d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"
-                                        clip-rule="evenodd" />
-                                </svg>
+                                <fa-icon [icon]="faCheckCircle" class="w-5 h-5 text-blue-600"></fa-icon>
                                 Pagos Registrados
                             </h4>
                             <div class="space-y-3">
@@ -234,6 +277,9 @@
                                             <div class="font-semibold text-gray-800">{{ pago.monto | number:'1.2-2' }}
                                                 Bs.</div>
                                             <div class="text-sm text-gray-600">{{ formatDate(pago.fecha_pago) }}</div>
+                                            @if (pago.observacion) {
+                                            <div class="text-xs text-gray-500 mt-1">{{ pago.observacion }}</div>
+                                            }
                                         </div>
                                     </div>
                                     <span
@@ -246,11 +292,7 @@
                         </div>
                         } @else {
                         <div class="bg-yellow-50 border-2 border-yellow-200 rounded-xl p-6 text-center">
-                            <svg class="w-12 h-12 text-yellow-600 mx-auto mb-3" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
+                            <fa-icon [icon]="faClock" class="w-12 h-12 text-yellow-600 mx-auto mb-3"></fa-icon>
                             <p class="text-yellow-800 font-medium">No hay pagos registrados para este plan de pago</p>
                         </div>
                         }
@@ -259,17 +301,11 @@
                 }
 
                 <!-- Sección de Detalles de Venta -->
-                @let currentVenta = venta();
-                @if (currentVenta && currentVenta.detalles && currentVenta.detalles.length > 0) {
+                @if (tieneDetalles()) {
                 <div class="mb-8">
                     <h2
                         class="text-lg sm:text-xl font-semibold text-black mb-4 flex items-center gap-2 border-b-2 border-red-200 pb-2">
-                        <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
-                            <path fill-rule="evenodd"
-                                d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z"
-                                clip-rule="evenodd" />
-                        </svg>
+                        <fa-icon [icon]="faShoppingCart" class="w-5 h-5 sm:w-6 sm:h-6"></fa-icon>
                         Detalles de la Venta
                     </h2>
                     <div class="to-white border-2 border-red-200 rounded-xl p-4 sm:p-6">
@@ -282,33 +318,86 @@
                                             Producto</th>
                                         <th
                                             class="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
-                                            Cantidad</th>
+                                            Código</th>
                                         <th
                                             class="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
-                                            Precio Unitario</th>
+                                            Precio/Kg</th>
+                                        <th
+                                            class="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                                            Peso Original</th>
+                                        <th
+                                            class="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                                            Desc. Peso</th>
+                                        <th
+                                            class="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                                            Peso Final</th>
                                         <th
                                             class="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
                                             Subtotal</th>
+                                        <th
+                                            class="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                                            Total</th>
                                     </tr>
                                 </thead>
                                 <tbody class="bg-white divide-y divide-gray-100">
-                                    @for (detalle of currentVenta.detalles; track $index) {
+                                    @for (detalle of getDetalles(); track $index) {
                                     <tr class="hover:bg-gray-50 transition-colors">
                                         <td class="px-4 py-3 text-sm font-medium text-gray-900">
-                                            {{ detalle.producto?.nombre || 'Producto #' + detalle.productoId }}
+                                            <div class="flex items-center gap-2">
+                                                <fa-icon [icon]="faBox" class="text-blue-600 text-xs"></fa-icon>
+                                                {{ detalle.nombre_producto || 'Producto' }}
+                                            </div>
+                                        </td>
+                                        <td class="px-4 py-3 text-sm text-gray-600 font-mono">
+                                            {{ detalle.producto_codigo }}
                                         </td>
                                         <td class="px-4 py-3 text-sm text-gray-600">
-                                            {{ detalle.cantidad | number:'1.2-2' }}
+                                            {{ detalle.precio_por_kilo | number:'1.2-2' }} Bs.
                                         </td>
                                         <td class="px-4 py-3 text-sm text-gray-600">
-                                            {{ detalle.precioUnitario | number:'1.2-2' }} Bs.
+                                            <div class="flex items-center gap-1">
+                                                <fa-icon [icon]="faWeightHanging"
+                                                    class="text-gray-400 text-xs"></fa-icon>
+                                                {{ detalle.peso_original | number:'1.2-2' }} kg
+                                            </div>
+                                        </td>
+                                        <td class="px-4 py-3 text-sm text-gray-600">
+                                            {{ detalle.descuento_peso | number:'1.2-2' }} kg
+                                        </td>
+                                        <td class="px-4 py-3 text-sm text-gray-600">
+                                            <div class="flex items-center gap-1">
+                                                <fa-icon [icon]="faWeightHanging"
+                                                    class="text-green-500 text-xs"></fa-icon>
+                                                {{ detalle.peso_final | number:'1.2-2' }} kg
+                                            </div>
                                         </td>
                                         <td class="px-4 py-3 text-sm font-semibold text-green-600">
-                                            {{ (detalle.cantidad * detalle.precioUnitario) | number:'1.2-2' }} Bs.
+                                            {{ calcularSubtotalDetalle(detalle) | number:'1.2-2' }} Bs.
+                                        </td>
+                                        <td class="px-4 py-3 text-sm font-bold text-blue-700">
+                                            {{ calcularTotalDetalle(detalle) | number:'1.2-2' }} Bs.
                                         </td>
                                     </tr>
                                     }
                                 </tbody>
+                                <!-- Footer con totales -->
+                                <tfoot class="bg-gray-50 border-t border-gray-200">
+                                    <tr>
+                                        <td colspan="6"
+                                            class="px-4 py-3 text-sm font-semibold text-gray-700 text-right">
+                                            Total General:
+                                        </td>
+                                        <td class="px-4 py-3 text-sm font-semibold text-gray-700">
+                                            {{ getTotalPesoFinal() | number:'1.2-2' }} kg
+                                        </td>
+                                        <td class="px-4 py-3 text-sm font-bold text-green-700">
+                                            {{ getTotalSubtotalDetalles() | number:'1.2-2' }} Bs.
+                                        </td>
+                                        <td class="px-4 py-3 text-sm font-bold text-blue-700">
+                                            {{ getTotalFinalDetalles() | number:'1.2-2' }} Bs.
+                                        </td>
+                                    </tr>
+                                </tfoot>
                             </table>
                         </div>
                     </div>
@@ -317,20 +406,14 @@
 
                 <!-- Botones de acción -->
                 <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-6 border-t border-gray-200">
-                    <button [routerLink]="['/ventas/editar', venta()?.id_venta]"
+                    <button [routerLink]="['/ventas/editar', getVentaId()]"
                         class="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg font-semibold hover:from-green-700 hover:to-green-800 transition-all duration-200 shadow-lg hover:shadow-xl text-sm sm:text-base flex items-center justify-center gap-2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                        </svg>
+                        <fa-icon [icon]="faEdit" class="text-sm"></fa-icon>
                         Editar Venta
                     </button>
                     <button [routerLink]="['/ventas']"
                         class="w-full sm:w-auto px-6 py-3 bg-gray-200 text-gray-700 rounded-lg font-semibold hover:bg-gray-300 transition-all duration-200 text-sm sm:text-base flex items-center justify-center gap-2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                        </svg>
+                        <fa-icon [icon]="faArrowLeft" class="text-sm"></fa-icon>
                         Volver a Ventas
                     </button>
                 </div>
@@ -339,21 +422,15 @@
         }
 
         <!-- Not Found State -->
-        @if(!loading() && !venta()){
+        @if (!loading() && !venta()) {
         <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 text-center">
             <div class="flex flex-col items-center gap-3">
-                <svg class="w-16 h-16 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.35 16.5c-.77.833.192 2.5 1.732 2.5z" />
-                </svg>
+                <fa-icon [icon]="faExclamationTriangle" class="w-16 h-16 text-red-500"></fa-icon>
                 <p class="text-lg font-semibold text-gray-900">No se encontró la venta</p>
                 <p class="text-sm text-gray-500">La venta solicitada no existe o no está disponible</p>
                 <button [routerLink]="['/ventas']"
                     class="mt-4 px-6 py-3 bg-[#ff7676] hover:bg-red-600 text-white rounded-lg font-semibold transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center gap-2">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                    </svg>
+                    <fa-icon [icon]="faArrowLeft" class="text-sm"></fa-icon>
                     Volver a Ventas
                 </button>
             </div>

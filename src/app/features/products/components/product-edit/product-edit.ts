@@ -61,12 +61,10 @@ export class ProductEdit implements OnInit {
 
   crearFormularioProducto(): FormGroup {
     return this.fb.group({
-      nombre: ['', [Validators.required, Validators.minLength(2)]],
-      peso: [0, [Validators.required, Validators.min(0)]],
-      precio: [0, [Validators.required, Validators.min(0.01)]], // Cambiado de precio_base a precio
+      peso: [0, [Validators.required, Validators.min(0.01)]],
       estado: [true],
-      observacion: [''], // Nuevo campo
-      fecha_llegada: ['', Validators.required], // Nuevo campo
+      observacion: [''],
+      fecha_llegada: ['', Validators.required],
     });
   }
 
@@ -76,9 +74,7 @@ export class ProductEdit implements OnInit {
       : new Date().toISOString().split('T')[0];
 
     this.productForm.patchValue({
-      nombre: product.nombre || '',
       peso: product.peso || 0,
-      precio: product.precio || 0, // Cambiado de precio_base a precio
       estado: product.estado ?? true,
       observacion: product.observacion || '',
       fecha_llegada: fechaLlegada,
@@ -101,7 +97,6 @@ export class ProductEdit implements OnInit {
     const dataActualizada = {
       ...this.productForm.value,
       peso: Number(this.productForm.value.peso),
-      precio: Number(this.productForm.value.precio), // Cambiado de precio_base a precio
       fecha_llegada: new Date(this.productForm.value.fecha_llegada),
     };
 
