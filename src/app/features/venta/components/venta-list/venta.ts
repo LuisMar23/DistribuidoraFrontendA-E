@@ -55,7 +55,6 @@ export class VentaComponent {
     { key: 'id_cliente', label: 'Cliente' },
     { key: 'fecha_venta', label: 'Fecha Venta' },
     { key: 'subtotal', label: 'Subtotal' },
-    { key: 'descuento', label: 'Descuento' },
     { key: 'total', label: 'Total' },
     { key: 'metodo_pago', label: 'Método Pago' },
   ];

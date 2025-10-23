@@ -1,13 +1,34 @@
 <div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-3 sm:p-6 lg:p-8">
   <div class="max-w-7xl mx-auto">
     <!-- Header -->
+        <a [routerLink]="['/caja']" class="flex items-center  py-4  text-black">
+        <svg
+          class="w-5 h-5 mr-2 transform group-hover:-translate-x-1 transition-transform duration-200"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M15 19l-7-7 7-7"
+          ></path>
+        </svg>
+        <span class="text-sm font-medium">Regresar</span>
+      </a>
     <div class="mb-6 sm:mb-8">
       <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-4">
         <div class="flex items-center gap-3 sm:gap-4">
           <div
             class="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-[#ff7676] to-red-700 rounded-2xl flex items-center justify-center shadow-xl transform hover:scale-105 transition-transform"
           >
-            <svg class="w-6 h-6 sm:w-7 sm:h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg
+              class="w-6 h-6 sm:w-7 sm:h-7 text-white"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
@@ -31,7 +52,12 @@
           <button
             class="flex-1 sm:flex-none bg-white hover:bg-gray-50 text-gray-700 px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl font-semibold border-2 border-gray-200 shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-2 text-sm"
           >
-            <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg
+              class="w-4 h-4 sm:w-5 sm:h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
@@ -44,7 +70,12 @@
           <button
             class="flex-1 sm:flex-none bg-gradient-to-r from-[#ff7676] to-red-700 hover:from-[#ff5555] hover:to-red-800 text-white px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 text-sm"
           >
-            <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg
+              class="w-4 h-4 sm:w-5 sm:h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
@@ -60,8 +91,12 @@
       <!-- Stats Cards -->
       <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
         <!-- Total Ingresos -->
-        <div class="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-lg border border-gray-200 hover:shadow-xl transition-all">
-          <div class="flex flex-col sm:flex-row items-start sm:items-center sm:justify-between gap-3">
+        <div
+          class="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-lg border border-gray-200 hover:shadow-xl transition-all"
+        >
+          <div
+            class="flex flex-col sm:flex-row items-start sm:items-center sm:justify-between gap-3"
+          >
             <div class="flex-1 w-full">
               <p class="text-xs sm:text-sm font-semibold text-gray-600 mb-1">Total Ingresos</p>
               <p class="text-lg sm:text-2xl font-bold text-green-600 truncate">
@@ -71,7 +106,12 @@
             <div
               class="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-green-500 to-green-700 rounded-xl flex items-center justify-center shadow-lg flex-shrink-0"
             >
-              <svg class="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg
+                class="w-5 h-5 sm:w-6 sm:h-6 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
                 <path
                   stroke-linecap="round"
                   stroke-linejoin="round"
@@ -84,8 +124,12 @@
         </div>
 
         <!-- Total Egresos -->
-        <div class="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-lg border border-gray-200 hover:shadow-xl transition-all">
-          <div class="flex flex-col sm:flex-row items-start sm:items-center sm:justify-between gap-3">
+        <div
+          class="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-lg border border-gray-200 hover:shadow-xl transition-all"
+        >
+          <div
+            class="flex flex-col sm:flex-row items-start sm:items-center sm:justify-between gap-3"
+          >
             <div class="flex-1 w-full">
               <p class="text-xs sm:text-sm font-semibold text-gray-600 mb-1">Total Egresos</p>
               <p class="text-lg sm:text-2xl font-bold text-red-600 truncate">
@@ -95,7 +139,12 @@
             <div
               class="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-[#ff7676] to-red-700 rounded-xl flex items-center justify-center shadow-lg flex-shrink-0"
             >
-              <svg class="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg
+                class="w-5 h-5 sm:w-6 sm:h-6 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
                 <path
                   stroke-linecap="round"
                   stroke-linejoin="round"
@@ -108,8 +157,12 @@
         </div>
 
         <!-- Balance -->
-        <div class="bg-gradient-to-br from-[#ff7676] to-red-700 rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-xl border border-red-400 hover:shadow-2xl transition-all">
-          <div class="flex flex-col sm:flex-row items-start sm:items-center sm:justify-between gap-3">
+        <div
+          class="bg-gradient-to-br from-[#ff7676] to-red-700 rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-xl border border-red-400 hover:shadow-2xl transition-all"
+        >
+          <div
+            class="flex flex-col sm:flex-row items-start sm:items-center sm:justify-between gap-3"
+          >
             <div class="flex-1 w-full">
               <p class="text-xs sm:text-sm font-semibold text-red-100 mb-1">Balance</p>
               <p class="text-lg sm:text-2xl font-bold text-white truncate">
@@ -119,7 +172,12 @@
             <div
               class="w-10 h-10 sm:w-12 sm:h-12 bg-white bg-opacity-20 rounded-xl flex items-center justify-center shadow-lg backdrop-blur-sm flex-shrink-0"
             >
-              <svg class="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg
+                class="w-5 h-5 sm:w-6 sm:h-6 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
                 <path
                   stroke-linecap="round"
                   stroke-linejoin="round"
@@ -132,8 +190,12 @@
         </div>
 
         <!-- Transacciones -->
-        <div class="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-lg border border-gray-200 hover:shadow-xl transition-all">
-          <div class="flex flex-col sm:flex-row items-start sm:items-center sm:justify-between gap-3">
+        <div
+          class="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-lg border border-gray-200 hover:shadow-xl transition-all"
+        >
+          <div
+            class="flex flex-col sm:flex-row items-start sm:items-center sm:justify-between gap-3"
+          >
             <div class="flex-1 w-full">
               <p class="text-xs sm:text-sm font-semibold text-gray-600 mb-1">Transacciones</p>
               <p class="text-lg sm:text-2xl font-bold text-gray-900">
@@ -143,7 +205,12 @@
             <div
               class="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-gray-500 to-gray-700 rounded-xl flex items-center justify-center shadow-lg flex-shrink-0"
             >
-              <svg class="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg
+                class="w-5 h-5 sm:w-6 sm:h-6 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
                 <path
                   stroke-linecap="round"
                   stroke-linejoin="round"
@@ -159,10 +226,17 @@
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
       <!-- Tabla de Movimientos - Desktop -->
-      <div class="lg:col-span-2 bg-white rounded-2xl sm:rounded-3xl shadow-xl border border-gray-200 overflow-hidden hidden md:block">
+      <div
+        class="lg:col-span-2 bg-white rounded-2xl sm:rounded-3xl shadow-xl border border-gray-200 overflow-hidden hidden md:block"
+      >
         <div class="p-4 sm:p-6 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
           <h2 class="text-lg sm:text-xl font-bold text-gray-900 flex items-center gap-2">
-            <svg class="w-5 h-5 sm:w-6 sm:h-6 text-[#ff7676]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg
+              class="w-5 h-5 sm:w-6 sm:h-6 text-[#ff7676]"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
@@ -175,32 +249,98 @@
         </div>
 
         <div class="overflow-x-auto">
+          <div class="flex flex-col lg:flex-row justify-between items-center gap-4 pt-3 p-4">
+            <!-- Buscador -->
+            <div class="w-full lg:w-1/3">
+              <div class="relative">
+                <i
+                  class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                ></i>
+                <input
+                  type="text"
+                  placeholder="Buscar por fecha ..."
+                  class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-black-100 focus:border-transparent shadow-sm"
+                  [(ngModel)]="searchTerm"
+                />
+              </div>
+            </div>
+
+            <!-- Botones -->
+          </div>
           <table class="min-w-full w-full text-sm">
             <thead class="bg-gradient-to-r from-gray-50 to-gray-100 border-b-2 border-gray-200">
               <tr>
-                <th class="px-4 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
-                  Fecha
+                <!-- @for (col of columns; track col) {
+                <th
+                  class="px-4 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider cursor-pointer"
+                  (click)="sort(col.key)"
+                >
+                  <div class="flex items-center space-x-2">
+                    <span
+                      [ngClass]="{
+                        'text-black': sortColumn() === col.key,
+                        'text-gray': sortColumn() !== col.key
+                      }"
+                      class="text-sm font-medium"
+                    >
+                      {{ col.label }}
+                    </span>
+                  </div>
                 </th>
-                <th class="px-4 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
-                  Tipo
+                } -->
+                @for (item of columns; track $index) {
+                <th
+                  class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider cursor-pointer"
+                  (click)="sort(item.key)"
+                >
+                  <div class="flex items-center space-x-2">
+                    <span
+                      class="transition-colors"
+                      [ngClass]="{
+                        'text-black': sortColumn() === item.key,
+                        'text-gray-600': sortColumn() !== item.key
+                      }"
+                    >
+                      {{ item.label }}
+                    </span>
+                    <div class="flex flex-col justify-center h-4 leading-none">
+                      <span
+                        class="text-[10px]"
+                        [ngClass]="{
+                          'text-black': sortColumn() === item.key && sortDirection() === 'asc',
+                          'text-gray-400': !(sortColumn() === item.key && sortDirection() === 'asc')
+                        }"
+                      >
+                        ▲
+                      </span>
+                      <span
+                        class="text-[10px]"
+                        [ngClass]="{
+                          'text-black': sortColumn() === item.key && sortDirection() === 'desc',
+                          'text-gray-400': !(
+                            sortColumn() === item.key && sortDirection() === 'desc'
+                          )
+                        }"
+                      >
+                        ▼
+                      </span>
+                    </div>
+                  </div>
                 </th>
-                <th class="px-4 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
-                  Monto
-                </th>
-                <th class="px-4 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
-                  Método
-                </th>
-                <th class="px-4 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
-                  Descripción
-                </th>
+                }
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-100">
-              @for (mov of movSvc.movimientos(); track mov.id) {
+              @for (mov of filteredMovimientos(); track mov.id) {
               <tr class="hover:bg-gray-50 transition-colors">
                 <td class="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
                   <div class="flex items-center gap-2">
-                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg
+                      class="w-4 h-4 text-gray-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
                       <path
                         stroke-linecap="round"
                         stroke-linejoin="round"
@@ -208,7 +348,9 @@
                         d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                       />
                     </svg>
-                    <span class="text-sm text-gray-900 font-medium">{{ mov.fecha | date : 'dd/MM/yyyy' }}</span>
+                    <span class="text-sm text-gray-900 font-medium">{{
+                      mov.fecha | date : 'dd/MM/yyyy'
+                    }}</span>
                   </div>
                   <div class="text-xs text-gray-500 ml-6">{{ mov.fecha | date : 'HH:mm' }}</div>
                 </td>
@@ -222,11 +364,19 @@
                   >
                     @if (mov.tipo === 'INGRESO') {
                     <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L9 9.414V13a1 1 0 102 0V9.414l1.293 1.293a1 1 0 001.414-1.414z" clip-rule="evenodd" />
+                      <path
+                        fill-rule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L9 9.414V13a1 1 0 102 0V9.414l1.293 1.293a1 1 0 001.414-1.414z"
+                        clip-rule="evenodd"
+                      />
                     </svg>
                     } @else {
                     <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v3.586L7.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 10.586V7z" clip-rule="evenodd" />
+                      <path
+                        fill-rule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v3.586L7.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 10.586V7z"
+                        clip-rule="evenodd"
+                      />
                     </svg>
                     }
                     {{ mov.tipo }}
@@ -244,9 +394,16 @@
                   </span>
                 </td>
                 <td class="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
-                  <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold bg-gray-100 text-gray-700 border border-gray-200">
+                  <span
+                    class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold bg-gray-100 text-gray-700 border border-gray-200"
+                  >
                     <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
+                      />
                     </svg>
                     {{ mov.metodoPago }}
                   </span>
@@ -259,9 +416,21 @@
               <tr>
                 <td colspan="5" class="px-6 py-16 text-center">
                   <div class="flex flex-col items-center justify-center">
-                    <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                      <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    <div
+                      class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4"
+                    >
+                      <svg
+                        class="w-8 h-8 text-gray-400"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                        />
                       </svg>
                     </div>
                     <h3 class="text-lg font-semibold text-gray-900 mb-1">No hay movimientos</h3>
@@ -272,21 +441,88 @@
               }
             </tbody>
           </table>
+          <div
+            class="flex flex-col sm:flex-row sm:justify-between sm:items-center mt-6 gap-4 p-4 px-2"
+          >
+            <div class="text-sm text-gray-600 text-center sm:text-left">
+              Mostrando {{ rangeStart() }} a {{ rangeEnd() }} de {{ total() }}
+            </div>
+            <div class="flex items-center justify-center gap-1 sm:gap-2 flex-wrap">
+              <button
+                (click)="prevPage()"
+                [disabled]="currentPage() === 1"
+                class="px-3 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg disabled:opacity-50 text-sm font-medium"
+              >
+                Anterior
+              </button>
+              @for (i of pageArray(); track $index) {
+              <button
+                (click)="goToPage(i)"
+                [class.font-bold]="currentPage() === i"
+                [class.bg-blue-500]="currentPage() === i"
+                [class.text-white]="currentPage() === i"
+                class="px-3 py-2 border rounded-lg hover:bg-blue-100 text-sm font-medium min-w-[40px]"
+              >
+                {{ i }}
+              </button>
+              }
+
+              <button
+                (click)="nextPage()"
+                [disabled]="currentPage() === totalPages()"
+                class="px-3 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg disabled:opacity-50 text-sm font-medium"
+              >
+                Siguiente
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
       <!-- Lista de Movimientos - Móvil (Cards) -->
       <div class="lg:col-span-2 space-y-3 md:hidden">
-        @for (mov of movSvc.movimientos(); track mov.id) {
-        <div class="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden hover:shadow-xl transition-all">
+        <div class="flex flex-col lg:flex-row justify-between items-center gap-4 pt-3">
+          <!-- Buscador -->
+          <div class="w-full lg:w-1/3">
+            <div class="relative">
+              <i
+                class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+              ></i>
+              <input
+                type="text"
+                placeholder="Buscar por fecha..."
+                class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-black-100 focus:border-transparent shadow-sm"
+                [(ngModel)]="searchTerm"
+              />
+            </div>
+          </div>
+
+          <!-- Botones -->
+        </div>
+        @for (mov of filteredMovimientos(); track mov.id) {
+        <div
+          class="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden hover:shadow-xl transition-all"
+        >
           <!-- Header de la Card -->
           <div class="bg-gradient-to-r from-gray-50 to-white px-4 py-3 border-b border-gray-100">
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-2">
-                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                <svg
+                  class="w-4 h-4 text-gray-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                  />
                 </svg>
-                <span class="text-sm font-semibold text-gray-900">{{ mov.fecha | date : 'dd/MM/yyyy' }}</span>
+                <span class="text-sm font-semibold text-gray-900">{{
+                  mov.fecha | date : 'dd/MM/yyyy'
+                }}</span>
                 <span class="text-xs text-gray-500">{{ mov.fecha | date : 'HH:mm' }}</span>
               </div>
               <span
@@ -298,11 +534,19 @@
               >
                 @if (mov.tipo === 'INGRESO') {
                 <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L9 9.414V13a1 1 0 102 0V9.414l1.293 1.293a1 1 0 001.414-1.414z" clip-rule="evenodd" />
+                  <path
+                    fill-rule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L9 9.414V13a1 1 0 102 0V9.414l1.293 1.293a1 1 0 001.414-1.414z"
+                    clip-rule="evenodd"
+                  />
                 </svg>
                 } @else {
                 <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v3.586L7.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 10.586V7z" clip-rule="evenodd" />
+                  <path
+                    fill-rule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v3.586L7.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 10.586V7z"
+                    clip-rule="evenodd"
+                  />
                 </svg>
                 }
                 {{ mov.tipo }}
@@ -334,8 +578,18 @@
 
             <!-- Método de Pago -->
             <div class="flex items-center gap-2">
-              <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+              <svg
+                class="w-4 h-4 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
+                />
               </svg>
               <span class="text-xs font-semibold text-gray-700">{{ mov.metodoPago }}</span>
             </div>
@@ -343,22 +597,74 @@
         </div>
         } @empty {
         <div class="bg-white rounded-2xl shadow-lg border border-gray-200 p-12 text-center">
-          <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          <div
+            class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4"
+          >
+            <svg
+              class="w-8 h-8 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+              />
             </svg>
           </div>
           <h3 class="text-lg font-semibold text-gray-900 mb-1">No hay movimientos</h3>
           <p class="text-sm text-gray-500">Aún no se han registrado transacciones</p>
         </div>
         }
-      </div>
+        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mt-6 gap-4 px-2">
+          <div class="text-sm text-gray-600 text-center sm:text-left">
+            Mostrando {{ rangeStart() }} a {{ rangeEnd() }} de {{ total() }}
+          </div>
+          <div class="flex items-center justify-center gap-1 sm:gap-2 flex-wrap">
+            <button
+              (click)="prevPage()"
+              [disabled]="currentPage() === 1"
+              class="px-3 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg disabled:opacity-50 text-sm font-medium"
+            >
+              Anterior
+            </button>
+            @for (i of pageArray(); track $index) {
+            <button
+              (click)="goToPage(i)"
+              [class.font-bold]="currentPage() === i"
+              [class.bg-blue-500]="currentPage() === i"
+              [class.text-white]="currentPage() === i"
+              class="px-3 py-2 border rounded-lg hover:bg-blue-100 text-sm font-medium min-w-[40px]"
+            >
+              {{ i }}
+            </button>
+            }
 
-      <!-- Panel de Totales por Método -->
-      <div class="lg:col-span-1 bg-white rounded-2xl sm:rounded-3xl shadow-xl border border-gray-200 overflow-hidden h-fit">
-        <div class="p-4 sm:p-6 border-b border-gray-100 bg-gradient-to-r from-red-50 to-[#ff7676] bg-opacity-20">
+            <button
+              (click)="nextPage()"
+              [disabled]="currentPage() === totalPages()"
+              class="px-3 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg disabled:opacity-50 text-sm font-medium"
+            >
+              Siguiente
+            </button>
+          </div>
+        </div>
+      </div>
+      <div
+        class="lg:col-span-1 bg-white rounded-2xl sm:rounded-3xl shadow-xl border border-gray-200 overflow-hidden h-fit"
+      >
+        <div
+          class="p-4 sm:p-6 border-b border-gray-100 bg-gradient-to-r from-red-50 to-[#ff7676] bg-opacity-20"
+        >
           <h3 class="text-base sm:text-lg font-bold text-gray-900 flex items-center gap-2">
-            <svg class="w-5 h-5 sm:w-6 sm:h-6 text-[#ff7676]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg
+              class="w-5 h-5 sm:w-6 sm:h-6 text-[#ff7676]"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
@@ -374,12 +680,26 @@
         <div class="p-4 sm:p-6">
           <div class="space-y-3 sm:space-y-4">
             @for (key of (movSvc.totales() | keyvalue); track key.key) {
-            <div class="bg-gradient-to-r from-gray-50 to-white rounded-xl sm:rounded-2xl p-4 border border-gray-200 hover:shadow-md transition-all">
+            <div
+              class="bg-gradient-to-r from-gray-50 to-white rounded-xl sm:rounded-2xl p-4 border border-gray-200 hover:shadow-md transition-all"
+            >
               <div class="flex items-center justify-between mb-2">
                 <div class="flex items-center gap-2 sm:gap-3">
-                  <div class="w-10 h-10 bg-gradient-to-br from-[#ff7676] to-red-700 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                  <div
+                    class="w-10 h-10 bg-gradient-to-br from-[#ff7676] to-red-700 rounded-xl flex items-center justify-center flex-shrink-0"
+                  >
+                    <svg
+                      class="w-5 h-5 text-white"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
+                      />
                     </svg>
                   </div>
                   <div>
@@ -396,8 +716,15 @@
             </div>
             } @empty {
             <div class="text-center py-8">
-              <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div
+                class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3"
+              >
+                <svg
+                  class="w-6 h-6 text-gray-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
                   <path
                     stroke-linecap="round"
                     stroke-linejoin="round"

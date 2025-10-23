@@ -54,11 +54,9 @@ export class Sidebar {
     { label: 'Ventas', icon: faShoppingCart, route: '/ventas' },
     { label: 'Productos', icon: faBox, route: '/productos' },
     { label: 'Clientes', icon: faUsers, route: '/clientes' },
-    { label: 'Transporte', icon: faTruck, route: '/transporte' },
     { label: 'Pagos', icon: faCreditCard, route: '/pagos' },
     { label: 'Caja', icon: faCashRegister, route: '/caja' },
     { label: 'Usuarios', icon: faUsers, route: '/usuarios' },
-    { label: 'Ajustes', icon: faCog, route: '/ajustes' },
   ];
 
   toggleSidebar() {

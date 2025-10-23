@@ -6,6 +6,7 @@ import { NotificationService } from '../../../../core/services/notification.serv
 import { faFileExcel } from '@fortawesome/free-solid-svg-icons';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { catchError, map, Observable, of, shareReplay } from 'rxjs';
 
 @Component({
   selector: 'app-compra-list',
@@ -23,7 +24,7 @@ export class CompraList implements OnInit {
   sortColumn = signal<string>('');
   sortDirection = signal<'asc' | 'desc'>('asc');
   faFileExcel = faFileExcel;
-
+  totalGanancia = signal<number | null>(null);
   searchTerm = signal('');
 
   private compraSvc = inject(CompraService);
@@ -41,7 +42,30 @@ export class CompraList implements OnInit {
     { key: 'detalles', label: 'Peso Neto (kg)' },
     { key: 'detalles', label: 'Precio Total (Bs)' },
   ];
+  private gananciaCache = new Map<number, Observable<number>>();
+  getGananciaCompraCached(id: number): Observable<number> {
+    if (!id) return of(0);
 
+    if (this.gananciaCache.has(id)) {
+      return this.gananciaCache.get(id)!;
+    }
+
+
+    const obs$ = this.compraSvc.getGananciaCompra(id).pipe(
+      map((resp) => {
+        console.log('Ganancia recibida:', resp);
+        return Number(resp.ganancia || 0);
+      }),
+      catchError((err) => {
+        console.error('Error al obtener la ganancia:', err);
+        return of(0);
+      }),
+      shareReplay({ bufferSize: 1, refCount: true }) 
+    );
+
+    this.gananciaCache.set(id, obs$);
+    return obs$;
+  }
   obtenerCompras(page: number = 1) {
     this.cargando.set(true);
     this.error.set(null);

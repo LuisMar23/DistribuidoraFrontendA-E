@@ -4,7 +4,6 @@ import { Observable, tap } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { PersonaDto } from '../../../core/interfaces/persona.interface';
 
-
 export interface DetalleCompra {
   pesoNeto: number;
   pesoBruto: number;
@@ -27,8 +26,7 @@ export interface Compra {
   creado_en: string;
   proveedor: {
     id_proveedor: number;
-    persona:PersonaDto
-
+    persona: PersonaDto;
   };
   detalles: DetalleCompra[];
   transportes: number;
@@ -73,10 +71,7 @@ export class CompraService {
   getAll(page: number = 1, pageSize: number = 10): Observable<any> {
     const url = `${this.baseUrl}?page=${page}&pageSize=${pageSize}`;
 
-
-    return this.http.get<any>(url).pipe(
-  
-    );
+    return this.http.get<any>(url).pipe();
   }
 
   getById(id: number): Observable<any> {
@@ -88,7 +83,12 @@ export class CompraService {
   }
 
   delete(id: number): Observable<any> {
- 
     return this.http.delete(`${this.baseUrl}/${id}`);
+  }
+
+  getGananciaCompra(compraId: number) {
+    return this.http.get<{ totalGastado: number; totalVendido: number; ganancia: number }>(
+      `${environment.apiUrl}/ganancia/ganancia/${compraId}`
+    );
   }
 }

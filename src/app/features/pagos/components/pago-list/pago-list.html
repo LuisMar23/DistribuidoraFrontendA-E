@@ -1,10 +1,10 @@
 <div class="bg-white rounded-2xl p-4 md:p-6 mb-6 flex items-center gap-4 shadow-sm">
   <div
-    class="bg-[#6ab9ab] text-white w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full"
+    class="bg-[#ff7676] text-white w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full"
   >
     <fa-icon [icon]="faMoney" class="text-lg md:text-xl"></fa-icon>
   </div>
-  <h2 class="text-lg md:text-xl font-bold font-sans text-gray-800">Pagos y Gastos</h2>
+  <h2 class="text-lg md:text-xl font-bold font-sans text-gray-800">Pagos</h2>
 </div>
 
 <div class="max-w-full mx-auto p-4 bg-gray-50">
@@ -26,13 +26,13 @@
 
   <div class="hidden xl:block">
     <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
-      <div class="overflow-x-auto">
-        <table class="min-w-full">
+      <div class="overflow-x-auto table-container">
+        <table class="min-w-full table-compact">
           <thead>
-            <tr class="bg-[#6ab9ab] text-white">
+            <tr class="bg-[#ff7676] text-white">
               @for (item of columns; track $index) {
               <th
-                class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider"
+                class="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider cursor-pointer"
                 (click)="sort(item.key)"
               >
                 <div class="flex items-center space-x-2">
@@ -40,7 +40,7 @@
                     class="transition-colors"
                     [ngClass]="{
                       'text-black': sortColumn() === item.key,
-                      'text-gray-600': sortColumn() !== item.key
+                      'text-white': sortColumn() !== item.key
                     }"
                   >
                     {{ item.label }}
@@ -50,7 +50,7 @@
                       class="text-[10px]"
                       [ngClass]="{
                         'text-black': sortColumn() === item.key && sortDirection() === 'asc',
-                        'text-gray-400': !(sortColumn() === item.key && sortDirection() === 'asc')
+                        'text-white': !(sortColumn() === item.key && sortDirection() === 'asc')
                       }"
                     >
                       ▲
@@ -59,7 +59,7 @@
                       class="text-[10px]"
                       [ngClass]="{
                         'text-black': sortColumn() === item.key && sortDirection() === 'desc',
-                        'text-gray-400': !(sortColumn() === item.key && sortDirection() === 'desc')
+                        'text-white': !(sortColumn() === item.key && sortDirection() === 'desc')
                       }"
                     >
                       ▼
@@ -88,7 +88,7 @@
               </td>
 
               <td class="px-4 py-4 max-w-md">
-                <p class="font-medium text-gray-900 text-sm line-clamp-2">
+                <p class="font-medium text-gray-900 text-sm leading-relaxed">
                   {{ p.descripcion || 'N/A' }}
                 </p>
               </td>
@@ -98,12 +98,12 @@
                   >Bs. {{ p.monto | number : '1.2-2' }}</span
                 >
               </td>
-
+              <!-- 
               <td class="px-4 py-4">
                 <span class="font-mono text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">{{
                   p.uuid
                 }}</span>
-              </td>
+              </td> -->
             </tr>
             } @if (pagos().length === 0) {
             <tr>
@@ -122,13 +122,12 @@
     </div>
   </div>
 
-  <!-- 📱 Vista móvil -->
   <div class="xl:hidden space-y-4">
     @for (p of filteredPayments(); track $index) {
     <div
       class="bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden"
     >
-      <div class="bg-[#6ab9ab] p-4">
+      <div class="bg-[#ff7676] p-4">
         <div class="flex justify-between items-start">
           <div class="flex-1">
             <h3 class="font-bold text-white text-base leading-tight">Pago #{{ $index + 1 }}</h3>
@@ -157,13 +156,13 @@
           <p class="text-gray-800 text-sm leading-relaxed">{{ p.descripcion || 'N/A' }}</p>
         </div>
 
-        <div>
+        <!-- <div>
           <div class="flex items-center text-gray-600 mb-1">
             <i class="fas fa-fingerprint text-xs mr-2"></i>
             <span class="text-xs font-medium uppercase tracking-wide">UUID</span>
           </div>
           <p class="font-mono text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">{{ p.uuid }}</p>
-        </div>
+        </div> -->
       </div>
     </div>
     } @if (pagos().length === 0) {

@@ -20,14 +20,7 @@
         </div>
         <!-- Botones de acción -->
         <div class="flex gap-3 w-full sm:w-auto">
-          <button
-            class="flex-1 sm:flex-initial bg-white hover:bg-gray-50 text-gray-700 px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl font-semibold border border-gray-200 shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-2">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-            </svg>
-            <span>Filtrar</span>
-          </button>
+
           <button
             class="flex-1 sm:flex-initial bg-[#ff7676] hover:bg-red-600 text-white px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2"
             [routerLink]="['/productos/crear']">
@@ -59,9 +52,7 @@
         <!-- Contenido de la tarjeta -->
         <div class="p-4 space-y-3">
           <div class="flex items-center gap-2 text-sm">
-            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-            </svg>
+  
             <span class="text-gray-600">ID: {{ product.id_producto }}</span>
           </div>
           <div class="flex items-center gap-2 text-sm">
@@ -157,12 +148,7 @@
             <tr class="hover:bg-gray-50 transition-colors">
               <td class="px-6 py-4 whitespace-nowrap">
                 <div class="flex items-center gap-3">
-                  <div class="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center">
-                    <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                    </svg>
-                  </div>
+               
                   <div>
                     <p class="font-medium text-gray-900">#{{ product.id_producto }}</p>
                     @if (product.observacion) {

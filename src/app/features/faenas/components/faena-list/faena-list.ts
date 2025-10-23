@@ -65,9 +65,7 @@ export class DetalleFaenaComponent {
 
   constructor(private faenaService: DetalleFaenaService) {
     this.loadFaenas();
-    this.route.paramMap.subscribe((params) => {
-      const id = parseInt(params.get('id') || '0', 10);
-    });
+
 
     effect(() => {
       console.log('ID cambió:', this.compraId());

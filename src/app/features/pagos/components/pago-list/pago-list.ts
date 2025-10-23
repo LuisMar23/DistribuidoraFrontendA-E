@@ -65,7 +65,6 @@ export class PagoList {
     { key: 'compra.Id', label: 'ID Compra' },
     { key: 'descripcion', label: 'Descripción' },
     { key: 'monto', label: 'Monto (Bs.)' },
-    { key: 'uuid', label: 'UUID' },
   ];
 
   searchTerm = signal('');
