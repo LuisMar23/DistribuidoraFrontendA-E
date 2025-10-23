@@ -11,6 +11,8 @@ import {
   faCalendarAlt,
   faDollarSign,
   faUser,
+  faFilePdf,
+  faPercent,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { VentaDto } from '../../../../core/interfaces/venta.interface';
@@ -19,6 +21,7 @@ import { CommonModule } from '@angular/common';
 import { NotificationService } from '../../../../core/services/notification.service';
 import { Router, RouterModule } from '@angular/router';
 import { VentaService } from '../../services/venta.service';
+import { PdfService } from '../../../../core/services/pdf.service';
 
 // Interface para las columnas con tipo seguro
 interface ColumnConfig {
@@ -43,21 +46,21 @@ export class VentaComponent {
   faCalendarAlt = faCalendarAlt;
   faDollarSign = faDollarSign;
   faUser = faUser;
+  faFilePdf = faFilePdf;
+  faPercent = faPercent;
 
   ventas = signal<VentaDto[]>([]);
   allVentas = signal<VentaDto[]>([]);
   searchTerm = signal('');
 
-  // Usar la interfaz ColumnConfig para asegurar tipos
+  // Columnas actualizadas: quitamos 'subtotal' y 'metodo_pago'
   columns: ColumnConfig[] = [
     { key: 'id_venta', label: 'ID' },
     { key: 'estado', label: 'Estado' },
     { key: 'id_cliente', label: 'Cliente' },
     { key: 'fecha_venta', label: 'Fecha Venta' },
-    { key: 'subtotal', label: 'Subtotal' },
-    { key: 'descuento', label: 'Descuento' },
+    { key: 'descuento', label: 'Desc. Peso' },
     { key: 'total', label: 'Total' },
-    { key: 'metodo_pago', label: 'Método Pago' },
   ];
 
   total = signal(0);
@@ -67,6 +70,7 @@ export class VentaComponent {
   sortDirection = signal<'asc' | 'desc'>('desc');
 
   _notificationService = inject(NotificationService);
+  private pdfService = inject(PdfService);
   private router = inject(Router);
   private ventaService = inject(VentaService);
 
@@ -77,11 +81,9 @@ export class VentaComponent {
   loadVentas() {
     this.ventaService.getAll().subscribe({
       next: (ventas: VentaDto[]) => {
-        // CORRECCIÓN: Aplicar cálculo correcto del total a todas las ventas
         const ventasCorregidas = ventas.map((venta) => ({
           ...venta,
-          // FORZAR el cálculo correcto: total = subtotal - descuento
-          total: this.calcularTotalCorrecto(venta),
+          total: venta.subtotal,
         }));
 
         this.allVentas.set(ventasCorregidas);
@@ -98,27 +100,21 @@ export class VentaComponent {
   private applyFilterAndSort() {
     let filtered = this.allVentas();
 
-    // Aplicar filtro de búsqueda
     const term = this.searchTerm().toLowerCase();
     if (term) {
       filtered = filtered.filter(
         (v) =>
           this.getClienteNombre(v).toLowerCase().includes(term) ||
-          v.metodo_pago.toLowerCase().includes(term) ||
           v.estado.toLowerCase().includes(term) ||
           v.id_venta?.toString().includes(term)
       );
     }
 
-    // Aplicar ordenamiento
     const sorted = this.sortVentas(filtered);
-
-    // Aplicar paginación
     const paginated = this.paginateVentas(sorted);
     this.ventas.set(paginated);
   }
 
-  // Ordenar ventas manualmente
   private sortVentas(ventas: VentaDto[]): VentaDto[] {
     const column = this.sortColumn();
     if (!column) {
@@ -131,26 +127,21 @@ export class VentaComponent {
       let aValue: any = a[column];
       let bValue: any = b[column];
 
-      // Manejar valores undefined/null
       if (aValue === undefined || aValue === null) aValue = '';
       if (bValue === undefined || bValue === null) bValue = '';
 
-      // Ordenar por fechas
       if (column === 'fecha_venta') {
         return direction * (new Date(aValue).getTime() - new Date(bValue).getTime());
       }
 
-      // Ordenar por números (ID, montos)
       if (typeof aValue === 'number' && typeof bValue === 'number') {
         return direction * (aValue - bValue);
       }
 
-      // Ordenar por texto
       return direction * aValue.toString().localeCompare(bValue.toString());
     });
   }
 
-  // Paginar ventas manualmente
   private paginateVentas(ventas: VentaDto[]): VentaDto[] {
     const startIndex = (this.currentPage() - 1) * this.pageSize();
     const endIndex = startIndex + this.pageSize();
@@ -161,12 +152,10 @@ export class VentaComponent {
     return this.ventas();
   });
 
-  // CORRECCIÓN: Obtener nombre del cliente igual que en otros componentes
   getClienteNombre(venta: VentaDto): string {
     const cliente = venta.cliente;
     if (!cliente) return 'Cliente N/A';
 
-    // Si tiene persona con nombre y apellido
     if (cliente.persona?.nombre) {
       const nombreCompleto = cliente.persona.nombre
         ? `${cliente.persona.nombre} ${cliente.persona.apellido || ''}`.trim()
@@ -174,12 +163,10 @@ export class VentaComponent {
       return nombreCompleto;
     }
 
-    // Si tiene nombre directo (sin 'persona')
     if (cliente.nombre) {
       return cliente.nombre;
     }
 
-    // Fallback
     return 'Cliente ' + (venta.id_cliente || 'N/A');
   }
 
@@ -187,22 +174,11 @@ export class VentaComponent {
     const classes: { [key: string]: string } = {
       pendiente: 'px-3 py-1 rounded-full text-xs font-bold bg-yellow-100 text-yellow-700',
       pagado: 'px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700',
-      anulado: 'px-3 py-1 rounded-full text-xs font-bold bg-red-100 text-red-700',
     };
     return classes[estado] || classes['pendiente'];
   }
 
-  getMetodoPagoClass(metodoPago: string): string {
-    const classes: { [key: string]: string } = {
-      efectivo: 'px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700',
-      transferencia: 'px-3 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-700',
-      credito: 'px-3 py-1 rounded-full text-xs font-bold bg-orange-100 text-orange-700',
-    };
-    return (
-      classes[metodoPago] || 'px-3 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-700'
-    );
-  }
-
+  // NUEVO: Formato de fecha solo con día, mes y año
   formatDate(dateString: string | undefined): string {
     if (!dateString) return '';
     const date = new Date(dateString);
@@ -210,24 +186,17 @@ export class VentaComponent {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
     });
   }
 
-  // CORRECCIÓN PRINCIPAL: Calcular total correctamente (subtotal - descuento)
-  calcularTotalCorrecto(venta: VentaDto): number {
-    const subtotal = Number(venta.subtotal) || 0;
-    const descuento = Number(venta.descuento) || 0;
-    return Math.max(0, subtotal - descuento);
+  getDescuentoPesoTotal(venta: VentaDto): number {
+    return venta.descuento || 0;
   }
 
-  // CORRECCIÓN: Obtener el total a mostrar (SIEMPRE usar el calculado)
   getTotalAMostrar(venta: VentaDto): number {
-    return this.calcularTotalCorrecto(venta);
+    return venta.subtotal || 0;
   }
 
-  // CORRECCIÓN: Calcular saldo pendiente correctamente
   getSaldoPendiente(venta: VentaDto): number {
     if (!venta.planPago || !venta.planPago.pagos) return 0;
 
@@ -240,12 +209,20 @@ export class VentaComponent {
     return Math.max(0, totalVenta - totalPagado);
   }
 
-  // Redirigir a la vista de creación
+  generateRecibo(venta: VentaDto) {
+    try {
+      this.pdfService.generateReciboPdf(venta);
+      this._notificationService.showSuccess('Recibo generado correctamente');
+    } catch (error) {
+      console.error('Error generando recibo:', error);
+      this._notificationService.showError('Error al generar el recibo');
+    }
+  }
+
   createVenta() {
     this.router.navigate(['/ventas/crear']);
   }
 
-  // Redirigir a la vista de edición
   edit(venta: VentaDto) {
     this.router.navigate(['/ventas/editar', venta.id_venta]);
   }
@@ -269,7 +246,6 @@ export class VentaComponent {
       });
   }
 
-  // Métodos de ordenamiento y paginación
   sort(column: keyof VentaDto) {
     if (this.sortColumn() === column) {
       this.sortDirection.set(this.sortDirection() === 'asc' ? 'desc' : 'asc');
@@ -306,51 +282,36 @@ export class VentaComponent {
     }
   }
 
-  totalPages() {
-    const filteredLength = this.searchTerm()
-      ? this.allVentas().filter(
-          (v) =>
-            this.getClienteNombre(v).toLowerCase().includes(this.searchTerm().toLowerCase()) ||
-            v.metodo_pago.toLowerCase().includes(this.searchTerm().toLowerCase()) ||
-            v.estado.toLowerCase().includes(this.searchTerm().toLowerCase()) ||
-            v.id_venta?.toString().includes(this.searchTerm())
-        ).length
-      : this.allVentas().length;
-
+  totalPages(): number {
+    const filteredLength = this.getTotalFiltered();
     return Math.ceil(filteredLength / this.pageSize());
   }
 
   pageArray(): number[] {
-    return Array.from({ length: this.totalPages() }, (_, i) => i + 1);
+    const total = this.totalPages();
+    return Array.from({ length: total }, (_, i) => i + 1);
   }
 
   rangeStart(): number {
+    const filteredLength = this.getTotalFiltered();
+    if (filteredLength === 0) return 0;
     return (this.currentPage() - 1) * this.pageSize() + 1;
   }
 
   rangeEnd(): number {
-    const filteredLength = this.searchTerm()
-      ? this.allVentas().filter(
-          (v) =>
-            this.getClienteNombre(v).toLowerCase().includes(this.searchTerm().toLowerCase()) ||
-            v.metodo_pago.toLowerCase().includes(this.searchTerm().toLowerCase()) ||
-            v.estado.toLowerCase().includes(this.searchTerm().toLowerCase()) ||
-            v.id_venta?.toString().includes(this.searchTerm())
-        ).length
-      : this.allVentas().length;
-
+    const filteredLength = this.getTotalFiltered();
     const end = this.currentPage() * this.pageSize();
     return end > filteredLength ? filteredLength : end;
   }
 
   getTotalFiltered(): number {
     if (this.searchTerm()) {
+      const term = this.searchTerm().toLowerCase();
       return this.allVentas().filter(
         (v) =>
-          this.getClienteNombre(v).toLowerCase().includes(this.searchTerm().toLowerCase()) ||
-          v.metodo_pago.toLowerCase().includes(this.searchTerm().toLowerCase()) ||
-          v.estado.toLowerCase().includes(this.searchTerm().toLowerCase()) ||
-          v.id_venta?.toString().includes(this.searchTerm())
+          this.getClienteNombre(v).toLowerCase().includes(term) ||
+          v.estado.toLowerCase().includes(term) ||
+          v.id_venta?.toString().includes(term)
       ).length;
     }
     return this.allVentas().length;

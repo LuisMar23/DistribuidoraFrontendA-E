@@ -9,7 +9,7 @@ export interface VentaDto {
   descuento: number;
   total: number;
   metodo_pago: 'efectivo' | 'transferencia' | 'credito';
-  estado: 'pendiente' | 'pagado' | 'anulado';
+  estado: 'pendiente' | 'pagado';
   observaciones?: string;
   cliente?: ClienteDto;
   usuario?: any;
@@ -54,6 +54,9 @@ export interface PlanPagoDto {
   fecha_vencimiento: string;
   estado?: 'ACTIVO' | 'PAGADO' | 'CANCELADO';
   pagos?: PagoPlanDto[];
+  saldo_pendiente?: number;
+  total_pagado?: number;
+  porcentaje_pagado?: number;
 }
 
 export interface PagoPlanDto {
@@ -63,4 +66,14 @@ export interface PagoPlanDto {
   monto: number;
   fecha_pago: string;
   observacion?: string;
+  recibos?: ReciboPlanPagoDto[];
+}
+
+export interface ReciboPlanPagoDto {
+  id: number;
+  pagoPlanPagoId: number;
+  urlArchivo: string;
+  tipoArchivo?: string;
+  nombreArchivo?: string;
+  creado_en: string;
 }
