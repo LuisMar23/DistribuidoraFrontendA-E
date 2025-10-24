@@ -23,7 +23,6 @@ export class ChangePasswordComponent {
   loading = signal(false);
   errorMessage = signal('');
   passwordChanged = signal(false);
-  changedUser = signal<{ username: string; fullName: string } | null>(null);
 
   // Variables para mostrar/ocultar contraseña
   showNewPassword = false;
@@ -76,10 +75,7 @@ export class ChangePasswordComponent {
 
       this.authService.changePassword(changePasswordData).subscribe({
         next: (response: ChangePasswordResponse) => {
-          this.changedUser.set({
-            username: response.user.username,
-            fullName: response.user.fullName,
-          });
+          // CORRECCIÓN: Solo marcamos que la contraseña fue cambiada, sin mostrar datos del usuario
           this.passwordChanged.set(true);
           this.loading.set(false);
           this.changePasswordForm.reset();

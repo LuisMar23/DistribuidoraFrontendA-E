@@ -5,7 +5,7 @@ import { AuthService } from '../components/services/auth.service';
 import { Router, RouterModule } from '@angular/router';
 import { faEye, faEyeSlash, faLock, faUser } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-
+import { NotificationService } from '../core/services/notification.service';
 
 @Component({
   selector: 'app-login',
@@ -23,6 +23,7 @@ export class LoginComponent {
   loginForm: FormGroup;
   showPassword: boolean = false;
   _authService = inject(AuthService);
+  private notificationService = inject(NotificationService);
 
   constructor(private fb: FormBuilder, private router: Router) {
     this.loginForm = this.fb.group({
@@ -38,7 +39,7 @@ export class LoginComponent {
 
   async onSubmit() {
     if (this.loginForm.valid) {
- 
+
       const formData = this.loginForm.value;
       console.log('Formulario válido', {
         identifier: formData.identifier,
@@ -50,16 +51,35 @@ export class LoginComponent {
 
       this._authService.login(data).subscribe({
         next: () => {
+          this.notificationService.showSuccess('¡Inicio de sesión exitoso!');
           this.router.navigate(['/dashboard']);
         },
-        error: () => {
-          alert('No se encontro datos');
+        error: (error) => {
+          this.handleLoginError(error);
         },
       });
     } else {
       Object.keys(this.loginForm.controls).forEach((key) => {
         this.loginForm.get(key)?.markAsTouched();
       });
+      this.notificationService.showWarning('Por favor, completa todos los campos requeridos');
+    }
+  }
+
+  private handleLoginError(error: any): void {
+    const errorMessage = error.error?.message || error.message || '';
+
+    if (
+      errorMessage.includes('bloqueó') ||
+      errorMessage.includes('bloqueada') ||
+      errorMessage.includes('minutos')
+    ) {
+      this.notificationService.showError(errorMessage);
+    } else {
+
+      this.notificationService.showError(
+        'No se pudo iniciar sesión. Verifica tus datos e intenta nuevamente.'
+      );
     }
   }
 }

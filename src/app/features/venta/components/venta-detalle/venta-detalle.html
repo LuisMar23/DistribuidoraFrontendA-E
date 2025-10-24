@@ -149,6 +149,40 @@
                     </div>
                 </div>
 
+                <!-- Descuento de Peso General -->
+                <div class="mb-8">
+                    <h2
+                        class="text-lg sm:text-xl font-semibold text-black mb-4 flex items-center gap-2 border-b-2 border-red-200 pb-2">
+                        <fa-icon [icon]="faPercent" class="w-5 h-5 sm:w-6 sm:h-6"></fa-icon>
+                        Descuento de Peso General
+                    </h2>
+                    <div class="to-white border-2 border-red-200 rounded-xl p-4 sm:p-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- Descuento de Peso Total -->
+                            <div class="bg-white rounded-lg p-4 shadow border border-gray-200">
+                                <p class="text-xs sm:text-sm text-gray-600 mb-1 flex items-center gap-1">
+                                    <fa-icon [icon]="faWeightHanging" class="text-xs text-orange-600"></fa-icon>
+                                    Descuento de Peso Total
+                                </p>
+                                <p class="text-lg sm:text-xl font-bold text-orange-700">{{ getDescuentoPesoTotal() |
+                                    number:'1.2-2' }} kg</p>
+                                <p class="text-xs text-gray-500 mt-1">Descuento aplicado a todos los productos</p>
+                            </div>
+
+                            <!-- Información del Descuento -->
+                            <div class="bg-blue-50 rounded-lg p-4 border-2 border-blue-200">
+                                <label class="block text-sm font-medium text-blue-700 mb-2">
+                                    Información del Descuento
+                                </label>
+                                <p class="text-sm text-blue-800">
+                                    Este descuento se distribuyó proporcionalmente entre todos los productos
+                                    seleccionados.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Montos -->
                 <div class="mb-8">
                     <h2
@@ -157,7 +191,7 @@
                         Resumen de Montos
                     </h2>
                     <div class="to-white border-2 border-red-200 rounded-xl p-4 sm:p-6">
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <!-- Subtotal -->
                             <div class="bg-white rounded-lg p-4 shadow border border-gray-200">
                                 <p class="text-xs sm:text-sm text-gray-600 mb-1 flex items-center gap-1">
@@ -165,16 +199,6 @@
                                     Subtotal
                                 </p>
                                 <p class="text-lg sm:text-xl font-bold text-blue-700">{{ getSubtotal() | number:'1.2-2'
-                                    }} Bs.</p>
-                            </div>
-
-                            <!-- Descuento -->
-                            <div class="bg-white rounded-lg p-4 shadow border border-gray-200">
-                                <p class="text-xs sm:text-sm text-gray-600 mb-1 flex items-center gap-1">
-                                    <fa-icon [icon]="faTag" class="text-xs text-red-600"></fa-icon>
-                                    Descuento
-                                </p>
-                                <p class="text-lg sm:text-xl font-bold text-red-700">{{ getDescuento() | number:'1.2-2'
                                     }} Bs.</p>
                             </div>
 
@@ -186,114 +210,141 @@
                                 </p>
                                 <p class="text-lg sm:text-xl font-bold text-green-700">{{ getTotal() | number:'1.2-2' }}
                                     Bs.</p>
+                                <p class="text-xs text-green-600 mt-1">Subtotal</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Sección de Plan de Pago (Solo para ventas a crédito) -->
-                @if (tienePlanPago() && esCredito()) {
+                <!-- SECCIÓN ESPECÍFICA DEL PLAN DE PAGO -->
+                @if (tienePlanPago()) {
                 <div class="mb-8">
                     <h2
                         class="text-lg sm:text-xl font-semibold text-black mb-4 flex items-center gap-2 border-b-2 border-red-200 pb-2">
-                        <fa-icon [icon]="faCreditCard" class="w-5 h-5 sm:w-6 sm:h-6"></fa-icon>
+                        <fa-icon [icon]="faCalendarAlt" class="w-5 h-5 sm:w-6 sm:h-6"></fa-icon>
                         Plan de Pago
                     </h2>
                     <div class="to-white border-2 border-red-200 rounded-xl p-4 sm:p-6">
-                        <!-- Resumen del Plan de Pago -->
-                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                            <div class="bg-white rounded-lg p-4 shadow border border-gray-200">
-                                <p class="text-xs sm:text-sm text-blue-600 mb-1">Total del Plan</p>
-                                <p class="text-lg sm:text-xl font-bold text-blue-700">
-                                    {{ getTotal() | number:'1.2-2' }} Bs.
-                                </p>
-                            </div>
-                            <div class="bg-white rounded-lg p-4 shadow border border-gray-200">
-                                <p class="text-xs sm:text-sm text-green-600 mb-1">Total Pagado</p>
-                                <p class="text-lg sm:text-xl font-bold text-green-700">
-                                    {{ calcularTotalPagado() | number:'1.2-2' }} Bs.
-                                </p>
-                            </div>
-                            <div class="bg-white rounded-lg p-4 shadow border border-gray-200">
-                                <p class="text-xs sm:text-sm text-orange-600 mb-1">Saldo Pendiente</p>
-                                <p class="text-lg sm:text-xl font-bold text-orange-700">
-                                    {{ calcularSaldoPendiente() | number:'1.2-2' }} Bs.
-                                </p>
-                            </div>
-                            <div class="bg-white rounded-lg p-4 shadow border border-gray-200">
-                                <p class="text-xs sm:text-sm text-purple-600 mb-1">Progreso</p>
-                                <div class="w-full bg-gray-200 rounded-full h-2.5 mb-2">
-                                    <div class="bg-purple-600 h-2.5 rounded-full"
-                                        [style.width]="calcularPorcentajePagado() + '%'"></div>
+
+                        <!-- SECCIÓN 1: Información del Plan -->
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                            <!-- Plazo -->
+                            <div>
+                                <label class="text-sm font-medium text-gray-700 mb-2">
+                                    Plazo
+                                </label>
+                                <div class="w-full px-4 py-2.5 border-2 border-gray-300 rounded-lg bg-gray-100">
+                                    <span class="font-semibold text-gray-800">{{ getPlazo() }} {{
+                                        getPeriodicidadTexto() }}</span>
                                 </div>
-                                <p class="text-sm font-bold text-purple-700">
-                                    {{ calcularPorcentajePagado() | number:'1.0-0' }}%
-                                </p>
+                            </div>
+
+                            <!-- Fecha Inicio -->
+                            <div>
+                                <label class="text-sm font-medium text-gray-700 mb-2">
+                                    Fecha de Inicio
+                                </label>
+                                <div class="w-full px-4 py-2.5 border-2 border-gray-300 rounded-lg bg-gray-100">
+                                    <span class="font-semibold text-gray-800">{{ getFechaInicioPlanPago() }}</span>
+                                </div>
+                            </div>
+
+                            <!-- Fecha Vencimiento -->
+                            <div>
+                                <label class="text-sm font-medium text-gray-700 mb-2">
+                                    Fecha de Vencimiento
+                                </label>
+                                <div class="w-full px-4 py-2.5 border-2 border-gray-300 rounded-lg bg-gray-100">
+                                    <span class="font-semibold text-gray-800">{{ calcularFechaVencimiento() }}</span>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- Información del Plan -->
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                            <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                                <p class="text-xs text-gray-600 mb-1">Monto Inicial</p>
-                                <p class="text-sm font-semibold text-gray-800">
-                                    {{ getPlanPago()?.monto_inicial | number:'1.2-2' }} Bs.
-                                </p>
-                            </div>
-                            <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                                <p class="text-xs text-gray-600 mb-1">Plazo</p>
-                                <p class="text-sm font-semibold text-gray-800">
-                                    {{ getPlanPago()?.plazo }}
-                                    @if (getPlanPago()?.periodicidad === 'DIAS') { días }
-                                    @if (getPlanPago()?.periodicidad === 'SEMANAS') { semanas }
-                                    @if (getPlanPago()?.periodicidad === 'MESES') { meses }
-                                </p>
-                            </div>
-                            <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                                <p class="text-xs text-gray-600 mb-1">Fecha Vencimiento</p>
-                                <p class="text-sm font-semibold text-gray-800">
-                                    {{ formatDate(getPlanPago()?.fecha_vencimiento) }}
-                                </p>
-                            </div>
-                        </div>
-
-                        <!-- Lista de Pagos Registrados -->
-                        @if (getPlanPago()?.pagos && getPlanPago()!.pagos.length > 0) {
-                        <div class="bg-gray-50 rounded-xl p-4 border-2 border-gray-200">
-                            <h4 class="text-md font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                                <fa-icon [icon]="faCheckCircle" class="w-5 h-5 text-blue-600"></fa-icon>
-                                Pagos Registrados
+                        <!-- SECCIÓN 2: Botón para agregar pago adicional -->
+                        @if (calcularSaldoPendiente() > 0) {
+                        <div class="mt-6">
+                            <h4 class="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                                <fa-icon [icon]="faCreditCard" class="w-4 h-4"></fa-icon>
+                                Registrar Pago Adicional
                             </h4>
-                            <div class="space-y-3">
-                                @for (pago of getPlanPago()!.pagos; track $index) {
-                                <div
-                                    class="bg-white rounded-lg p-4 shadow border border-gray-200 flex justify-between items-center">
-                                    <div class="flex items-center gap-4">
-                                        <div
-                                            class="bg-green-100 text-green-600 w-10 h-10 flex items-center justify-center rounded-full">
-                                            <fa-icon [icon]="faMoneyBillWave" class="text-sm"></fa-icon>
-                                        </div>
-                                        <div>
-                                            <div class="font-semibold text-gray-800">{{ pago.monto | number:'1.2-2' }}
-                                                Bs.</div>
-                                            <div class="text-sm text-gray-600">{{ formatDate(pago.fecha_pago) }}</div>
-                                            @if (pago.observacion) {
-                                            <div class="text-xs text-gray-500 mt-1">{{ pago.observacion }}</div>
-                                            }
-                                        </div>
+                            <div class="bg-blue-50 rounded-xl p-4 border border-blue-200">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="text-sm text-blue-800 font-medium">Saldo Pendiente: {{
+                                            calcularSaldoPendiente() | number:'1.2-2' }} Bs.</p>
+                                        <p class="text-xs text-blue-600 mt-1">Puede registrar pagos adicionales para
+                                            reducir el saldo pendiente</p>
                                     </div>
-                                    <span
-                                        class="bg-green-100 text-green-800 text-xs px-3 py-1 rounded-full font-medium">
-                                        Completado
-                                    </span>
+                                    <button type="button" (click)="mostrarAgregarPago()"
+                                        class="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2.5 rounded-lg font-semibold transition-all duration-200 shadow-lg hover:shadow-xl text-sm">
+                                        <fa-icon [icon]="faPlus" class="text-sm"></fa-icon>
+                                        Agregar Pago
+                                    </button>
                                 </div>
-                                }
                             </div>
                         </div>
-                        } @else {
-                        <div class="bg-yellow-50 border-2 border-yellow-200 rounded-xl p-6 text-center">
-                            <fa-icon [icon]="faClock" class="w-12 h-12 text-yellow-600 mx-auto mb-3"></fa-icon>
-                            <p class="text-yellow-800 font-medium">No hay pagos registrados para este plan de pago</p>
+                        }
+
+                        <!-- SECCIÓN 3: Resumen del Plan de Pago -->
+                        @if (getTotal() > 0) {
+                        <div class="mt-6 p-4 bg-blue-50 rounded-xl border border-blue-200">
+                            <h4 class="font-semibold text-blue-800 mb-3 flex items-center gap-2">
+                                <fa-icon [icon]="faSyncAlt" class="w-4 h-4"></fa-icon>
+                                Resumen del Plan de Pago
+                            </h4>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                                <div class="bg-white rounded-lg p-3 shadow">
+                                    <p class="text-xs text-gray-600 mb-1">Total a Pagar:</p>
+                                    <p class="font-semibold text-green-600">{{ getTotal() | number:'1.2-2' }} Bs.</p>
+                                </div>
+                                <div class="bg-white rounded-lg p-3 shadow">
+                                    <p class="text-xs text-gray-600 mb-1">Monto Inicial:</p>
+                                    <p class="font-semibold text-blue-600">{{ getMontoInicial() | number:'1.2-2' }} Bs.
+                                    </p>
+                                </div>
+                                <div class="bg-white rounded-lg p-3 shadow">
+                                    <p class="text-xs text-gray-600 mb-1">Total Pagado:</p>
+                                    <p class="font-semibold text-green-600">{{ calcularTotalPagado() | number:'1.2-2' }}
+                                        Bs.</p>
+                                </div>
+                                <div class="bg-white rounded-lg p-3 shadow">
+                                    <p class="text-xs text-gray-600 mb-1">Saldo Pendiente:</p>
+                                    <p class="font-semibold text-orange-600">{{ calcularSaldoPendiente() |
+                                        number:'1.2-2' }} Bs.</p>
+                                </div>
+                            </div>
+                        </div>
+                        }
+
+                        <!-- SECCIÓN 4: Historial de Pagos -->
+                        @if (getPagosExistentes().length > 0) {
+                        <div class="mt-6">
+                            <h4 class="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                                <fa-icon [icon]="faReceipt" class="w-4 h-4"></fa-icon>
+                                Historial de Pagos
+                            </h4>
+                            <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                                <table class="w-full text-sm">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th class="px-4 py-2 text-left font-semibold text-gray-700">Fecha</th>
+                                            <th class="px-4 py-2 text-left font-semibold text-gray-700">Monto</th>
+                                            <th class="px-4 py-2 text-left font-semibold text-gray-700">Observación</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-200">
+                                        @for (pago of getPagosExistentes(); track pago.id_pago_plan) {
+                                        <tr class="hover:bg-gray-50">
+                                            <td class="px-4 py-2">{{ formatDate(pago.fecha_pago) }}</td>
+                                            <td class="px-4 py-2 font-semibold text-green-600">{{ pago.monto |
+                                                number:'1.2-2' }} Bs.</td>
+                                            <td class="px-4 py-2 text-gray-600">{{ pago.observacion || 'Sin observación'
+                                                }}</td>
+                                        </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                         }
                     </div>
@@ -327,16 +378,10 @@
                                             Peso Original</th>
                                         <th
                                             class="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
-                                            Desc. Peso</th>
-                                        <th
-                                            class="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
                                             Peso Final</th>
                                         <th
                                             class="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
                                             Subtotal</th>
-                                        <th
-                                            class="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
-                                            Total</th>
                                     </tr>
                                 </thead>
                                 <tbody class="bg-white divide-y divide-gray-100">
@@ -362,9 +407,6 @@
                                             </div>
                                         </td>
                                         <td class="px-4 py-3 text-sm text-gray-600">
-                                            {{ detalle.descuento_peso | number:'1.2-2' }} kg
-                                        </td>
-                                        <td class="px-4 py-3 text-sm text-gray-600">
                                             <div class="flex items-center gap-1">
                                                 <fa-icon [icon]="faWeightHanging"
                                                     class="text-green-500 text-xs"></fa-icon>
@@ -374,27 +416,18 @@
                                         <td class="px-4 py-3 text-sm font-semibold text-green-600">
                                             {{ calcularSubtotalDetalle(detalle) | number:'1.2-2' }} Bs.
                                         </td>
-                                        <td class="px-4 py-3 text-sm font-bold text-blue-700">
-                                            {{ calcularTotalDetalle(detalle) | number:'1.2-2' }} Bs.
-                                        </td>
                                     </tr>
                                     }
                                 </tbody>
                                 <!-- Footer con totales -->
                                 <tfoot class="bg-gray-50 border-t border-gray-200">
                                     <tr>
-                                        <td colspan="6"
+                                        <td colspan="5"
                                             class="px-4 py-3 text-sm font-semibold text-gray-700 text-right">
                                             Total General:
                                         </td>
-                                        <td class="px-4 py-3 text-sm font-semibold text-gray-700">
-                                            {{ getTotalPesoFinal() | number:'1.2-2' }} kg
-                                        </td>
                                         <td class="px-4 py-3 text-sm font-bold text-green-700">
                                             {{ getTotalSubtotalDetalles() | number:'1.2-2' }} Bs.
-                                        </td>
-                                        <td class="px-4 py-3 text-sm font-bold text-blue-700">
-                                            {{ getTotalFinalDetalles() | number:'1.2-2' }} Bs.
                                         </td>
                                     </tr>
                                 </tfoot>
@@ -438,3 +471,105 @@
         }
     </div>
 </div>
+
+<!-- Modal para agregar pago adicional -->
+@if (mostrarModalPago()) {
+<div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden shadow-2xl">
+        <!-- Header del modal con colores de la aplicación -->
+        <div class="bg-[#ff7676] rounded-t-2xl shadow-lg p-6">
+            <div class="flex justify-between items-center">
+                <h3 class="text-xl font-bold text-white flex items-center gap-2">
+                    <fa-icon [icon]="faCreditCard" class="w-6 h-6 text-white"></fa-icon>
+                    Registrar Pago Adicional
+                </h3>
+                <button (click)="cerrarModalPago()"
+                    class="text-white hover:text-red-100 p-2 rounded-lg hover:bg-red-500 transition-colors">
+                    <fa-icon [icon]="faTimes" class="text-lg"></fa-icon>
+                </button>
+            </div>
+            <p class="text-red-100 text-sm mt-2">Complete los datos para registrar un nuevo pago</p>
+        </div>
+
+        <div class="p-6 overflow-y-auto max-h-[calc(90vh-200px)]">
+            <form [formGroup]="formPago" class="space-y-6">
+                <!-- Información de saldo pendiente -->
+                <div class="bg-yellow-50 rounded-xl p-4 border-2 border-yellow-200">
+                    <div class="flex items-center gap-3">
+                        <fa-icon [icon]="faMoneyBillWave" class="w-5 h-5 text-yellow-600"></fa-icon>
+                        <div>
+                            <p class="text-sm font-semibold text-yellow-800">Saldo Pendiente: {{
+                                calcularSaldoPendiente() | number:'1.2-2' }} Bs.</p>
+                            <p class="text-xs text-yellow-600 mt-1">Monto máximo que puede pagar</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Monto -->
+                    <div>
+                        <label class="text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                            <fa-icon [icon]="faDollarSign" class="w-4 h-4 text-green-600"></fa-icon>
+                            Monto a Pagar <span class="text-red-500">*</span>
+                        </label>
+                        <div class="relative">
+                            <span
+                                class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 font-medium">Bs</span>
+                            <input formControlName="monto" type="number" step="0.01" min="0.01"
+                                [max]="calcularSaldoPendiente()"
+                                class="w-full pl-12 pr-4 py-2.5 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-200 text-sm" />
+                        </div>
+                        @if (formPago.get('monto')?.invalid && formPago.get('monto')?.touched) {
+                        <p class="mt-1 text-xs text-red-600">El monto es requerido y debe ser mayor a 0</p>
+                        }
+                    </div>
+
+                    <!-- Fecha Pago -->
+                    <div>
+                        <label class="text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                            <fa-icon [icon]="faCalendarAlt" class="w-4 h-4 text-red-600"></fa-icon>
+                            Fecha de Pago <span class="text-red-500">*</span>
+                        </label>
+                        <input formControlName="fecha_pago" type="datetime-local"
+                            class="w-full px-4 py-2.5 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-200 text-sm" />
+                        @if (formPago.get('fecha_pago')?.invalid && formPago.get('fecha_pago')?.touched) {
+                        <p class="mt-1 text-xs text-red-600">La fecha de pago es requerida</p>
+                        }
+                    </div>
+
+                    <!-- Observación -->
+                    <div class="md:col-span-2">
+                        <label class="text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                            <fa-icon [icon]="faStickyNote" class="w-4 h-4 text-blue-600"></fa-icon>
+                            Observación (Opcional)
+                        </label>
+                        <textarea formControlName="observacion" rows="3"
+                            placeholder="Agregue una observación sobre este pago..."
+                            class="w-full px-4 py-2.5 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-200 text-sm resize-none"></textarea>
+                        <p class="mt-1 text-xs text-gray-500">Información adicional sobre el pago</p>
+                    </div>
+                </div>
+
+                <!-- Botones -->
+                <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-4 border-t border-gray-200">
+                    <button type="button" (click)="registrarPagoAdicional()"
+                        [disabled]="isLoading() || formPago.invalid"
+                        class="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg font-semibold hover:from-green-700 hover:to-green-800 disabled:bg-gray-400 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl text-sm flex items-center justify-center gap-2">
+                        <fa-icon [icon]="faSave" class="text-sm"></fa-icon>
+                        @if (isLoading()) {
+                        <span>Registrando Pago...</span>
+                        } @else {
+                        <span>Registrar Pago</span>
+                        }
+                    </button>
+                    <button type="button" (click)="cerrarModalPago()" [disabled]="isLoading()"
+                        class="w-full sm:w-auto px-6 py-3 bg-gray-200 text-gray-700 rounded-lg font-semibold hover:bg-gray-300 transition-all duration-200 text-sm flex items-center justify-center gap-2">
+                        <fa-icon [icon]="faTimes" class="text-sm"></fa-icon>
+                        Cancelar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+}

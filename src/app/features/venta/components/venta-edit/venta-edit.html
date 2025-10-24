@@ -87,6 +87,46 @@
                     </div>
                 </div>
 
+                <!-- Descuento de Peso General -->
+                <div class="mb-8">
+                    <h2
+                        class="text-lg sm:text-xl font-semibold text-black mb-4 flex items-center gap-2 border-b-2 border-red-200 pb-2">
+                        <fa-icon [icon]="faPercent" class="w-5 h-5 sm:w-6 sm:h-6"></fa-icon>
+                        Descuento de Peso General
+                    </h2>
+                    <div class="to-white border-2 border-red-200 rounded-xl p-4 sm:p-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- Descuento de Peso Total -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    <fa-icon [icon]="faWeightHanging" class="w-4 h-4 mr-1"></fa-icon>
+                                    Descuento de Peso Total (kg) <span class="text-red-500">*</span>
+                                </label>
+                                <input formControlName="descuento_peso_total" type="number" step="0.01" min="0"
+                                    (blur)="onDescuentoPesoTotalChange()"
+                                    class="w-full px-4 py-2.5 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-200 text-sm sm:text-base" />
+                                @if (form.get('descuento_peso_total')?.invalid &&
+                                form.get('descuento_peso_total')?.touched) {
+                                <p class="mt-1 text-xs text-red-600">El descuento de peso es requerido</p>
+                                }
+                                <p class="mt-1 text-xs text-gray-500">Descuento general que se aplicará por igual a
+                                    todos los
+                                    productos</p>
+                            </div>
+
+                            <!-- Información del Descuento -->
+                            <div class="bg-blue-50 rounded-xl p-4 border-2 border-blue-200">
+                                <label class="block text-sm font-medium text-blue-700 mb-2">
+                                    Información del Descuento
+                                </label>
+                                <p class="text-sm text-blue-800">
+                                    Este descuento se aplicará con el mismo monto a todos los productos seleccionados.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Método de Pago -->
                 <div class="mb-8">
                     <h2
@@ -119,7 +159,6 @@
                                     class="w-full px-4 py-2.5 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-200 text-sm sm:text-base appearance-none bg-white">
                                     <option value="pendiente">Pendiente</option>
                                     <option value="pagado">Pagado</option>
-                                    <option value="anulado">Anulado</option>
                                 </select>
                             </div>
                         </div>
@@ -144,7 +183,7 @@
                     <div formArrayName="detalles" class="space-y-4">
                         @for (detalle of detalles.controls; track $index; let i = $index) {
                         <div [formGroupName]="i"
-                            class="grid grid-cols-1 md:grid-cols-12 gap-3 p-4 border-2 border-gray-200 rounded-xl bg-gray-50">
+                            class="grid grid-cols-1 md:grid-cols-11 gap-3 p-4 border-2 border-gray-200 rounded-xl bg-gray-50">
                             <!-- Producto con buscador -->
                             <div class="md:col-span-2">
                                 <label class="block text-sm font-medium text-gray-700 mb-2">
@@ -196,35 +235,22 @@
                                     class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 text-sm" />
                             </div>
 
-                            <!-- Descuento Peso -->
-                            <div class="md:col-span-2">
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Desc. (kg)</label>
-                                <input formControlName="descuento_peso" type="number" step="0.01" min="0"
-                                    (blur)="calcularSubtotalDetalle(i)"
-                                    class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 text-sm" />
-                            </div>
-
                             <!-- Información Calculada -->
-                            <div class="md:col-span-6 grid grid-cols-3 gap-2 mt-2">
+                            <div class="md:col-span-6 grid grid-cols-2 gap-2 mt-2">
                                 <div class="bg-blue-50 rounded-lg p-2 text-center">
-                                    <p class="text-xs text-blue-600 font-medium">Peso Final</p>
-                                    <p class="text-sm font-bold text-blue-800">{{ detalle.get('peso_final')?.value || 0
-                                        }} kg</p>
+                                    <p class="text-xs text-blue-600 font-medium">Peso Original</p>
+                                    <p class="text-sm font-bold text-blue-800">{{ detalle.get('peso_original')?.value ||
+                                        0 }} kg</p>
                                 </div>
                                 <div class="bg-green-50 rounded-lg p-2 text-center">
                                     <p class="text-xs text-green-600 font-medium">Subtotal</p>
                                     <p class="text-sm font-bold text-green-800">Bs. {{ detalle.get('subtotal')?.value ||
                                         0 | number:'1.2-2' }}</p>
                                 </div>
-                                <div class="bg-purple-50 rounded-lg p-2 text-center">
-                                    <p class="text-xs text-purple-600 font-medium">Precio Unit.</p>
-                                    <p class="text-sm font-bold text-purple-800">Bs. {{
-                                        detalle.get('precio_por_kilo')?.value || 0 | number:'1.2-2' }}</p>
-                                </div>
                             </div>
 
                             <!-- Eliminar -->
-                            <div class="md:col-span-6 flex items-end justify-end">
+                            <div class="md:col-span-5 flex items-end justify-end">
                                 <button type="button" (click)="eliminarDetalle(i)"
                                     class="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 text-sm">
                                     <fa-icon [icon]="faTrash" class="text-sm"></fa-icon>
@@ -253,7 +279,7 @@
                         Resumen de Montos
                     </h2>
                     <div class="to-white border-2 border-red-200 rounded-xl p-4 sm:p-6">
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <!-- Subtotal -->
                             <div class="bg-blue-50 rounded-xl p-4 border-2 border-blue-200">
                                 <label class="block text-sm font-medium text-blue-700 mb-2">
@@ -262,17 +288,6 @@
                                 <div class="flex items-center justify-center">
                                     <span class="text-2xl font-bold text-blue-800">Bs. {{ (form.get('subtotal')?.value
                                         || 0) | number:'1.2-2' }}</span>
-                                </div>
-                            </div>
-
-                            <!-- Descuento -->
-                            <div class="bg-orange-50 rounded-xl p-4 border-2 border-orange-200">
-                                <label class="block text-sm font-medium text-orange-700 mb-2">
-                                    Descuento
-                                </label>
-                                <div class="flex items-center justify-center">
-                                    <span class="text-2xl font-bold text-orange-800">Bs. {{
-                                        (form.get('descuento')?.value || 0) | number:'1.2-2' }}</span>
                                 </div>
                             </div>
 
@@ -285,204 +300,66 @@
                                     <span class="text-2xl font-bold text-green-800">Bs. {{ (form.get('total')?.value ||
                                         0) | number:'1.2-2' }}</span>
                                 </div>
-                                <p class="text-xs text-center text-green-600 mt-2">Subtotal - Descuento</p>
                             </div>
+                        </div>
+
+                        <!-- Información sobre el descuento -->
+                        <div class="mt-4 p-3 bg-orange-50 rounded-lg border border-orange-200">
+                            <p class="text-sm text-orange-800">
+                                <strong>Descuento de peso:</strong> {{ (form.get('descuento_peso_total')?.value || 0) |
+                                number:'1.2-2' }} kg
+                                se aplicará con el mismo monto a todos los productos.
+                            </p>
                         </div>
                     </div>
                 </div>
 
-                <!-- Plan de Pago -->
+                <!-- Recibos del Plan de Pago -->
+                @if (ventaOriginal()?.planPago) {
                 <div class="mb-8">
                     <h2
                         class="text-lg sm:text-xl font-semibold text-black mb-4 flex items-center gap-2 border-b-2 border-red-200 pb-2">
-                        <fa-icon [icon]="faCalendarAlt" class="w-5 h-5 sm:w-6 sm:h-6"></fa-icon>
-                        Plan de Pago
+                        <fa-icon [icon]="faReceipt" class="w-5 h-5 sm:w-6 sm:h-6"></fa-icon>
+                        Recibos del Plan de Pago
                     </h2>
                     <div class="to-white border-2 border-red-200 rounded-xl p-4 sm:p-6">
-
-                        <!-- SECCIÓN 1: Información del Plan (SOLO LECTURA) -->
-                        @if (planPagoId()) {
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                            <!-- Plazo -->
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">
-                                    Plazo
-                                </label>
-                                <div class="w-full px-4 py-2.5 border-2 border-gray-300 rounded-lg bg-gray-100">
-                                    <span class="font-semibold text-gray-800">{{ form.get('plazo')?.value }} {{
-                                        getPeriodicidadTexto() }}</span>
+                        <!-- Información del Plan de Pago -->
+                        <div class="mb-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-blue-700 mb-1">Total del Plan</label>
+                                    <div class="text-lg font-bold text-blue-800">Bs. {{ ventaOriginal()?.planPago?.total
+                                        | number:'1.2-2' }}</div>
                                 </div>
-                            </div>
-
-                            <!-- Fecha Inicio -->
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">
-                                    Fecha de Inicio
-                                </label>
-                                <div class="w-full px-4 py-2.5 border-2 border-gray-300 rounded-lg bg-gray-100">
-                                    <span class="font-semibold text-gray-800">{{ fechaInicio() | date:'dd/MM/yyyy'
-                                        }}</span>
+                                <div>
+                                    <label class="block text-sm font-medium text-blue-700 mb-1">Pagado</label>
+                                    <div class="text-lg font-bold text-green-600">Bs. {{
+                                        ventaOriginal()?.planPago?.total_pagado || 0 | number:'1.2-2' }}</div>
                                 </div>
-                            </div>
-
-                            <!-- Fecha Vencimiento -->
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">
-                                    Fecha de Vencimiento
-                                </label>
-                                <div class="w-full px-4 py-2.5 border-2 border-gray-300 rounded-lg bg-gray-100">
-                                    <span class="font-semibold text-gray-800">{{ calcularFechaVencimiento() }}</span>
-                                </div>
-                            </div>
-                        </div>
-                        }
-
-                        <!-- SECCIÓN 2: Registrar Pago Adicional -->
-                        @if (calcularSaldoPendiente() > 0) {
-                        <div class="mt-6">
-                            <h4 class="font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                                <fa-icon [icon]="faCreditCard" class="w-4 h-4"></fa-icon>
-                                Registrar Pago Adicional
-                            </h4>
-                            <div class="bg-blue-50 rounded-xl p-4 border border-blue-200">
-                                <form [formGroup]="formPago">
-                                    <!-- Saldo Pendiente -->
-                                    <div class="mb-4 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
-                                        <div class="text-sm text-yellow-800">
-                                            <div class="font-semibold">Saldo Pendiente: {{ calcularSaldoPendiente() |
-                                                number:'1.2-2' }} Bs.</div>
-                                            <div class="text-xs mt-1">Monto máximo que puede pagar</div>
-                                        </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-blue-700 mb-1">Estado</label>
+                                    <div class="text-lg font-bold"
+                                        [class.text-green-600]="ventaOriginal()?.planPago?.estado === 'PAGADO'"
+                                        [class.text-orange-600]="ventaOriginal()?.planPago?.estado === 'ACTIVO'">
+                                        {{ ventaOriginal()?.planPago?.estado }}
                                     </div>
-
-                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                        <!-- Monto -->
-                                        <div>
-                                            <label class="block text-sm font-medium text-gray-700 mb-2">
-                                                Monto a Pagar <span class="text-red-500">*</span>
-                                            </label>
-                                            <div class="flex items-center">
-                                                <span class="absolute left-3 text-gray-500 font-medium">Bs</span>
-                                                <input formControlName="monto" type="number" step="0.01" min="0.01"
-                                                    [max]="calcularSaldoPendiente()"
-                                                    class="w-full pl-12 pr-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-sm" />
-                                            </div>
-                                            @if (formPago.get('monto')?.invalid && formPago.get('monto')?.touched) {
-                                            <p class="mt-1 text-xs text-red-600">El monto es requerido y debe ser mayor
-                                                a 0</p>
-                                            }
-                                        </div>
-
-                                        <!-- Fecha Pago -->
-                                        <div>
-                                            <label class="block text-sm font-medium text-gray-700 mb-2">
-                                                Fecha de Pago <span class="text-red-500">*</span>
-                                            </label>
-                                            <input formControlName="fecha_pago" type="datetime-local"
-                                                class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-sm" />
-                                            @if (formPago.get('fecha_pago')?.invalid &&
-                                            formPago.get('fecha_pago')?.touched) {
-                                            <p class="mt-1 text-xs text-red-600">La fecha de pago es requerida</p>
-                                            }
-                                        </div>
-
-                                        <!-- Observación -->
-                                        <div>
-                                            <label class="block text-sm font-medium text-gray-700 mb-2">
-                                                Observación (Opcional)
-                                            </label>
-                                            <input formControlName="observacion" type="text"
-                                                placeholder="Observación sobre este pago..."
-                                                class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-sm" />
-                                        </div>
-                                    </div>
-
-                                    <!-- Botones -->
-                                    <div class="flex gap-3 mt-4">
-                                        <button type="button" (click)="registrarPagoAdicional()"
-                                            [disabled]="isLoading() || formPago.invalid"
-                                            class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold transition-all duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed text-sm flex items-center justify-center gap-2">
-                                            <fa-icon [icon]="faSave" class="text-sm"></fa-icon>
-                                            @if (isLoading()) {
-                                            <span>Registrando...</span>
-                                            } @else {
-                                            <span>Registrar Pago</span>
-                                            }
-                                        </button>
-                                        <button type="button" (click)="cerrarModalPago()" [disabled]="isLoading()"
-                                            class="flex-1 bg-gray-200 text-gray-700 px-4 py-2 rounded-lg font-semibold hover:bg-gray-300 transition-all duration-200 text-sm">
-                                            Cancelar
-                                        </button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                        }
-
-                        <!-- SECCIÓN 3: Resumen del Plan de Pago -->
-                        @if (form.get('total')?.value > 0) {
-                        <div class="mt-6 p-4 bg-blue-50 rounded-xl border border-blue-200">
-                            <h4 class="font-semibold text-blue-800 mb-3 flex items-center gap-2">
-                                <fa-icon [icon]="faSyncAlt" class="w-4 h-4"></fa-icon>
-                                Resumen del Plan de Pago
-                            </h4>
-                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                                <div class="bg-white rounded-lg p-3 shadow">
-                                    <p class="text-xs text-gray-600 mb-1">Total a Pagar:</p>
-                                    <p class="font-semibold text-green-600">{{ (form.get('total')?.value || 0) |
-                                        number:'1.2-2' }} Bs.</p>
-                                </div>
-                                <div class="bg-white rounded-lg p-3 shadow">
-                                    <p class="text-xs text-gray-600 mb-1">Monto Inicial:</p>
-                                    <p class="font-semibold text-blue-600">{{ montoInicial() | number:'1.2-2' }} Bs.</p>
-                                </div>
-                                <div class="bg-white rounded-lg p-3 shadow">
-                                    <p class="text-xs text-gray-600 mb-1">Total Pagado:</p>
-                                    <p class="font-semibold text-green-600">{{ calcularTotalPagado() | number:'1.2-2' }}
-                                        Bs.</p>
-                                </div>
-                                <div class="bg-white rounded-lg p-3 shadow">
-                                    <p class="text-xs text-gray-600 mb-1">Saldo Pendiente:</p>
-                                    <p class="font-semibold text-orange-600">{{ calcularSaldoPendiente() |
-                                        number:'1.2-2' }} Bs.</p>
                                 </div>
                             </div>
                         </div>
-                        }
 
-                        <!-- SECCIÓN 4: Historial de Pagos (Solo lectura) -->
-                        @if (pagosExistentes().length > 0) {
-                        <div class="mt-6">
-                            <h4 class="font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                                <fa-icon [icon]="faReceipt" class="w-4 h-4"></fa-icon>
-                                Historial de Pagos
-                            </h4>
-                            <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
-                                <table class="w-full text-sm">
-                                    <thead class="bg-gray-50">
-                                        <tr>
-                                            <th class="px-4 py-2 text-left font-semibold text-gray-700">Fecha</th>
-                                            <th class="px-4 py-2 text-left font-semibold text-gray-700">Monto</th>
-                                            <th class="px-4 py-2 text-left font-semibold text-gray-700">Observación</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="divide-y divide-gray-200">
-                                        @for (pago of pagosExistentes(); track pago.id_pago_plan) {
-                                        <tr class="hover:bg-gray-50">
-                                            <td class="px-4 py-2">{{ pago.fecha_pago | date:'dd/MM/yyyy' }}</td>
-                                            <td class="px-4 py-2 font-semibold text-green-600">{{ pago.monto |
-                                                number:'1.2-2' }} Bs.</td>
-                                            <td class="px-4 py-2 text-gray-600">{{ pago.observacion || 'Sin observación'
-                                                }}</td>
-                                        </tr>
-                                        }
-                                    </tbody>
-                                </table>
-                            </div>
+                        <!-- Botón para gestionar recibos -->
+                        <div class="text-center">
+                            <button type="button" (click)="abrirModalRecibos()"
+                                class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-200 flex items-center gap-2 mx-auto">
+                                <fa-icon [icon]="faReceipt" class="text-sm"></fa-icon>
+                                Gestionar Recibos del Plan de Pago
+                            </button>
+                            <p class="text-sm text-gray-500 mt-2">Suba comprobantes, facturas o documentos relacionados
+                                con este plan de pago</p>
                         </div>
-                        }
                     </div>
                 </div>
+                }
 
                 <!-- Observaciones -->
                 <div class="mb-8">
@@ -655,6 +532,135 @@
         </div>
         <div class="p-4 border-t bg-gray-50">
             <button (click)="cerrarBuscadorProductos()"
+                class="w-full bg-[#ff7676] hover:bg-red-600 text-white px-4 py-3 rounded-lg transition-colors font-semibold">
+                Cerrar
+            </button>
+        </div>
+    </div>
+</div>
+}
+
+<!-- Modal Recibos Plan de Pago -->
+@if (mostrarModalRecibos()) {
+<div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-2xl">
+        <div class="bg-gradient-to-r from-red-50 to-rose-50 px-6 py-4 border-b border-gray-200">
+            <div class="flex justify-between items-center">
+                <h3 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+                    <fa-icon [icon]="faReceipt" class="w-6 h-6 text-[#ff7676]"></fa-icon>
+                    Recibos del Plan de Pago
+                </h3>
+                <button (click)="cerrarModalRecibos()"
+                    class="text-gray-500 hover:text-gray-700 p-2 rounded-lg hover:bg-white transition-colors">
+                    <fa-icon [icon]="faTimes" class="text-lg"></fa-icon>
+                </button>
+            </div>
+        </div>
+
+        <!-- Sección de subida de archivos -->
+        <div class="p-6 border-b border-gray-200">
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    <fa-icon [icon]="faFileUpload" class="w-4 h-4 mr-1 text-blue-500"></fa-icon>
+                    Subir Recibos (PDF, Imágenes)
+                </label>
+                <input type="file" (change)="onArchivosSeleccionados($event)" multiple
+                    accept=".pdf,.jpg,.jpeg,.png,.gif"
+                    class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm">
+                <p class="mt-1 text-xs text-gray-500">Puede seleccionar múltiples archivos</p>
+            </div>
+
+            <!-- Archivos seleccionados para subir -->
+            @if (archivosSeleccionados().length > 0) {
+            <div class="bg-blue-50 border-2 border-blue-200 rounded-lg p-3 space-y-2">
+                <p class="text-sm font-medium text-blue-800">
+                    {{ archivosSeleccionados().length }} archivo(s) seleccionado(s):
+                </p>
+                <div class="max-h-32 overflow-y-auto space-y-1">
+                    @for (file of archivosSeleccionados(); track $index) {
+                    <div class="text-xs text-blue-700 bg-blue-100 px-2 py-1 rounded">
+                        • {{ file.name }} ({{ (file.size / 1024).toFixed(1) }} KB)
+                    </div>
+                    }
+                </div>
+                <button (click)="subirRecibos()" [disabled]="subiendoArchivos()"
+                    class="w-full sm:w-auto bg-blue-500 hover:bg-blue-600 disabled:bg-gray-400 disabled:cursor-not-allowed text-white px-4 py-2 rounded-lg shadow-md transition-all transform hover:scale-105 active:scale-95 font-medium text-sm flex items-center justify-center gap-2">
+                    @if (!subiendoArchivos()) {
+                    <span>⬆️ Subir {{ archivosSeleccionados().length }} Archivo(s)</span>}
+                    @if (subiendoArchivos()) {
+                    <span class="flex items-center gap-2">
+                        <svg class="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"
+                                fill="none"></circle>
+                            <path class="opacity-75" fill="currentColor"
+                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                            </path>
+                        </svg>
+                        Subiendo...
+                    </span>
+                    }
+                </button>
+            </div>
+            }
+        </div>
+
+        <!-- Lista de recibos -->
+        <div class="overflow-y-auto max-h-96">
+            @if (cargandoRecibos()) {
+            <div class="flex justify-center items-center py-20">
+                <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-red-500"></div>
+            </div>
+            }
+            @else if (recibosPlanPago().length === 0) {
+            <div
+                class="flex flex-col items-center justify-center text-center py-10 px-4 bg-gray-50 rounded-2xl border border-gray-200 shadow-inner m-4">
+                <div class="w-14 h-14 flex items-center justify-center bg-red-100 text-red-500 rounded-full mb-3">
+                    <fa-icon [icon]="faFileUpload" class="text-white text-xl"></fa-icon>
+                </div>
+                <h3 class="text-gray-700 font-semibold text-lg">Sin recibos adjuntos</h3>
+                <p class="text-gray-500 text-sm mt-1">
+                    Aún no se han subido archivos para este plan de pago.
+                </p>
+            </div>
+            }
+            @else {
+            <div class="space-y-2 p-4">
+                <p class="text-sm font-medium text-gray-700">Archivos adjuntos:</p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                    @for (r of recibosPlanPago(); track $index) {
+                    <div
+                        class="bg-gradient-to-r from-gray-50 to-gray-100 p-3 rounded-lg flex items-center justify-between gap-2 shadow-sm border border-gray-200 hover:shadow-md transition-all">
+                        <div class="flex items-center gap-2 flex-1 min-w-0">
+                            <span class="text-xl">📄</span>
+                            <span class="text-sm font-medium text-gray-700 truncate">
+                                {{ r.nombreArchivo }}
+                            </span>
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <button (click)="verRecibo(r)"
+                                class="text-blue-600 hover:text-blue-800 p-1.5 rounded-md transition-all" title="Ver">
+                                <fa-icon [icon]="faEye" class="w-4 h-4"></fa-icon>
+                            </button>
+                            <button (click)="descargarRecibo(r)"
+                                class="text-green-600 hover:text-green-800 p-1.5 rounded-md transition-all"
+                                title="Descargar">
+                                <fa-icon [icon]="faDownload" class="w-4 h-4"></fa-icon>
+                            </button>
+                            <button (click)="eliminarRecibo(r.id)"
+                                class="text-red-600 hover:text-red-800 p-1.5 rounded-md transition-all"
+                                title="Eliminar">
+                                <fa-icon [icon]="faTrash" class="w-4 h-4"></fa-icon>
+                            </button>
+                        </div>
+                    </div>
+                    }
+                </div>
+            </div>
+            }
+        </div>
+
+        <div class="p-4 border-t bg-gray-50">
+            <button (click)="cerrarModalRecibos()"
                 class="w-full bg-[#ff7676] hover:bg-red-600 text-white px-4 py-3 rounded-lg transition-colors font-semibold">
                 Cerrar
             </button>

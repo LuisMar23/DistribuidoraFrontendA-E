@@ -13,17 +13,30 @@ import {
   faPenToSquare,
   faTrash,
   faFileExcel,
+  faFilePdf,
+  faMoneyBillWave,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 
 import { ClientService } from '../../services/cliente.service';
 import { NotificationService } from '../../../../core/services/notification.service';
 import { Workbook } from 'exceljs';
 import { saveAs } from 'file-saver';
 import { PdfService } from '../../../../core/services/pdf.service';
-import { DataTableService, TableState } from '../../../../core/services/ordenamiento.service';
+import { VentaService } from '../../../venta/services/venta.service';
+
+export interface ClientDto {
+  id_cliente: number;
+  persona: {
+    nombre: string;
+    nit_ci: string;
+    telefono: string;
+    direccion: string;
+  };
+  creado_en: string;
+  isActive: boolean;
+}
 
 @Component({
   selector: 'app-client',
@@ -31,6 +44,7 @@ import { DataTableService, TableState } from '../../../../core/services/ordenami
   imports: [CommonModule, ReactiveFormsModule, FormsModule, FontAwesomeModule],
   templateUrl: './clientes-list.html',
   styleUrls: ['./clientes-list.css'],
+  providers: [DatePipe],
 })
 export class ClientComponent {
   faUser = faUser;
@@ -39,6 +53,8 @@ export class ClientComponent {
   faPenToSquare = faPenToSquare;
   faTrash = faTrash;
   faFileExcel = faFileExcel;
+  faFilePdf = faFilePdf;
+  faMoneyBillWave = faMoneyBillWave;
 
   clients = signal<ClientDto[]>([]);
   editId = signal<number | null>(null);
@@ -47,6 +63,8 @@ export class ClientComponent {
   form: FormGroup;
   editMode = signal(false);
 
+  clientesConDeudas = signal<any[]>([]);
+  cargandoDeudas = signal(false);
 
   columns = [
     { key: 'id_cliente', label: 'N°' },
@@ -62,75 +80,92 @@ export class ClientComponent {
   currentPage = signal(1);
   sortColumn = signal<string>('');
   sortDirection = signal<'asc' | 'desc'>('desc');
+
   private _notificationService = inject(NotificationService);
+  private _ventaService = inject(VentaService);
   private pdfService = inject(PdfService);
+  private datePipe = inject(DatePipe);
+
   constructor(private clientService: ClientService, private fb: FormBuilder) {
     this.form = this.fb.group({
-      nombre: ['', Validators.required],
-      nit_ci: ['', Validators.required],
-      telefono: ['', Validators.required],
-      direccion: ['', Validators.required],
+      nombre: ['', [Validators.required, Validators.minLength(2)]],
+      nit_ci: ['', [Validators.required, Validators.minLength(3)]],
+      telefono: ['', [Validators.required, Validators.minLength(6)]],
+      direccion: ['', [Validators.required, Validators.minLength(5)]],
     });
 
     this.loadClients();
   }
 
   loadClients() {
-    this.clientService
-      .getAll(this.currentPage(), this.pageSize())
-      .subscribe((data: ClientDto[]) => {
-        this.clients.set(data);
-        this.total.set(data.length);
-      });
+    this.clientService.getAll(this.currentPage(), this.pageSize()).subscribe({
+      next: (data: ClientDto[]) => {
+        this.clients.set(Array.isArray(data) ? data : []);
+        this.total.set(this.clients().length);
+      },
+      error: (error) => {
+        console.error('Error cargando clientes:', error);
+        this._notificationService.showError('Error al cargar los clientes');
+        this.clients.set([]);
+      },
+    });
   }
 
+  filteredClients = computed(() => {
+    const search = this.searchTerm().toLowerCase().trim();
+    if (!search) return this.clients();
 
-  private dataTable = inject(DataTableService);
+    return this.clients().filter(
+      (client) =>
+        client?.persona?.nombre?.toLowerCase().includes(search) ||
+        client?.persona?.nit_ci?.toLowerCase().includes(search) ||
+        client?.persona?.telefono?.toLowerCase().includes(search) ||
+        client?.persona?.direccion?.toLowerCase().includes(search)
+    );
+  });
 
-  tableState: TableState<any> = {
-    data: this.clients,
-    searchTerm: this.searchTerm,
-    sortColumn: this.sortColumn,
-    sortDirection: this.sortDirection,
-  };
-  filteredClients = this.dataTable.filteredAndSorted(this.tableState, [
-    'persona.nombre',
-    'persona.nit_ci',
-    'persona.telefono',
-    'persona.direccion',
-  ]);
+  paginatedClients = computed(() => {
+    const startIndex = (this.currentPage() - 1) * this.pageSize();
+    const endIndex = startIndex + this.pageSize();
+    return this.filteredClients().slice(startIndex, endIndex);
+  });
 
-  paginatedClients = this.dataTable.paginate(this.filteredClients, this.currentPage, this.pageSize);
-
-  toggleSort(column: any) {
-    this.dataTable.toggleSort(this.tableState, column);
+  toggleSort(column: string) {
+    if (this.sortColumn() === column) {
+      this.sortDirection.set(this.sortDirection() === 'asc' ? 'desc' : 'asc');
+    } else {
+      this.sortColumn.set(column);
+      this.sortDirection.set('asc');
+    }
+    this.ordenarClientes();
   }
-
-  // Simplifica el método sort
-  // sort(column: string) {
-  //   console.log('Ordenando por:', column);
-
-  //   if (this.sortColumn() === column) {
-  //     this.sortDirection.set(this.sortDirection() === 'asc' ? 'desc' : 'asc');
-  //   } else {
-  //     this.sortColumn.set(column);
-  //     this.sortDirection.set('asc');
-  //   }
-  //   // No necesitas llamar a ordenarClientes() porque filteredClients es computed
-  // }
-
-  // ELIMINA el método ordenarClientes() completamente
 
   ordenarClientes() {
     const col = this.sortColumn();
     const dir = this.sortDirection();
     if (!col) return;
 
-    const arr = [...this.clients()]; // ✅ Usa 'clients', no 'clientes'
-
+    const arr = [...this.clients()];
     arr.sort((a, b) => {
-      const valA = a[col as keyof ClientDto];
-      const valB = b[col as keyof ClientDto];
+      let valA: any;
+      let valB: any;
+
+      if (col === 'nombre') {
+        valA = a.persona.nombre;
+        valB = b.persona.nombre;
+      } else if (col === 'nit_ci') {
+        valA = a.persona.nit_ci;
+        valB = b.persona.nit_ci;
+      } else if (col === 'telefono') {
+        valA = a.persona.telefono;
+        valB = b.persona.telefono;
+      } else if (col === 'direccion') {
+        valA = a.persona.direccion;
+        valB = b.persona.direccion;
+      } else {
+        valA = a[col as keyof ClientDto];
+        valB = b[col as keyof ClientDto];
+      }
 
       if (valA == null) return 1;
       if (valB == null) return -1;
@@ -142,12 +177,71 @@ export class ClientComponent {
       return dir === 'asc' ? (valA < valB ? -1 : 1) : valA < valB ? 1 : -1;
     });
 
-    this.clients.set(arr); // ✅ Actualiza la señal correcta
+    this.clients.set(arr);
+  }
+
+  cargarClientesConDeudas() {
+    this.cargandoDeudas.set(true);
+    this._ventaService.obtenerClientesConDeudas().subscribe({
+      next: (deudas) => {
+        if (!deudas || !Array.isArray(deudas)) {
+          this._notificationService.showAlert('No se encontraron datos válidos de deudas');
+          this.cargandoDeudas.set(false);
+          return;
+        }
+
+        this.clientesConDeudas.set(deudas);
+        this.cargandoDeudas.set(false);
+
+        if (deudas.length === 0) {
+          this._notificationService.showAlert('No se encontraron clientes con deudas pendientes');
+        } else {
+          this.generarPdfDeudas();
+        }
+      },
+      error: (error) => {
+        console.error('Error cargando clientes con deudas:', error);
+        this._notificationService.showError('Error al cargar los clientes con deudas');
+        this.cargandoDeudas.set(false);
+      },
+    });
+  }
+
+  generarPdfDeudas() {
+    const deudas = this.clientesConDeudas();
+    if (!deudas || deudas.length === 0) {
+      this._notificationService.showAlert(
+        'No hay clientes con deudas pendientes para generar el PDF'
+      );
+      return;
+    }
+
+    try {
+      this.pdfService.downloadDeudasPdf(deudas);
+      this._notificationService.showSuccess('PDF de deudas generado correctamente');
+    } catch (error) {
+      console.error('Error generando PDF de deudas:', error);
+      this._notificationService.showError('Error al generar el PDF de deudas');
+    }
+  }
+
+  formatDate(date?: string | Date): string {
+    if (!date) return '';
+    try {
+      const d = new Date(date);
+      if (isNaN(d.getTime())) return '';
+      return this.datePipe.transform(d, 'dd/MM/yyyy') || '';
+    } catch {
+      return '';
+    }
   }
 
   submit() {
     if (this.form.invalid) {
-      this._notificationService.showAlert('Formulario inválido');
+      this._notificationService.showAlert(
+        'Por favor complete todos los campos requeridos correctamente'
+      );
+      this.markFormGroupTouched(this.form);
       return;
     }
 
@@ -157,41 +251,55 @@ export class ClientComponent {
       const id = this.editId();
       if (id != null) {
         this.clientService.update(id, data).subscribe({
-          next: (result) => {
-            this._notificationService.showSuccess(`Cliente actualizado: ${result}`);
+          next: () => {
+            this._notificationService.showSuccess('Cliente actualizado correctamente');
             this.loadClients();
             this.cancelEdit();
           },
           error: (error) => {
-            this._notificationService.showError(`Error al actualizar cliente: ${error}`);
+            console.error('Error actualizando cliente:', error);
+            this._notificationService.showError('Error al actualizar el cliente');
           },
         });
       }
     } else {
       this.clientService.create(data).subscribe({
-        next: (result) => {
-          this._notificationService.showSuccess(`Cliente creado: ${result}`);
+        next: () => {
+          this._notificationService.showSuccess('Cliente creado correctamente');
           this.loadClients();
           this.cancelEdit();
         },
         error: (error) => {
-          const msg = error.error?.message || 'Error al crear cliente';
+          console.error('Error creando cliente:', error);
+          const msg = error.error?.message || 'Error al crear el cliente';
           this._notificationService.showError(msg);
         },
       });
     }
   }
+
+  private markFormGroupTouched(formGroup: FormGroup) {
+    Object.keys(formGroup.controls).forEach((key) => {
+      const control = formGroup.get(key);
+      if (control) {
+        control.markAsTouched();
+      }
+    });
+  }
+
   edit(client: ClientDto) {
+    if (!client) return;
+
     this.showModal.set(true);
     this.editMode.set(true);
-    this.editId.set(client.id_cliente!);
+    this.editId.set(client.id_cliente);
 
     const p = client.persona;
     this.form.patchValue({
-      nombre: p.nombre,
-      nit_ci: p.nit_ci,
-      telefono: p.telefono,
-      direccion: p.direccion,
+      nombre: p.nombre || '',
+      nit_ci: p.nit_ci || '',
+      telefono: p.telefono || '',
+      direccion: p.direccion || '',
     });
   }
 
@@ -203,7 +311,6 @@ export class ClientComponent {
       nit_ci: '',
       telefono: '',
       direccion: '',
-      // ✅ email eliminado
     });
   }
 
@@ -216,37 +323,36 @@ export class ClientComponent {
       nit_ci: '',
       telefono: '',
       direccion: '',
-      // ✅ email eliminado
     });
+    this.form.markAsPristine();
+    this.form.markAsUntouched();
   }
 
-  delete(data: any) {
+  delete(client: ClientDto) {
+    if (!client) return;
+
     this._notificationService
-      .confirmDelete(`Se eliminara al cliente ${data.nombre}`)
+      .confirmDelete(`¿Está seguro de eliminar al cliente ${client.persona.nombre}?`)
       .then((result) => {
         if (result.isConfirmed) {
-          this._notificationService.showSuccess('Eliminado correctamente');
-          this.clientService.delete(data.id).subscribe(() => this.loadClients());
+          this.clientService.delete(client.id_cliente).subscribe({
+            next: () => {
+              this._notificationService.showSuccess('Cliente eliminado correctamente');
+              this.loadClients();
+            },
+            error: (error) => {
+              console.error('Error eliminando cliente:', error);
+              this._notificationService.showError('Error al eliminar el cliente');
+            },
+          });
         }
       });
   }
 
   view(c: ClientDto) {
-    console.log('Ver cliente:', c);
+    if (!c) return;
+    this._notificationService.showInfo(`Viendo detalles de ${c.persona.nombre}`);
   }
-
-  // sort(column: string) {
-  //   console.log("adadada")
-  //   console.log(column)
-
-  //   if (this.sortColumn() === column) {
-  //     this.sortDirection.set(this.sortDirection() === 'asc' ? 'desc' : 'asc');
-  //   } else {
-  //     this.sortColumn.set(column);
-  //     this.sortDirection.set('asc');
-  //   }
-  //   this.ordenarClientes();
-  // }
 
   nextPage() {
     if (this.currentPage() < this.totalPages()) {
@@ -270,11 +376,12 @@ export class ClientComponent {
   }
 
   totalPages() {
-    return Math.ceil(this.total() / this.pageSize());
+    return Math.ceil(this.total() / this.pageSize()) || 1;
   }
 
   pageArray(): number[] {
-    return Array.from({ length: this.totalPages() }, (_, i) => i + 1);
+    const pages = this.totalPages();
+    return Array.from({ length: pages }, (_, i) => i + 1);
   }
 
   rangeStart(): number {
@@ -286,151 +393,162 @@ export class ClientComponent {
     return end > this.total() ? this.total() : end;
   }
 
-
-
   downloadExcel() {
-    const workbook = new Workbook();
-    const worksheet = workbook.addWorksheet('Clientes');
+    try {
+      const workbook = new Workbook();
+      const worksheet = workbook.addWorksheet('Clientes');
 
-    worksheet.columns = [
-      { header: 'N°', key: 'numero', width: 8 },
-      { header: 'ID Cliente', key: 'id_cliente', width: 12 },
-      { header: 'Nombre', key: 'nombre', width: 30 },
-      { header: 'NIT/CI', key: 'nit_ci', width: 20 },
-      { header: 'Teléfono', key: 'telefono', width: 20 },
-      { header: 'Dirección', key: 'direccion', width: 40 },
-      { header: 'Fecha de Registro', key: 'creado_en', width: 25 },
-    ];
+      worksheet.columns = [
+        { header: 'N°', key: 'numero', width: 8 },
+        { header: 'ID Cliente', key: 'id_cliente', width: 12 },
+        { header: 'Nombre', key: 'nombre', width: 30 },
+        { header: 'NIT/CI', key: 'nit_ci', width: 20 },
+        { header: 'Teléfono', key: 'telefono', width: 20 },
+        { header: 'Dirección', key: 'direccion', width: 40 },
+        { header: 'Fecha de Registro', key: 'creado_en', width: 25 },
+      ];
 
-    // Estilo de encabezado
-    worksheet.getRow(1).eachCell((cell) => {
-      cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
-      cell.fill = {
-        type: 'pattern',
-        pattern: 'solid',
-        fgColor: { argb: 'FFFF7676' },
-      };
-      cell.alignment = { vertical: 'middle', horizontal: 'center' };
-      cell.border = {
-        top: { style: 'thin' },
-        left: { style: 'thin' },
-        bottom: { style: 'thin' },
-        right: { style: 'thin' },
-      };
-    });
-
-    const clientes = this.filteredClients();
-
-    clientes.forEach((cliente, index) => {
-      const p = cliente.persona;
-
-      const row = worksheet.addRow({
-        numero: index + 1,
-        id_cliente: cliente.id_cliente,
-        nombre: p.nombre || 'N/A',
-        nit_ci: p.nit_ci || 'N/A',
-        telefono: p.telefono || 'N/A',
-        direccion: p.direccion || 'N/A',
-        creado_en: this.formatDate(cliente.creado_en),
-      });
-
-      row.getCell('numero').alignment = {
-        vertical: 'middle',
-        horizontal: 'center',
-      };
-
-      row.eachCell((cell) => {
+      worksheet.getRow(1).eachCell((cell) => {
+        cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+        cell.fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: 'FFFF7676' },
+        };
+        cell.alignment = { vertical: 'middle', horizontal: 'center' };
         cell.border = {
-          top: { style: 'thin', color: { argb: 'FFE0E0E0' } },
-          left: { style: 'thin', color: { argb: 'FFE0E0E0' } },
-          bottom: { style: 'thin', color: { argb: 'FFE0E0E0' } },
-          right: { style: 'thin', color: { argb: 'FFE0E0E0' } },
+          top: { style: 'thin' },
+          left: { style: 'thin' },
+          bottom: { style: 'thin' },
+          right: { style: 'thin' },
         };
       });
 
-      if (index % 2 === 0) {
+      const clientes = this.filteredClients();
+
+      clientes.forEach((cliente, index) => {
+        if (!cliente) return;
+
+        const p = cliente.persona || {};
+
+        const row = worksheet.addRow({
+          numero: index + 1,
+          id_cliente: cliente.id_cliente || 'N/A',
+          nombre: p.nombre || 'N/A',
+          nit_ci: p.nit_ci || 'N/A',
+          telefono: p.telefono || 'N/A',
+          direccion: p.direccion || 'N/A',
+          creado_en: this.formatDate(cliente.creado_en),
+        });
+
+        row.getCell('numero').alignment = {
+          vertical: 'middle',
+          horizontal: 'center',
+        };
+
         row.eachCell((cell) => {
-          cell.fill = {
-            type: 'pattern',
-            pattern: 'solid',
-            fgColor: { argb: 'FFF9F9F9' },
+          cell.border = {
+            top: { style: 'thin', color: { argb: 'FFE0E0E0' } },
+            left: { style: 'thin', color: { argb: 'FFE0E0E0' } },
+            bottom: { style: 'thin', color: { argb: 'FFE0E0E0' } },
+            right: { style: 'thin', color: { argb: 'FFE0E0E0' } },
           };
         });
-      }
-    });
 
-    worksheet.eachRow({ includeEmpty: false }, (row) => {
-      row.height = 22;
-    });
-
-    const totalRow = worksheet.addRow({
-      numero: '',
-      id_cliente: '',
-      nombre: `Total de clientes: ${clientes.length}`,
-      nit_ci: '',
-      telefono: '',
-      direccion: '',
-      creado_en: new Date().toLocaleDateString('es-BO'),
-    });
-
-    totalRow.eachCell((cell) => {
-      cell.font = { bold: true };
-      cell.fill = {
-        type: 'pattern',
-        pattern: 'solid',
-        fgColor: { argb: 'FFFFFFFF' },
-      };
-      cell.alignment = { vertical: 'middle', horizontal: 'center' };
-    });
-
-    workbook.xlsx.writeBuffer().then((data) => {
-      const blob = new Blob([data], {
-        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        if (index % 2 === 0) {
+          row.eachCell((cell) => {
+            cell.fill = {
+              type: 'pattern',
+              pattern: 'solid',
+              fgColor: { argb: 'FFF9F9F9' },
+            };
+          });
+        }
       });
-      const fecha = new Date().toISOString().split('T')[0];
-      saveAs(blob, `Clientes_${fecha}.xlsx`);
-    });
-  }
 
-  formatDate(date?: string | Date): string {
-    if (!date) return '';
-    const d = new Date(date);
-    if (isNaN(d.getTime())) return '';
-    const day = String(d.getDate()).padStart(2, '0');
-    const month = String(d.getMonth() + 1).padStart(2, '0');
-    const year = d.getFullYear();
-    const hours = String(d.getHours()).padStart(2, '0');
-    const minutes = String(d.getMinutes()).padStart(2, '0');
-    return `${day}/${month}/${year} ${hours}:${minutes}`;
+      worksheet.eachRow({ includeEmpty: false }, (row) => {
+        row.height = 22;
+      });
+
+      const totalRow = worksheet.addRow({
+        numero: '',
+        id_cliente: '',
+        nombre: `Total de clientes: ${clientes.length}`,
+        nit_ci: '',
+        telefono: '',
+        direccion: '',
+        creado_en: new Date().toLocaleDateString('es-BO'),
+      });
+
+      totalRow.eachCell((cell) => {
+        cell.font = { bold: true };
+        cell.fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: 'FFFFFFFF' },
+        };
+        cell.alignment = { vertical: 'middle', horizontal: 'center' };
+      });
+
+      workbook.xlsx
+        .writeBuffer()
+        .then((data) => {
+          const blob = new Blob([data], {
+            type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+          });
+          const fecha = new Date().toISOString().split('T')[0];
+          saveAs(blob, `Clientes_${fecha}.xlsx`);
+          this._notificationService.showSuccess('Excel generado correctamente');
+        })
+        .catch((error) => {
+          console.error('Error generando Excel:', error);
+          this._notificationService.showError('Error al generar el Excel');
+        });
+    } catch (error) {
+      console.error('Error en downloadExcel:', error);
+      this._notificationService.showError('Error al generar el archivo Excel');
+    }
   }
 
   downloadPDF() {
-    this.pdfService.downloadTablePdf({
-      title: 'Sistema Ventas Carnes A&E ',
-      subtitle: 'Lista de Clientes',
-      columns: [
-        { header: 'N°', dataKey: 'numero', width: 30, alignment: 'center' },
-        { header: 'ID', dataKey: 'id_cliente', width: 40, alignment: 'center' },
-        { header: 'Nombre', dataKey: 'nombre', width: '*', alignment: 'left' },
-        { header: 'NIT/CI', dataKey: 'nit_ci', width: 70, alignment: 'center' },
-        { header: 'Teléfono', dataKey: 'telefono', width: 70, alignment: 'center' },
-        { header: 'Dirección', dataKey: 'direccion', width: 120, alignment: 'left' },
-        { header: 'Fecha', dataKey: 'creado_en', width: 70, alignment: 'center' },
-      ],
-      data: this.filteredClients().map((c, index) => ({
-        numero: index + 1,
-        id_cliente: c.id_cliente,
-        nombre: c.persona.nombre || 'N/A',
-        nit_ci: c.persona.nit_ci || 'N/A',
-        telefono: c.persona.telefono || 'N/A',
-        direccion: c.persona.direccion || 'N/A',
-        creado_en: this.formatDate(c.creado_en),
-      })),
-      fileName: 'Clientes',
-      pageOrientation: 'landscape', 
+    try {
+      const clientes = this.filteredClients();
+      if (clientes.length === 0) {
+        this._notificationService.showAlert('No hay clientes para generar el PDF');
+        return;
+      }
 
-      showFooter: true,
-      footerText: 'Distribuidora A-E - Sistema de Gestión',
-    });
+      this.pdfService.downloadTablePdf({
+        title: 'Sistema Ventas Carnes A&E ',
+        subtitle: 'Lista de Clientes',
+        columns: [
+          { header: 'N°', dataKey: 'numero', width: 30, alignment: 'center' },
+          { header: 'ID', dataKey: 'id_cliente', width: 40, alignment: 'center' },
+          { header: 'Nombre', dataKey: 'nombre', width: '*', alignment: 'left' },
+          { header: 'NIT/CI', dataKey: 'nit_ci', width: 70, alignment: 'center' },
+          { header: 'Teléfono', dataKey: 'telefono', width: 70, alignment: 'center' },
+          { header: 'Dirección', dataKey: 'direccion', width: 120, alignment: 'left' },
+          { header: 'Fecha', dataKey: 'creado_en', width: 70, alignment: 'center' },
+        ],
+        data: clientes.map((c, index) => ({
+          numero: index + 1,
+          id_cliente: c.id_cliente || 'N/A',
+          nombre: c.persona?.nombre || 'N/A',
+          nit_ci: c.persona?.nit_ci || 'N/A',
+          telefono: c.persona?.telefono || 'N/A',
+          direccion: c.persona?.direccion || 'N/A',
+          creado_en: this.formatDate(c.creado_en),
+        })),
+        fileName: 'Clientes',
+        pageOrientation: 'landscape',
+        showFooter: true,
+        footerText: 'Distribuidora A-E - Sistema de Gestión',
+      });
+
+      this._notificationService.showSuccess('PDF generado correctamente');
+    } catch (error) {
+      console.error('Error en downloadPDF:', error);
+      this._notificationService.showError('Error al generar el PDF');
+    }
   }
 }
