@@ -51,17 +51,24 @@ export class AuthService {
       tap((res) => {
         console.log('Login exitoso - Tokens recibidos');
 
+        // CORRECCIÓN COMPLETA: Manejo consistente de tokens según rememberMe
         if (data.rememberMe) {
+          // Guardar en localStorage (persistente)
           localStorage.setItem(this.tokenKey, res.data.accessToken);
           localStorage.setItem(this.refreshTokenKey, res.data.refreshToken);
           localStorage.setItem(this.userKey, JSON.stringify(res.data.user));
+
+          // Limpiar sessionStorage
           sessionStorage.removeItem(this.tokenKey);
           sessionStorage.removeItem(this.refreshTokenKey);
           sessionStorage.removeItem(this.userKey);
         } else {
+          // Guardar en sessionStorage (solo para la sesión)
           sessionStorage.setItem(this.tokenKey, res.data.accessToken);
           sessionStorage.setItem(this.refreshTokenKey, res.data.refreshToken);
           sessionStorage.setItem(this.userKey, JSON.stringify(res.data.user));
+
+          // Limpiar localStorage
           localStorage.removeItem(this.tokenKey);
           localStorage.removeItem(this.refreshTokenKey);
           localStorage.removeItem(this.userKey);
@@ -106,7 +113,7 @@ export class AuthService {
   }
 
   refreshToken(): Observable<string> {
-    const token = this.getRefreshToken(); 
+    const token = this.getRefreshToken(); // CORRECCIÓN: Usar método corregido
     if (!token) {
       console.error('No hay refresh token disponible');
       return throwError(() => new Error('No hay refresh token disponible'));
@@ -118,19 +125,21 @@ export class AuthService {
       })
       .pipe(
         tap((res) => {
-      
+          // CORRECCIÓN: Actualizar tokens en el storage correspondiente
           if (localStorage.getItem(this.tokenKey)) {
-  
+            // Si estaba en localStorage, mantener ahí
             localStorage.setItem(this.tokenKey, res.accessToken);
             localStorage.setItem(this.refreshTokenKey, res.refreshToken);
           } else {
-
+            // Si estaba en sessionStorage, mantener ahí
             sessionStorage.setItem(this.tokenKey, res.accessToken);
             sessionStorage.setItem(this.refreshTokenKey, res.refreshToken);
           }
         }),
         map((res) => res.accessToken),
         catchError((error) => {
+          console.error('Error refreshing token:', error);
+          // Si falla el refresh, hacer logout
           this.logout();
           return throwError(() => error);
         })
@@ -148,6 +157,8 @@ export class AuthService {
     }
     return null;
   }
+
+  // CORRECCIÓN: Método para obtener el refresh token correctamente
   getRefreshToken(): string | null {
     if (typeof window !== 'undefined') {
       return (
@@ -162,6 +173,7 @@ export class AuthService {
   }
 
   logout() {
+    // CORRECCIÓN: Limpiar ambos storage completamente
     localStorage.removeItem(this.tokenKey);
     localStorage.removeItem(this.refreshTokenKey);
     localStorage.removeItem(this.userKey);
