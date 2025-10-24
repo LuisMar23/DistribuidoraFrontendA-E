@@ -1,18 +1,20 @@
 import { Component, inject, signal, OnInit, computed } from '@angular/core';
 import { CompraService, Compra } from '../../services/compra.service';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { NotificationService } from '../../../../core/services/notification.service';
 import { faFileExcel } from '@fortawesome/free-solid-svg-icons';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { catchError, map, Observable, of, shareReplay } from 'rxjs';
+import { catchError, lastValueFrom, map, Observable, of, shareReplay } from 'rxjs';
+import { PdfService } from '../../../../core/services/pdf.service';
 
 @Component({
   selector: 'app-compra-list',
   standalone: true,
   imports: [CommonModule, RouterModule, ReactiveFormsModule, FormsModule, FontAwesomeModule],
   templateUrl: './compra-list.html',
+  providers: [DatePipe],
 })
 export class CompraList implements OnInit {
   compras = signal<Compra[]>([]);
@@ -26,10 +28,14 @@ export class CompraList implements OnInit {
   faFileExcel = faFileExcel;
   totalGanancia = signal<number | null>(null);
   searchTerm = signal('');
+  precioKilo = signal<number | null>(null);
+  detallePrecio = signal<any | null>(null);
+  loading = signal<boolean>(false);
 
+  private pdfService = inject(PdfService);
   private compraSvc = inject(CompraService);
   private notificationService = inject(NotificationService);
-
+  private datePipe = inject(DatePipe);
   ngOnInit(): void {
     this.obtenerCompras();
   }
@@ -50,7 +56,6 @@ export class CompraList implements OnInit {
       return this.gananciaCache.get(id)!;
     }
 
-
     const obs$ = this.compraSvc.getGananciaCompra(id).pipe(
       map((resp) => {
         console.log('Ganancia recibida:', resp);
@@ -60,12 +65,17 @@ export class CompraList implements OnInit {
         console.error('Error al obtener la ganancia:', err);
         return of(0);
       }),
-      shareReplay({ bufferSize: 1, refCount: true }) 
+      shareReplay({ bufferSize: 1, refCount: true })
     );
 
     this.gananciaCache.set(id, obs$);
     return obs$;
   }
+
+  getPrecioKilo(id: number): Observable<number> {
+    return this.compraSvc.getPrecioKiloCached(id);
+  }
+
   obtenerCompras(page: number = 1) {
     this.cargando.set(true);
     this.error.set(null);
@@ -129,31 +139,20 @@ export class CompraList implements OnInit {
     });
   }
 
-  eliminarCompra(id: number) {
-    if (confirm('¿Seguro que quieres eliminar esta compra?')) {
-      this.compraSvc.delete(id).subscribe({
-        next: () => {
-          this.compras.update((list) => list.filter((c) => c.id !== id));
-          this.notificationService.showSuccess('Compra eliminada correctamente');
-        },
-        error: (err) => {
-          console.error('Error al eliminar compra:', err);
-
-          if (err.status === 401) {
-            this.notificationService.showError(
-              'Sesión expirada. Por favor, inicie sesión nuevamente.'
-            );
-          } else {
-            this.notificationService.showError('Error al eliminar la compra: ' + err.message);
-          }
-        },
+  eliminarCompra(data: any) {
+    this.notificationService
+      .confirmDelete(`Se eliminará la compra con codigo ${data.codigo}`)
+      .then((result) => {
+        if (result.isConfirmed) {
+          this.notificationService.showSuccess('Eliminado correctamente');
+          this.compraSvc.delete(data.id).subscribe(() => this.compras());
+        }
       });
-    }
   }
 
   filteredCompras = computed(() => {
     let arr = this.compras();
-
+    console.log(this.compras());
     const term = (this.searchTerm() ?? '').toLowerCase();
     if (!term) return arr;
 
@@ -281,5 +280,84 @@ export class CompraList implements OnInit {
   rangeEnd(): number {
     const end = this.currentPage() * this.pageSize();
     return end > this.total() ? this.total() : end;
+  }
+
+  async downloadPDFCompras() {
+    try {
+      const compras = this.filteredCompras(); // Tu método que filtra compras
+      if (compras.length === 0) {
+        this.notificationService.showAlert('No hay compras para generar el PDF');
+        return;
+      }
+
+      const data = await Promise.all(
+        compras.map(async (c, index) => {
+          const ganancia = await lastValueFrom(this.getGananciaCompraCached(c.id));
+          const precioKilo = await lastValueFrom(this.getPrecioKilo(c.id));
+
+          const pagoTotal = c.PagoCompra?.reduce(
+            (sum: number, p: any) => sum + Number(p.monto || 0),
+            0
+          );
+
+          const detalle = c.detalles[0];
+
+          return {
+            numero: index + 1,
+            codigo: c.codigo || 'N/A',
+            fecha: this.formatDate(c.creado_en),
+            proveedor: c.proveedor?.persona?.nombre || 'N/A',
+            cantidad: detalle?.cantidad || 0,
+            pesoBruto: detalle?.pesoBruto || 0,
+            pesoNeto: detalle?.pesoNeto || 0,
+            precioUnitario: detalle?.precio || 0,
+            totalCompra: detalle?.precioTotal || 0,
+            transporte: c.transportes || 0,
+            otrosGastos: c.otrosGastos || 0,
+            pagoTotal: pagoTotal || 0,
+            ganancia,
+            precioKilo,
+          };
+        })
+      );
+      this.pdfService.downloadTablePdf({
+        title: 'Sistema Ventas Carnes',
+        subtitle: 'Lista de Compras',
+        columns: [
+          { header: 'N°', dataKey: 'numero', width: 20, alignment: 'center' },
+          { header: 'Código', dataKey: 'codigo', width: 60, alignment: 'center' },
+          { header: 'Fecha', dataKey: 'fecha', width: 55, alignment: 'center' },
+          { header: 'Proveedor', dataKey: 'proveedor', width: 55, alignment: 'left' },
+          { header: 'Cantidad', dataKey: 'cantidad', width: 55, alignment: 'center' },
+          { header: 'Peso Bruto', dataKey: 'pesoBruto', width: 55, alignment: 'center' },
+          { header: 'Peso Neto', dataKey: 'pesoNeto', width: 55, alignment: 'center' },
+          { header: 'Precio Unitario', dataKey: 'precioUnitario', width: 55, alignment: 'center' },
+          { header: 'Total', dataKey: 'totalCompra', width: 50, alignment: 'center' },
+          { header: 'Ganancia', dataKey: 'ganancia', width: 55, alignment: 'center' },
+          { header: 'Precio Kilo', dataKey: 'precioKilo', width: 55, alignment: 'center' },
+        ],
+        data,
+        fileName: 'Compras',
+        pageOrientation: 'landscape',
+        showFooter: true,
+        footerText:
+          'Distribuidora A-E - Sistema de Gestión. Nota: Total incluye transporte y otros gastos.',
+      });
+
+      this.notificationService.showSuccess('PDF de compras generado correctamente');
+    } catch (error) {
+      console.error('Error en downloadPDFCompras:', error);
+      this.notificationService.showError('Error al generar el PDF de compras');
+    }
+  }
+  formatDate(date?: string | Date): string {
+    if (!date) return '';
+    try {
+      const d = new Date(date);
+      if (isNaN(d.getTime())) return '';
+      return this.datePipe.transform(d, 'dd/MM/yyyy') || '';
+    } catch {
+      return '';
+    }
   }
 }

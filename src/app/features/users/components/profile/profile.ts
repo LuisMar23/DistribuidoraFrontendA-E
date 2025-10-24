@@ -6,11 +6,13 @@ import { HttpClientModule } from '@angular/common/http';
 import { UserService } from '../../services/users.service';
 import { NotificationService } from '../../../../core/services/notification.service';
 import { environment } from '../../../../../environments/environment';
+import { AppRoutingModule } from "../../../../app.routes";
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule,RouterModule],
   templateUrl: './profile.html',
 })
 export class ProfileComponent {

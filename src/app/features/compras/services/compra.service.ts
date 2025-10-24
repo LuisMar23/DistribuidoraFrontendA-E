@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
+import { catchError, map, Observable, of, shareReplay, tap } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { PersonaDto } from '../../../core/interfaces/persona.interface';
 
@@ -91,4 +91,26 @@ export class CompraService {
       `${environment.apiUrl}/ganancia/ganancia/${compraId}`
     );
   }
+
+
+  private precioKiloCache = new Map<number, Observable<number>>();
+  getPrecioKiloCached(id: number): Observable<number> {
+    if (!id) return of(0);
+    if (this.precioKiloCache.has(id)) {
+      return this.precioKiloCache.get(id)!;
+    }
+
+    const obs$ = this.http.get<{ precioKilo: number }>(`${this.baseUrl}/${id}/precio-kilo`).pipe(
+      map((resp) => Number(resp.precioKilo || 0)),
+      catchError((err) => {
+        console.error('Error al obtener el precio por kilo:', err);
+        return of(0);
+      }),
+
+      shareReplay({ bufferSize: 1, refCount: true })
+    );
+    this.precioKiloCache.set(id, obs$);
+    return obs$;
+  }
+
 }

@@ -1,7 +1,7 @@
 <!-- Header -->
 <div class="bg-white rounded-2xl p-4 md:p-6 mb-6 flex items-center gap-4 shadow-sm">
   <div
-    class="bg-[#ff7676]  text-white w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full"
+    class="bg-[#ff7676] text-white w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full"
   >
     <fa-icon [icon]="faBox" class="text-lg md:text-xl"></fa-icon>
   </div>
@@ -28,12 +28,31 @@
     </div>
 
     <!-- Botón nuevo proveedor -->
-    <button
-      (click)="openModal()"
-      class="flex items-center gap-2 bg-[#ff7676] hover:bg-red-400 text-white px-6 py-3 rounded-xl shadow-lg transition-all duration-200 transform hover:scale-105 w-full lg:w-auto justify-center lg:justify-start"
-    >
-      <i class="fas fa-plus"></i> Nuevo Proveedor
-    </button>
+
+    <div class="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
+      <button
+        (click)="downloadPDFProveedores()"
+        class="flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white px-4 py-3 rounded-xl shadow-lg transition-all duration-200 transform hover:scale-105 w-full sm:w-auto justify-center"
+      >
+        <fa-icon [icon]="faFilePdf" class="text-white text-lg"></fa-icon>
+        <span>Descargar PDF</span>
+      </button>
+
+      <button
+        (click)="downloadExcelProveedores()"
+        class="flex items-center gap-2 bg-[#6ab9ab] hover:bg-[#5dccb8] text-white px-6 py-3 rounded-xl shadow-lg transition-all duration-200 transform hover:scale-105 w-full sm:w-auto justify-center"
+      >
+        <fa-icon [icon]="faFileExcel" class="text-white text-lg"></fa-icon>
+        Exportar Excel
+      </button>
+
+      <button
+        (click)="openModal()"
+        class="flex items-center gap-2 bg-[#ff7676] hover:bg-red-400 text-white px-6 py-3 rounded-xl shadow-lg transition-all duration-200 transform hover:scale-105 w-full lg:w-auto justify-center lg:justify-start"
+      >
+        <i class="fas fa-plus"></i> Nuevo Proveedor
+      </button>
+    </div>
   </div>
 
   <!-- Vista Desktop/Tablet - Tabla -->
@@ -299,7 +318,7 @@
     class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl animate-fadeIn max-h-[95vh] overflow-y-auto"
   >
     <!-- Header del Modal -->
-    <div class="bg-[#ff7676]  text-white p-4 md:p-6 rounded-t-2xl">
+    <div class="bg-[#ff7676] text-white p-4 md:p-6 rounded-t-2xl">
       <div class="flex justify-between items-center">
         <h2 class="text-xl md:text-2xl font-bold">
           {{ editMode() ? 'Editar Proveedor' : 'Nuevo Proveedor' }}

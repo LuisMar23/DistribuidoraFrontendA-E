@@ -59,7 +59,7 @@ export class DashboardComponent implements OnInit {
   }
 
   private setupCharts() {
-    // 🟦 Ventas por cliente
+
     this.ventasChartData = {
       labels: this.ventas()?.ventasPorCliente.map((v: any) => `Cliente ${v.id_cliente}`) || [],
       datasets: [
@@ -72,7 +72,7 @@ export class DashboardComponent implements OnInit {
       ],
     };
 
-    // 🟩 Top proveedores (compras)
+
     this.comprasChartData = {
       labels:
         this.compras()?.proveedoresMasActivos.map((p: any) => `Proveedor ${p.proveedorId}`) || [],

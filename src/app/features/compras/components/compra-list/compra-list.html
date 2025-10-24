@@ -33,17 +33,19 @@
           <div class="flex flex-col sm:flex-row gap-2 w-full lg:w-auto">
             <button
               class="flex items-center gap-1 bg-red-500 hover:bg-red-600 text-white text-sm px-2.5 py-1.5 rounded-lg shadow-md transition-all duration-200 transform hover:scale-105"
-            >
+              (click)="downloadPDFCompras()"
+              >
+
               <i class="fas fa-file-pdf text-sm"></i>
               <span>PDF</span>
             </button>
 
-            <button
+            <!-- <button
               class="flex items-center gap-1 bg-[#6ab9ab] hover:bg-[#5dccb8] text-white text-sm px-2.5 py-1.5 rounded-lg shadow-md transition-all duration-200 transform hover:scale-105 w-full sm:w-auto justify-center"
             >
               <fa-icon [icon]="faFileExcel" class="text-white text-sm"></fa-icon>
               <span>Excel</span>
-            </button>
+            </button> -->
             <button
               class="flex-1 sm:flex-initial bg-[#ff7676] hover:bg-red-700 text-white text-sm px-2.5 py-1.5 rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2"
               [routerLink]="['/compras/crear']"
@@ -210,13 +212,30 @@
             </div>
           </div>
 
-          <div class="pt-2 border-t border-gray-100">
-            <p class="text-xs text-gray-500 mb-1">Precio Total</p>
-            <p class="text-xl font-bold text-red-600">
-              Bs {{ compra.detalles[0].precioTotal | number : '1.2-2' }}
-            </p>
+          <div class="pt-3 border-t border-gray-100 space-y-2">
+            <!-- Precio Total -->
+            <div class="flex items-center justify-between">
+              <p class="text-xs text-gray-500">Precio Total</p>
+              <p class="text-lg font-bold text-red-600">
+                Bs {{ compra.detalles[0].precioTotal | number : '1.2-2' }}
+              </p>
+            </div>
 
-            Bs {{ getGananciaCompraCached(compra.id) | async | number : '1.2-2' }}
+            <!-- Ganancia -->
+            <div class="flex items-center justify-between">
+              <p class="text-xs text-gray-500">Ganancia</p>
+              <p class="text-lg font-semibold text-green-600">
+                Bs {{ getGananciaCompraCached(compra.id) | async | number : '1.2-2' }}
+              </p>
+            </div>
+
+            <!-- Precio por Kilo -->
+            <div class="flex items-center justify-between">
+              <p class="text-xs text-gray-500">Precio por Kg</p>
+              <p class="text-lg font-semibold text-blue-600">
+                {{ getPrecioKilo(compra.id) | async | number : '1.2-2' }} Bs/kg
+              </p>
+            </div>
           </div>
         </div>
 
@@ -263,7 +282,7 @@
           <!-- Eliminar -->
           <button
             class="p-2.5 rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-100 transition flex items-center justify-center"
-            (click)="eliminarCompra(compra.id)"
+            (click)="eliminarCompra(compra)"
           >
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
@@ -391,10 +410,23 @@
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                 {{ getPesoNeto(compra) | number : '1.2-2' }} Kg
               </td>
-              <td class="px-6 py-4 whitespace-nowrap font-bold text-red-600">
-                Bs {{ compra.detalles[0].precioTotal | number : '1.2-2' }}
-                <p> Ganancia   Bs {{ getGananciaCompraCached(compra.id) | async | number : '1.2-2' }}</p>
-                   
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="flex flex-col items-end space-y-1">
+                  <p class="text-base font-bold text-red-600">
+                    Bs {{ compra.detalles[0].precioTotal | number : '1.2-2' }}
+                  </p>
+
+                  <p class="text-sm font-semibold text-green-600">
+                    Ganancia:
+                    <span class="text-green-700">
+                      Bs {{ getGananciaCompraCached(compra.id) | async | number : '1.2-2' }}
+                    </span>
+                  </p>
+
+                  <p class="text-sm font-medium text-blue-600">
+                    Precio/Kg: Bs {{ getPrecioKilo(compra.id) | async | number : '1.2-2' }} 
+                  </p>
+                </div>
               </td>
 
               <td class="px-6 py-4 whitespace-nowrap">
@@ -437,7 +469,7 @@
 
                   <button
                     class="p-2 rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-100 transition"
-                    (click)="eliminarCompra(compra.id)"
+                    (click)="eliminarCompra(compra)"
                     title="Eliminar"
                   >
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
