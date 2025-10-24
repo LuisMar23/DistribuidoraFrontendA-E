@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Output, EventEmitter } from '@angular/core';
+import { Component, Output, EventEmitter, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -20,6 +20,7 @@ import {
   faShoppingBag,
   faCow,
 } from '@fortawesome/free-solid-svg-icons';
+import { AuthService } from '../components/services/auth.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -38,14 +39,19 @@ export class Sidebar {
   faBuilding = faBuilding;
   faShoppingBag = faShoppingBag;
   faCow = faCow;
-
+  private authSvc = inject(AuthService);
   @Output() sidebarToggled = new EventEmitter<boolean>();
 
   imagen: string = 'assets/logoSistemaVenta.png';
 
   isCollapsed = false;
   isMobileOpen = false;
-
+  ngOnInit(): void {
+    const role = this.authSvc.getUserRole();
+    if (role !== 'ADMIN' && role !== 'SYSADMIN') {
+      this.menu = this.menu.filter((item) => item.route !== '/pagos' && item.route !== '/usuarios');
+    }
+  }
   menu: { label: string; icon: IconDefinition; route: string }[] = [
     { label: 'Dashboard', icon: faTachometerAlt, route: '/dashboard' },
     { label: 'Proveedores', icon: faStore, route: '/proveedores' },

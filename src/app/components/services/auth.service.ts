@@ -66,7 +66,6 @@ export class AuthService {
   }
 
   register(data: RegisterDto): Observable<RegisterDto> {
-    // SOLUCIÓN: Log seguro
     console.log('Registro attempt:', {
       username: data.username,
       fullName: data.fullName,
@@ -160,5 +159,15 @@ export class AuthService {
       }
     }
     return null;
+  }
+
+  getUserRole(): string | null {
+    const user = this.getCurrentUser();
+    return user?.role || null;
+  }
+  hasRole(...roles: string[]): boolean {
+    const user = this.getCurrentUser();
+    if (!user || !user.role) return false;
+    return roles.includes(user.role);
   }
 }

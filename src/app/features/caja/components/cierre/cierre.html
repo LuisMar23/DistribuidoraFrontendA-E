@@ -1,59 +1,163 @@
-<div class="bg-white shadow-md rounded-2xl p-6">
-  <h3 class="text-lg font-semibold text-gray-700 mb-4">Cierre de Caja</h3>
+<div class="bg-white shadow-lg rounded-2xl p-4 sm:p-6 border border-gray-100">
+  <a [routerLink]="['/caja']" class="flex items-center  py-3 text-black">
+        <svg
+          class="w-5 h-5 mr-2 transform group-hover:-translate-x-1 transition-transform duration-200"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M15 19l-7-7 7-7"
+          ></path>
+        </svg>
+        <span class="text-sm font-medium">Regresar</span>
+      </a>
 
-  <form [formGroup]="form" (ngSubmit)="crearCierre()" class="flex flex-col gap-4">
-    <!-- Tipo -->
-    <div>
-      <label class="block text-sm font-medium text-gray-600 mb-1">Tipo de Cierre</label>
-      <select
-        formControlName="tipo"
-        class="w-full px-4 py-2 border rounded-xl focus:ring focus:ring-blue-200 focus:border-blue-500 outline-none"
-      >
-        <option value="TOTAL">Total</option>
-        <option value="PARCIAL">Parcial</option>
-      </select>
+  <div class="flex items-center gap-3 mb-6 pb-4 border-b border-gray-100">
+    <div class="w-10 h-10 sm:w-12 sm:h-12 bg-gray-100 rounded-xl flex items-center justify-center">
+      <svg class="w-5 h-5 sm:w-6 sm:h-6 text-[#ff7676]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+          d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z">
+        </path>
+      </svg>
     </div>
-
-    <!-- Saldo Real -->
     <div>
-      <label class="block text-sm font-medium text-gray-600 mb-1">Saldo Real</label>
-      <input
-        formControlName="saldoReal"
-        type="number"
-        min="0"
-        step="0.01"
-        placeholder="0.00"
-        class="w-full px-4 py-2 border rounded-xl focus:ring focus:ring-blue-200 focus:border-blue-500 outline-none"
-      />
-      @if (form.get('saldoReal')?.invalid && form.get('saldoReal')?.touched) {
-      <div class="text-red-500 text-xs mt-1">
-        Ingresa un saldo válido
+      <h3 class="text-lg sm:text-xl font-bold text-gray-800">Arqueo de Caja </h3>
+      <p class="text-xs text-gray-500 hidden sm:block">Registra el cierre de caja del día</p>
+    </div>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="crearCierre()" class="flex flex-col gap-4 sm:gap-5">
+    <!-- Grid responsivo para campos -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
+      
+      <!-- Tipo de Cierre -->
+      <div class="space-y-2">
+        <label class="flex items-center gap-2 text-sm font-semibold text-gray-700">
+          <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2">
+            </path>
+          </svg>
+          Tipo de Cierre
+        </label>
+        <div class="relative">
+          <select
+            formControlName="tipo"
+            class="w-full appearance-none px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#ff7676] focus:border-[#ff7676] outline-none transition-all duration-200 bg-white text-gray-800 font-medium hover:border-gray-300 cursor-pointer"
+          >
+            <option value="TOTAL">✓ Total</option>
+            <option value="PARCIAL">◐ Parcial</option>
+          </select>
+          <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </div>
+        </div>
+        <p class="text-xs text-gray-500 ml-1">Selecciona el tipo de cierre a realizar</p>
       </div>
-      }
 
+      <!-- Saldo Real -->
+      <div class="space-y-2">
+        <label class="flex items-center gap-2 text-sm font-semibold text-gray-700">
+          <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+              d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+            </path>
+          </svg>
+          Saldo Real
+          <span class="text-[#ff7676]">*</span>
+        </label>
+        <div class="relative">
+          <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-semibold">Bs.</span>
+          <input
+            formControlName="saldoReal"
+            type="number"
+            min="0"
+            step="0.01"
+            placeholder="0.00"
+            class="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#ff7676] focus:border-[#ff7676] outline-none transition-all duration-200 font-medium text-gray-800 hover:border-gray-300"
+            [class.border-[#ff7676]]="form.get('saldoReal')?.invalid && form.get('saldoReal')?.touched"
+            [class.focus:ring-[#ff7676]]="form.get('saldoReal')?.invalid && form.get('saldoReal')?.touched"
+          />
+        </div>
+        @if (form.get('saldoReal')?.invalid && form.get('saldoReal')?.touched) {
+        <div class="flex items-center gap-1 text-[#ff7676] text-xs mt-1 ml-1 animate-shake">
+          <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" 
+              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" 
+              clip-rule="evenodd">
+            </path>
+          </svg>
+          Ingresa un saldo válido
+        </div>
+        } @else {
+        <p class="text-xs text-gray-500 ml-1">Monto contado en caja física</p>
+        }
+      </div>
     </div>
 
-    <!-- Observaciones -->
-    <div>
-      <label class="block text-sm font-medium text-gray-600 mb-1">Observaciones</label>
+    <!-- Observaciones (ancho completo) -->
+    <div class="space-y-2">
+      <label class="flex items-center gap-2 text-sm font-semibold text-gray-700">
+        <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
+          </path>
+        </svg>
+        Observaciones
+        <span class="text-gray-400 text-xs font-normal">(Opcional)</span>
+      </label>
       <textarea
         formControlName="observaciones"
-        rows="3"
-        placeholder="Notas opcionales..."
-        class="w-full px-4 py-2 border rounded-xl focus:ring focus:ring-blue-200 focus:border-blue-500 outline-none"
+        rows="4"
+        placeholder="Ej: Faltante de Bs. 50 en billetes de 10..."
+        class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#ff7676] focus:border-[#ff7676] outline-none transition-all duration-200 resize-none hover:border-gray-300"
       ></textarea>
+      <p class="text-xs text-gray-500 ml-1">
+        Anota cualquier detalle importante del cierre
+      </p>
     </div>
 
-    <!-- Botón -->
-    <div class="flex justify-end">
+    <!-- Botones de acción -->
+    <div class="flex flex-col-reverse sm:flex-row justify-between items-stretch sm:items-center gap-3 pt-2">
+      <!-- Info adicional (oculto en móvil pequeño) -->
+      <div class="hidden sm:flex items-center gap-2 text-xs text-gray-500">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+          </path>
+        </svg>
+        <span>Los campos con <span class="text-[#ff7676]">*</span> son obligatorios</span>
+      </div>
+
+      <!-- Botón de envío -->
       <button
         type="submit"
         [disabled]="form.invalid"
-        class="bg-blue-600 text-white px-6 py-2 rounded-xl font-semibold hover:bg-blue-700 transition disabled:opacity-50"
+        class="w-full sm:w-auto bg-[#ff7676] text-white px-8 py-3 rounded-xl font-semibold hover:bg-[#ff5e5e] transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-lg flex items-center justify-center gap-2 group disabled:bg-gray-300"
       >
-        Guardar Cierre
+        <svg class="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+            d="M5 13l4 4L19 7">
+          </path>
+        </svg>
+        <span>Guardar Cierre</span>
       </button>
+    </div>
+
+    <!-- Mensaje de campos requeridos (solo móvil) -->
+    <div class="sm:hidden flex items-center gap-2 text-xs text-gray-500 bg-gray-50 p-3 rounded-lg border border-gray-100">
+      <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+          d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+        </path>
+      </svg>
+      <span>Los campos con <span class="text-[#ff7676]">*</span> son obligatorios</span>
     </div>
   </form>
 </div>
-

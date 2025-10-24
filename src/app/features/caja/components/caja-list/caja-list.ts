@@ -7,6 +7,7 @@ import { faCashRegister } from '@fortawesome/free-solid-svg-icons';
 import { AppRoutingModule } from '../../../../app.routes';
 import { RouterModule } from '@angular/router';
 import { MovimientoModalComponent } from '../movimiento/movimiento';
+import { AuthService } from '../../../../components/services/auth.service';
 
 @Component({
   selector: 'app-caja-list',
@@ -28,7 +29,7 @@ export class CajaList {
   faCashRegister = faCashRegister;
   
   form!: FormGroup;
-
+   authSvc = inject(AuthService);
   ngOnInit(): void {
     this.form = this.fb.group({
       nombre: ['', [Validators.required, Validators.minLength(3)]],

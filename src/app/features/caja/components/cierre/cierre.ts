@@ -2,10 +2,11 @@ import { Component, inject, Input } from '@angular/core';
 import { CierreService } from '../../services/cierre.service';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-cierre',
-  imports: [CommonModule,ReactiveFormsModule],
+  imports: [CommonModule,ReactiveFormsModule,RouterModule],
   templateUrl: './cierre.html',
   styleUrl: './cierre.css'
 })

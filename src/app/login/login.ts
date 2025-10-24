@@ -5,7 +5,7 @@ import { AuthService } from '../components/services/auth.service';
 import { Router, RouterModule } from '@angular/router';
 import { faEye, faEyeSlash, faLock, faUser } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { AppRoutingModule } from '../app.routes';
+
 
 @Component({
   selector: 'app-login',
@@ -38,7 +38,7 @@ export class LoginComponent {
 
   async onSubmit() {
     if (this.loginForm.valid) {
-      // SOLUCIÓN: Log seguro sin mostrar contraseña
+ 
       const formData = this.loginForm.value;
       console.log('Formulario válido', {
         identifier: formData.identifier,

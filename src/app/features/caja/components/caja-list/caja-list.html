@@ -136,7 +136,9 @@
     <!-- Botón Registrar Movimiento - Móvil -->
 
     <!-- Formulario Nueva Caja -->
-    <form
+    @if (authSvc.hasRole('ADMIN','SYSADMIN')) {
+   <form
+
       [formGroup]="form"
       (ngSubmit)="crearCaja()"
       class="bg-white shadow-xl rounded-2xl sm:rounded-3xl p-5 sm:p-6 lg:p-8 mb-6 sm:mb-8 border border-gray-200"
@@ -250,6 +252,8 @@
         </button>
       </div>
     </form>
+    }
+ 
 
     <!-- Estados de Carga y Vacío -->
     @if (cajaService.cargando()) {
@@ -302,7 +306,7 @@
                   'bg-gradient-to-br from-gray-400 to-gray-600': caja.estado === 'CERRADA'
                 }"
               >
-                <fa-icon [icon]="faCashRegister" class="text-white text-2xl sm:text-3xl"></fa-icon>
+                <fa-icon [icon]="faCashRegister" class="text-gray text-2xl sm:text-3xl"></fa-icon>
               </div>
 
               <div class="flex-1 min-w-0">

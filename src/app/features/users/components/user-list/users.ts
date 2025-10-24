@@ -33,6 +33,7 @@ export class UsersComponent implements OnInit {
   faSearch = faSearch;
   faUser = faUser;
   faUserCircle = faUserCircle;
+  faUsuario=faUser;
 
   // Signals
   allUsers = signal<any[]>([]);
@@ -42,9 +43,8 @@ export class UsersComponent implements OnInit {
   showModal = signal(false);
 
   // Roles
-  roles = ['ADMIN', 'VENDEDOR', 'USER'];
+  roles = ['ADMIN','USER'];
 
-  // Computed → lista filtrada
   users = computed(() => {
     const term = this.searchTerm().toLowerCase();
     if (!term) return this.allUsers();
@@ -98,7 +98,7 @@ export class UsersComponent implements OnInit {
     if (!user) return;
 
     this.showModal.set(false);
-
+    console.log(this.selectedRole())
     this._usersService.updateRole(user.id, this.selectedRole()).subscribe({
       next: () => {
         this._notificationService.showSuccess(
