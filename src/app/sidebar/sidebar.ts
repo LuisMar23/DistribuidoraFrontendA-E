@@ -53,7 +53,7 @@ export class Sidebar {
     }
   }
   menu: { label: string; icon: IconDefinition; route: string }[] = [
-    { label: 'Dashboard', icon: faTachometerAlt, route: '/dashboard' },
+    { label: 'Inicio', icon: faTachometerAlt, route: '/dashboard' },
     { label: 'Proveedores', icon: faStore, route: '/proveedores' },
     { label: 'Compras', icon: faShoppingBag, route: '/compras' },
     { label: 'Menudo', icon: faCow, route: '/faenas' },

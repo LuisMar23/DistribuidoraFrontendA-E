@@ -12,17 +12,14 @@ import { ProductService } from '../../services/product.service';
   imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './product-list.html',
 })
-export class ProductList implements OnInit {
-  // Señales principales
+export class ProductList {
   products = signal<ProductDto[]>([]);
   allProducts = signal<ProductDto[]>([]);
   searchTerm = signal<string>('');
 
-  // Señales de estado
   cargando = signal<boolean>(true);
   error = signal<string | null>(null);
 
-  // Señales de paginación y ordenamiento
   currentPage = signal<number>(1);
   pageSize = signal<number>(10);
   total = signal<number>(0);
@@ -47,7 +44,6 @@ export class ProductList implements OnInit {
         this.cargando.set(false);
       },
       error: (err) => {
-
         this.error.set('No se pudieron cargar los productos');
         this.cargando.set(false);
       },
@@ -56,8 +52,6 @@ export class ProductList implements OnInit {
 
   private applyFilterAndSort() {
     let filtered = this.allProducts();
-
-    // Aplicar filtro de búsqueda
     const term = this.searchTerm().toLowerCase().trim();
     if (term) {
       filtered = filtered.filter(
@@ -70,10 +64,8 @@ export class ProductList implements OnInit {
       );
     }
 
-    // Aplicar ordenamiento
     const sorted = this.sortProducts(filtered);
 
-    // Aplicar paginación
     const paginated = this.paginateProducts(sorted);
     this.products.set(paginated);
   }
@@ -121,13 +113,10 @@ export class ProductList implements OnInit {
     const endIndex = startIndex + this.pageSize();
     return products.slice(startIndex, endIndex);
   }
-
-  // Computed para productos filtrados
   filteredProducts = computed(() => {
     return this.products();
   });
 
-  // Métodos de ordenamiento
   sort(column: keyof ProductDto) {
     if (this.sortColumn() === column) {
       this.sortDirection.set(this.sortDirection() === 'asc' ? 'desc' : 'asc');
@@ -138,13 +127,11 @@ export class ProductList implements OnInit {
     this.applyFilterAndSort();
   }
 
-  // Métodos de búsqueda - CORREGIDO
   onSearchChange() {
-    this.currentPage.set(1); // Resetear a primera página al buscar
+    this.currentPage.set(1);
     this.applyFilterAndSort();
   }
 
-  // Métodos de paginación
   nextPage() {
     if (this.currentPage() < this.totalPages()) {
       this.currentPage.update((v) => v + 1);
@@ -166,33 +153,28 @@ export class ProductList implements OnInit {
     }
   }
 
-  // Calcular total de páginas
   totalPages(): number {
     const filteredLength = this.getTotalFiltered();
     return Math.ceil(filteredLength / this.pageSize());
   }
 
-  // Array de páginas para el paginador
   pageArray(): number[] {
     const total = this.totalPages();
     return Array.from({ length: total }, (_, i) => i + 1);
   }
 
-  // Calcular rango inicial
   rangeStart(): number {
     const filteredLength = this.getTotalFiltered();
     if (filteredLength === 0) return 0;
     return (this.currentPage() - 1) * this.pageSize() + 1;
   }
 
-  // Calcular rango final
   rangeEnd(): number {
     const filteredLength = this.getTotalFiltered();
     const end = this.currentPage() * this.pageSize();
     return end > filteredLength ? filteredLength : end;
   }
 
-  // Obtener el total de elementos filtrados
   getTotalFiltered(): number {
     const term = this.searchTerm().toLowerCase().trim();
     if (term) {
@@ -208,40 +190,43 @@ export class ProductList implements OnInit {
     return this.allProducts().length;
   }
 
-  // Métodos existentes
-  verDetalles(product: ProductDto) {
-    // Implementar lógica de detalles si es necesario
-    console.log('Ver detalles:', product);
-  }
 
-  cerrarModal() {
-    // Implementar lógica de cerrar modal si es necesario
-  }
 
-  eliminarProduct(id: number) {
-    if (confirm('¿Está seguro que desea eliminar este producto?')) {
-      this.productSvc.delete(id).subscribe({
-        next: () => {
-          // Actualizar la lista local
-          this.allProducts.update((list) => list.filter((p) => p.id_producto !== id));
-          // Re-aplicar filtros y paginación
-          this.applyFilterAndSort();
-          this.notificationService.showSuccess('Producto eliminado correctamente');
-        },
-        error: (err) => {
-          console.error('Error al eliminar producto:', err);
-          this.notificationService.showError('No se pudo eliminar el producto');
-        },
+  cerrarModal() {}
+
+  // eliminarProduct(data:any) {
+  //   if (confirm('¿Está seguro que desea eliminar este producto?')) {
+  //     this.productSvc.delete(id).subscribe({
+  //       next: () => {
+  //         // Actualizar la lista local
+  //         this.allProducts.update((list) => list.filter((p) => p.id_producto !== id));
+  //         // Re-aplicar filtros y paginación
+  //         this.applyFilterAndSort();
+  //         this.notificationService.showSuccess('Producto eliminado correctamente');
+  //       },
+  //       error: (err) => {
+  //         console.error('Error al eliminar producto:', err);
+  //         this.notificationService.showError('No se pudo eliminar el producto');
+  //       },
+  //     });
+  //   }
+  // }
+
+  eliminarProduct(data: any) {
+    this.notificationService
+      .confirmDelete(`Se eliminara el producto con codigo ${data.codigo}`)
+      .then((result) => {
+        if (result.isConfirmed) {
+          this.notificationService.showSuccess('Eliminado Correctamente');
+          this.productSvc.delete(data.id_producto).subscribe(() => this.loadProducts());
+        }
       });
-    }
   }
 
-  // Método para compatibilidad con la plantilla existente
   getProductsPaginados(): ProductDto[] {
     return this.products();
   }
 
-  // Método para compatibilidad con la plantilla existente
   getPages(): number[] {
     return this.pageArray();
   }

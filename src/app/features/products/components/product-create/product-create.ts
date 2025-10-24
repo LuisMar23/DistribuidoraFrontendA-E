@@ -58,7 +58,6 @@ export class ProductCreate {
       peso: Number(this.productForm.value.peso),
       fecha_llegada: new Date(this.productForm.value.fecha_llegada),
     };
-    console.log(productData)
     this.productSvc.create(productData).subscribe({
       next: (response) => {
         this.enviando.set(false);

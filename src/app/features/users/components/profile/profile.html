@@ -165,6 +165,7 @@
           <!-- Botones de acción -->
           <div class="flex flex-col sm:flex-row gap-4">
             <button
+             [routerLink]="['/dashboard']"
               type="button"
               class="flex-1 bg-gray-100 text-gray-700 py-3 px-6 rounded-xl font-semibold hover:bg-gray-200 transition-all duration-300 hover:shadow-md"
             >
@@ -173,7 +174,7 @@
             <button
               type="submit"
               [disabled]="profileForm.invalid"
-              class="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 px-6 rounded-xl font-semibold hover:from-blue-700 hover:to-blue-800 transition-all duration-300 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none"
+              class="flex-1 bg-[#ff7676] text-white py-3 px-6 rounded-xl font-semibold hover:from-blue-700 hover:to-blue-800 transition-all duration-300 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none"
             >
               <svg
                 class="w-5 h-5 inline-block mr-2"
