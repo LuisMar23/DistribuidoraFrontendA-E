@@ -39,7 +39,6 @@ export class LoginComponent {
 
   async onSubmit() {
     if (this.loginForm.valid) {
-
       const formData = this.loginForm.value;
       console.log('Formulario válido', {
         identifier: formData.identifier,
@@ -69,6 +68,7 @@ export class LoginComponent {
   private handleLoginError(error: any): void {
     const errorMessage = error.error?.message || error.message || '';
 
+    // Si es mensaje de cuenta bloqueada, mostrarlo tal cual
     if (
       errorMessage.includes('bloqueó') ||
       errorMessage.includes('bloqueada') ||
@@ -76,7 +76,7 @@ export class LoginComponent {
     ) {
       this.notificationService.showError(errorMessage);
     } else {
-
+      // Para todos los demás errores, mostrar mensaje genérico
       this.notificationService.showError(
         'No se pudo iniciar sesión. Verifica tus datos e intenta nuevamente.'
       );
