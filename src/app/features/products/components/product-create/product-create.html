@@ -1,133 +1,195 @@
-<div class="min-h-screen bg-gradient-to-br from-red-50 via-white to-red-50 py-4 px-2 sm:px-4 lg:px-8">
-    <div class="max-w-8xl mx-auto">
-        <div class="bg-[#ff7676] rounded-t-2xl shadow-lg p-4 sm:p-6">
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <div class="flex items-center gap-3">
-                    <svg class="w-8 h-8 sm:w-10 sm:h-10 text-white" fill="none" stroke="currentColor"
-                        viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                    </svg>
-                    <div>
-                        <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold text-white">Nuevo Producto</h1>
-                        <p class="text-red-100 text-xs sm:text-sm mt-1">Complete los datos para registrar un nuevo
-                            producto</p>
-                    </div>
-                </div>
-                <button [routerLink]="['/productos/lista']"
-                    class="bg-white text-[#ff7676] font-semibold px-4 py-2 rounded-lg shadow-md hover:bg-red-50 transition-all text-sm sm:text-base w-full sm:w-auto">
-                    Volver al Listado
-                </button>
-            </div>
+<div
+  class="min-h-screen bg-gradient-to-br from-red-50 via-white to-red-50 py-4 px-2 sm:px-4 lg:px-8"
+>
+  <div class="max-w-8xl mx-auto">
+    <!-- Header -->
+    <div class="bg-[#ff7676] rounded-t-2xl shadow-lg p-4 sm:p-6">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <svg
+            class="w-8 h-8 sm:w-10 sm:h-10 text-white"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+            />
+          </svg>
+          <div>
+            <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold text-white">Nuevo Producto</h1>
+            <p class="text-red-100 text-xs sm:text-sm mt-1">
+              Complete los datos para registrar un nuevo producto
+            </p>
+          </div>
         </div>
-        <div class="bg-white rounded-b-2xl shadow-xl p-4 sm:p-6 lg:p-8">
-            <form [formGroup]="productForm">
-                <div class="mb-8">
-                    <h2
-                        class="text-lg sm:text-xl font-semibold text-black mb-4 flex items-center gap-2 border-b-2 border-red-200 pb-2">
-                        <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
-                            <path fill-rule="evenodd"
-                                d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm9 4a1 1 0 10-2 0v6a1 1 0 102 0V9zm-3 2a1 1 0 10-2 0v4a1 1 0 102 0v-4zm-3 3a1 1 0 10-2 0v1a1 1 0 102 0v-1z"
-                                clip-rule="evenodd" />
-                        </svg>
-                        Información del Producto
-                    </h2>
-                    <div class="to-white border-2 border-red-200 rounded-xl p-4 sm:p-6">
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">
-                                    Peso (kg) <span class="text-red-500">*</span>
-                                </label>
-                                <input type="number" step="0.01" formControlName="peso"
-                                    class="w-full px-4 py-2.5 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-200 text-sm sm:text-base"
-                                    placeholder="0.00" />
-                                @if (productForm.get('peso')?.invalid && productForm.get('peso')?.touched) {
-                                <p class="mt-1 text-xs text-red-600">El peso es requerido y debe ser mayor a 0</p>
-                                }
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">
-                                    Fecha de Llegada <span class="text-red-500">*</span>
-                                </label>
-                                <input type="date" formControlName="fecha_llegada"
-                                    class="w-full px-4 py-2.5 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-200 text-sm sm:text-base" />
-                                @if (productForm.get('fecha_llegada')?.invalid &&
-                                productForm.get('fecha_llegada')?.touched) {
-                                <p class="mt-1 text-xs text-red-600">La fecha de llegada es requerida</p>
-                                }
-                            </div>
-                            <div class="sm:col-span-2">
-                                <label class="block text-sm font-medium text-gray-700 mb-2">
-                                    Observación
-                                </label>
-                                <textarea formControlName="observacion" rows="3"
-                                    class="w-full px-4 py-2.5 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-200 text-sm sm:text-base"
-                                    placeholder="Observaciones adicionales..."></textarea>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Estado</label>
-                                <div class="flex items-center gap-3 mt-2">
-                                    <label class="flex items-center cursor-pointer">
-                                        <div class="relative">
-                                            <input type="checkbox" formControlName="estado" class="sr-only" />
-                                            <div
-                                                [class]="productForm.get('estado')?.value ? 'w-12 h-6 bg-red-600 rounded-full' : 'w-12 h-6 bg-gray-300 rounded-full'">
-                                            </div>
-                                            <div
-                                                [class]="productForm.get('estado')?.value ? 'absolute left-6 top-1 bg-white w-4 h-4 rounded-full transition-transform' : 'absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform'">
-                                            </div>
-                                        </div>
-                                        <span class="ml-3 text-sm font-medium text-gray-700">
-                                            {{ productForm.get('estado')?.value ? 'Activo' : 'Inactivo' }}
-                                        </span>
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Resumen y botón guardar -->
-                <div class="border-2 border-gray-300 rounded-xl p-4 sm:p-6 mb-6 bg-blue-50">
-                    <h3 class="text-base sm:text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd"
-                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z"
-                                clip-rule="evenodd" />
-                        </svg>
-                        Resumen del Producto
-                    </h3>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div class="bg-white rounded-lg p-4 shadow">
-                            <p class="text-xs sm:text-sm text-gray-600 mb-1">Peso</p>
-                            <p class="text-lg sm:text-xl font-bold text-blue-700">{{
-                                productForm.get('peso')?.value || 0 | number:'1.2-2' }} kg</p>
-                        </div>
-                        <div class="bg-white rounded-lg p-4 shadow">
-                            <p class="text-xs sm:text-sm text-gray-600 mb-1">Estado</p>
-                            <p class="text-lg sm:text-xl font-bold"
-                                [class]="productForm.get('estado')?.value ? 'text-green-700' : 'text-red-700'">
-                                {{ productForm.get('estado')?.value ? 'Activo' : 'Inactivo' }}
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="flex flex-col sm:flex-row gap-3 sm:gap-4">
-                    <button type="button" (click)="onSubmit()" [disabled]="productForm.invalid || enviando()"
-                        class="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg font-semibold hover:from-green-700 hover:to-green-800 disabled:bg-gray-400 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl text-sm sm:text-base flex items-center justify-center gap-2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                        </svg>
-                        {{ enviando() ? 'Creando Producto...' : 'Crear Producto' }}
-                    </button>
-                    <button type="button" (click)="router.navigate(['/productos/lista'])"
-                        class="w-full sm:w-auto px-6 py-3 bg-gray-200 text-gray-700 rounded-lg font-semibold hover:bg-gray-300 transition-all duration-200 text-sm sm:text-base">
-                        Cancelar
-                    </button>
-                </div>
-            </form>
-        </div>
+        <button
+          [routerLink]="['/productos/lista']"
+          class="bg-white text-[#ff7676] font-semibold px-4 py-2 rounded-lg shadow-md hover:bg-red-50 transition-all text-sm sm:text-base w-full sm:w-auto"
+        >
+          Volver al Listado
+        </button>
+      </div>
     </div>
+
+    <!-- Formulario -->
+    <div class="bg-white rounded-b-2xl shadow-xl p-4 sm:p-6 lg:p-8">
+      <form [formGroup]="productForm">
+        <!-- 🔍 Buscador de compra -->
+        <div class="relative w-full max-w-md pb-4">
+          <!-- Label flotante -->
+          <label for="busquedaCompra" class="block text-gray-700 text-sm font-medium mb-1">
+            Debe seleccionar una compra Asociada
+          </label>
+
+          <!-- Input de búsqueda -->
+          <input
+            id="busquedaCompra"
+            type="text"
+            [ngModel]="terminoBusqueda()"
+            (ngModelChange)="terminoBusqueda.set($event)"
+            [ngModelOptions]="{ standalone: true }"
+            placeholder="Buscar por código o fecha (DD/MM/YYYY)"
+            class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 text-sm sm:text-base"
+            (focus)="mostrarLista = true"
+          />
+
+          <!-- Lista filtrada -->
+          @if (mostrarLista && comprasFiltradas().length > 0) {
+          <ul
+            class="absolute z-10 w-full bg-white border border-gray-200 rounded-lg mt-1 max-h-56 overflow-auto shadow-lg"
+          >
+            @for (compra of comprasFiltradas(); track $index) {
+            <li
+              (click)="seleccionarCompra(compra)"
+              class="px-4 py-2 hover:bg-red-100 cursor-pointer text-sm flex justify-between items-center"
+            >
+              <span class="font-semibold text-red-700">{{ compra.codigo }}</span>
+              <span class="text-gray-500">{{ compra.fechaCompra | date : 'dd/MM/yyyy' }}</span>
+            </li>
+            }
+          </ul>
+          }
+        </div>
+
+        <!-- InformaciBuscarón del producto -->
+        <div class="mb-8">
+          <h2
+            class="text-lg sm:text-xl font-semibold text-black mb-4 flex items-center gap-2 border-b-2 border-red-200 pb-2"
+          >
+            <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
+              <path
+                fill-rule="evenodd"
+                d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm9 4a1 1 0 10-2 0v6a1 1 0 102 0V9zm-3 2a1 1 0 10-2 0v4a1 1 0 102 0v-4zm-3 3a1 1 0 10-2 0v1a1 1 0 102 0v-1z"
+                clip-rule="evenodd"
+              />
+            </svg>
+            Información del Producto
+          </h2>
+
+          <div class="border-2 border-red-200 rounded-xl p-4 sm:p-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <!-- Peso -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                  Kilos (kg) <span class="text-red-500">*</span>
+                </label>
+                <input
+                  type="number"
+                  step="0.01"
+                  formControlName="peso"
+                  class="w-full px-4 py-2.5 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-200 text-sm sm:text-base"
+                  placeholder="0.00"
+                />
+              </div>
+
+              <!-- Fecha llegada -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                  Fecha de Llegada <span class="text-red-500">*</span>
+                </label>
+                <input
+                  type="date"
+                  formControlName="fecha_llegada"
+                  class="w-full px-4 py-2.5 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-200 text-sm sm:text-base"
+                />
+              </div>
+
+              <!-- Observación -->
+              <div class="sm:col-span-2">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Observación</label>
+                <textarea
+                  formControlName="observacion"
+                  rows="3"
+                  class="w-full px-4 py-2.5 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-200 text-sm sm:text-base"
+                  placeholder="Observaciones adicionales..."
+                ></textarea>
+              </div>
+
+              <!-- Estado -->
+              <!-- <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Estado</label>
+                <div class="flex items-center gap-3 mt-2">
+                  <label class="flex items-center cursor-pointer">
+                    <div class="relative">
+                      <input type="checkbox" formControlName="estado" class="sr-only" />
+                      <div
+                        [class]="
+                          productForm.get('estado')?.value
+                            ? 'w-12 h-6 bg-red-600 rounded-full'
+                            : 'w-12 h-6 bg-gray-300 rounded-full'
+                        "
+                      ></div>
+                      <div
+                        [class]="
+                          productForm.get('estado')?.value
+                            ? 'absolute left-6 top-1 bg-white w-4 h-4 rounded-full transition-transform'
+                            : 'absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform'
+                        "
+                      ></div>
+                    </div>
+                    <span class="ml-3 text-sm font-medium text-gray-700">
+                      {{ productForm.get('estado')?.value ? 'Activo' : 'Inactivo' }}
+                    </span>
+                  </label>
+                </div>
+              </div> -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Botones -->
+        <div class="flex flex-col sm:flex-row gap-3 sm:gap-4">
+          <button
+            type="button"
+            (click)="onSubmit()"
+            [disabled]="productForm.invalid || enviando()"
+            class="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg font-semibold hover:from-green-700 hover:to-green-800 disabled:bg-gray-400 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl text-sm sm:text-base flex items-center justify-center gap-2"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M5 13l4 4L19 7"
+              />
+            </svg>
+            {{ enviando() ? 'Creando Producto...' : 'Crear Producto' }}
+          </button>
+
+          <button
+            type="button"
+            (click)="router.navigate(['/productos/lista'])"
+            class="w-full sm:w-auto px-6 py-3 bg-gray-200 text-gray-700 rounded-lg font-semibold hover:bg-gray-300 transition-all duration-200 text-sm sm:text-base"
+          >
+            Cancelar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
 </div>

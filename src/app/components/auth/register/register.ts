@@ -4,7 +4,6 @@ import { AuthService } from '../../services/auth.service';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
-
 import { NotificationService } from '../../../core/services/notification.service';
 
 @Component({
@@ -27,11 +26,8 @@ export class RegisterComponent {
     hasNumber: false,
     hasSymbol: false,
   };
-  private _notificationService=inject(NotificationService)
-  constructor(
-    private fb: FormBuilder,
-    private router: Router
-  ) {
+  private _notificationService = inject(NotificationService);
+  constructor(private fb: FormBuilder, private router: Router) {
     this.registerForm = this.fb.group({
       fullName: ['', [Validators.required, Validators.minLength(3)]],
       username: ['', [Validators.required, Validators.minLength(3)]],
@@ -80,23 +76,22 @@ export class RegisterComponent {
     this.isLoading = true;
     this.errorMessage = '';
 
-    console.log(this.registerForm.value)
-    this._authService.register(this.registerForm.value).subscribe({
-      next: (resp) => {
-     
-        this.isLoading = false;
-        this._notificationService.showSuccess(`Usuario registrado exitosamente ${resp.fullName}`)
-     
-        this.router.navigate(['/login']); 
-      },
-    error: (err: any) => {
+    console.log(this.registerForm.value);
+    const usernameValue = this.registerForm.get('username')?.value;
 
-    this.isLoading = false;
-     this.errorMessage = err.error?.message || 'Error al crear la cuenta. Inténtalo nuevamente.';
-      this._notificationService.showError(`${this.errorMessage}`)
-    // Asignamos directamente el mensaje del backend
-   
-  }
+    this._authService.register(this.registerForm.value).subscribe({
+      next: () => {
+        this.isLoading = false;
+        this._notificationService.showSuccess(`Usuario registrado exitosamente ${usernameValue}`);
+
+        this.router.navigate(['/login']);
+      },
+      error: (err: any) => {
+        this.isLoading = false;
+        this.errorMessage = err.error?.message || 'Error al crear la cuenta. Inténtalo nuevamente.';
+        this._notificationService.showError(`${this.errorMessage}`);
+        // Asignamos directamente el mensaje del backend
+      },
     });
   }
 
@@ -106,8 +101,6 @@ export class RegisterComponent {
       control?.markAsTouched();
     });
   }
-
-  // Método para obtener errores específicos de cada campo
   getFieldError(fieldName: string): string {
     const field = this.registerForm.get(fieldName);
     if (field?.errors && field.touched) {
@@ -143,8 +136,6 @@ export class RegisterComponent {
     };
     return labels[fieldName] || fieldName;
   }
-
-  // Método para toggle del password
   togglePasswordVisibility(): void {
     this.showPassword = !this.showPassword;
   }

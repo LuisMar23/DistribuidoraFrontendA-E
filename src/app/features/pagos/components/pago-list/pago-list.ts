@@ -1,8 +1,20 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { PagoService } from '../../services/pago.service';
 import { CommonModule } from '@angular/common';
-import { faAlignLeft, faDollarSign, faEye, faFileExcel, faFingerprint, faMoneyBillWave, faPenToSquare, faPlus, faTrash } from '@fortawesome/free-solid-svg-icons';
+import {
+  faAlignLeft,
+  faDollarSign,
+  faEye,
+  faFileExcel,
+  faFingerprint,
+  faMoneyBill,
+  faMoneyBillWave,
+  faPenToSquare,
+  faPlus,
+  faTrash,
+} from '@fortawesome/free-solid-svg-icons';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 interface Payment {
   id: number;
@@ -13,36 +25,30 @@ interface Payment {
 }
 @Component({
   selector: 'app-pago-list',
-  imports: [CommonModule,ReactiveFormsModule,FormsModule],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule,FontAwesomeModule],
   templateUrl: './pago-list.html',
   styleUrl: './pago-list.css',
 })
 export class PagoList {
-
-
-
-
   private _pagoService = inject(PagoService);
   ngOnInit() {
-    console.log(this.loadPagos())
- 
+    this.loadPagos();
   }
   constructor() {
-       this.loadPagos()
+    this.loadPagos();
   }
-  pagos= signal<any[]>([]);
+  pagos = signal<any[]>([]);
   loadPagos() {
     this._pagoService.getAll().subscribe({
       next: (resp) => {
-        console.log(resp.data)
-        this.pagos.set( resp.data);
+         this.total.set(resp.total);
+        console.log(resp.data);
+        this.pagos.set(resp.data);
       },
     });
   }
 
-
-
-    faMoneyBillWave = faMoneyBillWave;
+  faMoneyBillWave = faMoneyBillWave;
   faEye = faEye;
   faPenToSquare = faPenToSquare;
   faTrash = faTrash;
@@ -51,152 +57,97 @@ export class PagoList {
   faDollarSign = faDollarSign;
   faAlignLeft = faAlignLeft;
   faFingerprint = faFingerprint;
+  faMoney=faMoneyBill
 
-  // Datos
-  payments = signal<Payment[]>([
-    {
-      id: 1,
-      compraId: 1,
-      descripcion: 'Pago por compra de ganado código C-202510-0001 al proveedor csimon llano (20 reses), incluye transporte y otros gastos',
-      monto: '60000',
-      uuid: '16e4f52b-d670-4293-9c57-f1350e4fb4eb'
-    }
-    // Agrega más pagos aquí
-  ]);
-
-  // Configuración de columnas
   columns = [
-    { key: 'id' , label: 'N°' },
-    { key: 'compraId' , label: 'ID Compra' },
-    { key: 'descripcion' , label: 'Descripción' },
-    { key: 'monto' , label: 'Monto (Bs.)' },
-    { key: 'uuid' , label: 'UUID' }
+    { key: 'id', label: 'N°' },
+    { key: 'compra', label: 'Codigo Compra' },
+    { key: 'compra.Id', label: 'ID Compra' },
+    { key: 'descripcion', label: 'Descripción' },
+    { key: 'monto', label: 'Monto (Bs.)' },
   ];
 
-  // Búsqueda
   searchTerm = signal('');
-
-  // Ordenamiento
   sortColumn = signal<any>('id');
   sortDirection = signal<any>('asc');
-
-  // Paginación
   currentPage = signal(1);
   itemsPerPage = signal(10);
 
+  filteredPayments = computed(() => {
+    let arr = this.pagos();
 
-  // filteredPayments = computed(() => {
-  //   const term = this.searchTerm().toLowerCase().trim();
-  //   let filtered = this.payments();
+    const term = (this.searchTerm() ?? '').toLowerCase();
 
-  //   if (term) {
-  //     filtered = filtered.filter(p =>
-  //       p.descripcion?.toLowerCase().includes(term) ||
-  //       p.compraId?.toString().includes(term) ||
-  //       p.monto?.toString().includes(term) ||
-  //       p.uuid?.toLowerCase().includes(term)
-  //     );
-  //   }
+    console.log(term);
 
-  //   // Ordenamiento
-  //   // const sorted = [...filtered].sort((a, b) => {
-  //   //   const col = this.sortColumn();
-  //   //   const dir = this.sortDirection();
-  //   //   let aVal: any = a[col];
-  //   //   let bVal: any = b[col];
+    if (!term) return arr;
 
-  //   //   // Convertir monto a número para ordenamiento correcto
-  //   //   if (col === 'monto') {
-  //   //     aVal = parseFloat(aVal) || 0;
-  //   //     bVal = parseFloat(bVal) || 0;
-  //   //   }
-
-  //   //   if (aVal < bVal) return dir === 'asc' ? -1 : 1;
-  //   //   if (aVal > bVal) return dir === 'asc' ? 1 : -1;
-  //   //   return 0;
-  //   // });
-
-  //   return sorted;
-  // });
-
-
-  // paginatedPayments = computed(() => {
-  //   const start = (this.currentPage() - 1) * this.itemsPerPage();
-  //   const end = start + this.itemsPerPage();
-  //   return this.filteredPayments().slice(start, end);
-  // });
-
-
-  // totalPages = computed(() => {
-  //   return Math.ceil(this.filteredPayments().length / this.itemsPerPage());
-  // });
-
-  
-  // pageArray = computed(() => {
-  //   const total = this.totalPages();
-  //   return Array.from({ length: total }, (_, i) => i + 1);
-  // });
-
-
-  // total = computed(() => this.filteredPayments().length);
-  
-  // rangeStart = computed(() => {
-  //   if (this.total() === 0) return 0;
-  //   return (this.currentPage() - 1) * this.itemsPerPage() + 1;
-  // });
-
-  // rangeEnd = computed(() => {
-  //   const end = this.currentPage() * this.itemsPerPage();
-  //   return Math.min(end, this.total());
-  // });
-
-  // Métodos de ordenamiento
-  toggleSort(column: string) {
+    return arr.filter((p) => {
+      return (p.compra.codigo || '').toLowerCase().includes(term);
+    });
+  });
+  sort(column: string) {
     if (this.sortColumn() === column) {
       this.sortDirection.set(this.sortDirection() === 'asc' ? 'desc' : 'asc');
     } else {
       this.sortColumn.set(column);
       this.sortDirection.set('asc');
     }
-  }
 
-  // Métodos de paginación
+    this.ordenarPagosCompra()
+  }
+  ordenarPagosCompra() {
+    const col = this.sortColumn();
+    const dir = this.sortDirection();
+    if (!col) return;
+    const arr = [...this.pagos()];
+
+    arr.sort((a, b) => {
+      const valA = a[col as keyof any];
+      const valB = b[col as keyof any];
+
+      if (valA == null) return 1;
+      if (valB == null) return -1;
+
+      if (typeof valA === 'string' && typeof valB === 'string') {
+        return dir === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
+      }
+
+      return dir === 'asc' ? (valA < valB ? -1 : 1) : valA < valB ? 1 : -1;
+    });
+    this.pagos.set(arr);
+  }
+  total = signal(0);
+  pageSize = signal(10);
+
   prevPage() {
     if (this.currentPage() > 1) {
-      this.currentPage.update(page => page - 1);
+      this.currentPage.update((page) => page - 1);
     }
   }
 
-  // nextPage() {
-  //   if (this.currentPage() < this.totalPages()) {
-  //     this.currentPage.update(page => page + 1);
-  //   }
-  // }
+  nextPage() {
+    if (this.currentPage() < this.totalPages()) {
+      this.currentPage.update((page) => page + 1);
+    }
+  }
+  totalPages() {
+    return Math.ceil(this.total() / this.pageSize());
+  }
 
   goToPage(page: number) {
     this.currentPage.set(page);
   }
-
-  // Métodos de acciones
-  view(payment: Payment) {
-    console.log('Ver detalle:', payment);
-    // Implementa la lógica para ver detalles
+  pageArray(): number[] {
+    return Array.from({ length: this.totalPages() }, (_, i) => i + 1);
   }
 
-  edit(payment: Payment) {
-    console.log('Editar:', payment);
-    // Implementa la lógica para editar
+  rangeStart(): number {
+    return (this.currentPage() - 1) * this.pageSize() + 1;
   }
 
-  delete(payment: Payment) {
-    console.log('Eliminar:', payment);
-    // Implementa la lógica para eliminar
-    if (confirm(`¿Está seguro de eliminar el pago #${payment.id}?`)) {
-      this.payments.update(payments => 
-        payments.filter(p => p.id !== payment.id)
-      );
-    }
+  rangeEnd(): number {
+    const end = this.currentPage() * this.pageSize();
+    return end > this.total() ? this.total() : end;
   }
-
-
 }

@@ -1,12 +1,17 @@
-<div class="min-h-screen bg-white p-4 sm:p-6 md:p-8">
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-3 sm:p-6 lg:p-8">
   <div class="max-w-7xl mx-auto">
     <!-- Header Elegante -->
- <div class="mb-8 flex flex-wrap items-center gap-3">
-      <div class="flex items-center gap-3 mb-2">
-         <div
-        class="w-12 h-12 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg"
-      >
-          <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <div class="mb-6 sm:mb-8">
+      <div class="flex items-center gap-3 sm:gap-4">
+        <div
+          class="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-[#ff7676] to-red-700 rounded-2xl flex items-center justify-center shadow-xl transform hover:scale-105 transition-transform"
+        >
+          <svg
+            class="w-6 h-6 sm:w-8 sm:h-8 text-white"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -15,31 +20,43 @@
             />
           </svg>
         </div>
-     <div class="flex-1 min-w-0">
+        <div class="flex-1 min-w-0">
           <h1
-            class="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent"
+            class="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-gray-900 via-gray-800 to-[#ff7676] bg-clip-text text-transparent"
           >
             Gestión de Cajas
           </h1>
-       <p class="text-sm text-gray-600 mt-1 truncate">Administra y controla tus cajas de efectivo</p>
+          <p class="text-xs sm:text-sm text-gray-600 mt-1 truncate">
+            Administra y controla tus cajas de efectivo
+          </p>
         </div>
       </div>
     </div>
 
     <!-- Stats Cards Elegantes -->
- <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-8">
-  <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-shadow">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
+      <!-- Cajas Abiertas -->
+      <div
+        class="bg-white rounded-2xl sm:rounded-3xl p-5 sm:p-6 shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-200"
+      >
         <div class="flex items-center justify-between">
-          <div>
-            <p class="text-sm font-medium text-gray-600 mb-1">Cajas Abiertas</p>
-            <p class="text-3xl font-bold text-gray-900">
+          <div class="flex-1">
+            <p class="text-xs sm:text-sm font-semibold text-gray-600 mb-1 sm:mb-2">
+              Cajas Abiertas
+            </p>
+            <p class="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">
               {{ getCajasAbiertas() }}
             </p>
           </div>
           <div
-            class="w-14 h-14 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center shadow-lg"
+            class="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 bg-gradient-to-br from-[#ff7676] to-red-600 rounded-2xl flex items-center justify-center shadow-lg"
           >
-            <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg
+              class="w-6 h-6 sm:w-7 sm:h-7 text-white"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
@@ -51,18 +68,28 @@
         </div>
       </div>
 
-      <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-shadow">
+      <!-- Cajas Cerradas -->
+      <div
+        class="bg-white rounded-2xl sm:rounded-3xl p-5 sm:p-6 shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-200"
+      >
         <div class="flex items-center justify-between">
-          <div>
-            <p class="text-sm font-medium text-gray-600 mb-1">Cajas Cerradas</p>
-            <p class="text-3xl font-bold text-gray-900">
+          <div class="flex-1">
+            <p class="text-xs sm:text-sm font-semibold text-gray-600 mb-1 sm:mb-2">
+              Cajas Cerradas
+            </p>
+            <p class="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">
               {{ getCajasCerradas() }}
             </p>
           </div>
           <div
-            class="w-14 h-14 bg-gradient-to-br from-red-500 to-rose-600 rounded-2xl flex items-center justify-center shadow-lg"
+            class="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 bg-gradient-to-br from-gray-500 to-gray-700 rounded-2xl flex items-center justify-center shadow-lg"
           >
-            <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg
+              class="w-6 h-6 sm:w-7 sm:h-7 text-white"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
@@ -74,20 +101,26 @@
         </div>
       </div>
 
-      <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-shadow">
+      <!-- Total en Cajas -->
+      <div
+        class="bg-gradient-to-br from-[#ff7676] to-red-700 rounded-2xl sm:rounded-3xl p-5 sm:p-6 shadow-xl hover:shadow-2xl transition-all duration-300 border border-red-400 sm:col-span-2 lg:col-span-1"
+      >
         <div class="flex items-center justify-between">
-          <div>
-            <p class="text-sm font-medium text-gray-600 mb-1">Total en Cajas</p>
-            <p
-              class="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent"
-            >
+          <div class="flex-1">
+            <p class="text-xs sm:text-sm font-semibold text-red-100 mb-1 sm:mb-2">Total en Cajas</p>
+            <p class="text-2xl sm:text-3xl lg:text-4xl font-bold text-white">
               {{ getTotalCajas() | number : '1.2-2' }} Bs
             </p>
           </div>
           <div
-            class="w-14 h-14 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg"
+            class="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 bg-white bg-opacity-20 rounded-2xl flex items-center justify-center shadow-lg backdrop-blur-sm"
           >
-            <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg
+              class="w-6 h-6 sm:w-7 sm:h-7 text-white"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
@@ -100,19 +133,24 @@
       </div>
     </div>
 
-    <!-- Formulario Nueva Caja - Diseño Premium -->
+    <!-- Botón Registrar Movimiento - Móvil -->
 
-    <div class="grid grid-cols-1 gap-6">
+    <!-- Formulario Nueva Caja -->
     <form
       [formGroup]="form"
       (ngSubmit)="crearCaja()"
-      class="bg-white shadow-xl rounded-3xl p-8 mb-8 border border-gray-100"
+      class="bg-white shadow-xl rounded-2xl sm:rounded-3xl p-5 sm:p-6 lg:p-8 mb-6 sm:mb-8 border border-gray-200"
     >
-      <div class="flex items-center gap-3 mb-6">
+      <div class="flex items-center gap-3 mb-5 sm:mb-6">
         <div
-          class="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center"
+          class="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-[#ff7676] to-red-700 rounded-xl flex items-center justify-center shadow-lg"
         >
-          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg
+            class="w-5 h-5 sm:w-6 sm:h-6 text-white"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -121,10 +159,13 @@
             />
           </svg>
         </div>
-        <h3 class="text-xl font-bold text-gray-900">Nueva Caja</h3>
+        <h3 class="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900">Nueva Caja</h3>
+
+        <!-- Botón Registrar Movimiento - Desktop -->
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+        <!-- Nombre de la Caja -->
         <div>
           <label class="block text-sm font-semibold text-gray-700 mb-2">Nombre de la Caja</label>
           <div class="relative">
@@ -145,23 +186,24 @@
               formControlName="nombre"
               type="text"
               placeholder="Ej. Caja Principal"
-              class="w-full pl-12 pr-4 py-3.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+              class="w-full pl-12 pr-4 py-3 sm:py-3.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#ff7676] focus:border-[#ff7676] outline-none transition-all text-sm sm:text-base"
             />
           </div>
           @if ( form.get('nombre')?.invalid && form.get('nombre')?.touched ) {
-          <div class="flex items-center gap-2 text-red-600 text-sm mt-2">
-            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+          <div class="flex items-center gap-2 text-red-600 text-xs sm:text-sm mt-2">
+            <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
               <path
                 fill-rule="evenodd"
                 d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
                 clip-rule="evenodd"
               />
             </svg>
-            El nombre es requerido (mín. 3 caracteres)
+            <span>El nombre es requerido (mín. 3 caracteres)</span>
           </div>
           }
         </div>
 
+        <!-- Monto Inicial -->
         <div>
           <label class="block text-sm font-semibold text-gray-700 mb-2">Monto Inicial</label>
           <div class="relative">
@@ -184,17 +226,17 @@
               min="0"
               step="0.01"
               placeholder="0.00"
-              class="w-full pl-12 pr-4 py-3.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+              class="w-full pl-12 pr-4 py-3 sm:py-3.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#ff7676] focus:border-[#ff7676] outline-none transition-all text-sm sm:text-base"
             />
           </div>
         </div>
       </div>
 
-      <div class="flex justify-end mt-6">
+      <div class="flex justify-end mt-5 sm:mt-6">
         <button
           type="submit"
           [disabled]="form.invalid"
-          class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-3.5 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+          class="w-full sm:w-auto bg-gradient-to-r from-[#ff7676] to-red-700 hover:from-[#ff5555] hover:to-red-800 text-white px-6 sm:px-8 py-3 sm:py-3.5 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         >
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
@@ -204,23 +246,32 @@
               d="M12 4v16m8-8H4"
             />
           </svg>
-          Crear Caja
+          <span>Crear Caja</span>
         </button>
       </div>
     </form>
 
-    <!-- Lista de Cajas - Diseño Premium -->
+    <!-- Estados de Carga y Vacío -->
     @if (cajaService.cargando()) {
-    <div class="flex flex-col items-center justify-center py-16">
+    <div class="flex flex-col items-center justify-center py-12 sm:py-16">
       <div
-        class="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"
+        class="w-14 h-14 sm:w-16 sm:h-16 border-4 border-[#ff7676] border-t-transparent rounded-full animate-spin mb-4"
       ></div>
-      <p class="text-gray-600 font-medium">Cargando cajas...</p>
+      <p class="text-gray-600 font-medium text-sm sm:text-base">Cargando cajas...</p>
     </div>
     } @if (!cajaService.cargando() && cajaService.cajas().length === 0) {
-    <div class="bg-white rounded-3xl p-16 text-center shadow-lg border border-gray-100">
-      <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-        <svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <div
+      class="bg-white rounded-2xl sm:rounded-3xl p-10 sm:p-16 text-center shadow-lg border border-gray-200"
+    >
+      <div
+        class="w-16 h-16 sm:w-20 sm:h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4"
+      >
+        <svg
+          class="w-8 h-8 sm:w-10 sm:h-10 text-gray-400"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
           <path
             stroke-linecap="round"
             stroke-linejoin="round"
@@ -229,42 +280,40 @@
           />
         </svg>
       </div>
-      <h3 class="text-xl font-bold text-gray-900 mb-2">No hay cajas registradas</h3>
-      <p class="text-gray-600">Crea tu primera caja para comenzar</p>
+      <h3 class="text-lg sm:text-xl font-bold text-gray-900 mb-2">No hay cajas registradas</h3>
+      <p class="text-sm sm:text-base text-gray-600">Crea tu primera caja para comenzar</p>
     </div>
     }
-    </div>
 
-
-    <div class="grid gap-6">
+    <!-- Lista de Cajas -->
+    <div class="grid gap-4 sm:gap-6">
       @for (caja of cajaService.cajas(); track caja) {
       <div
-        class="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden hover:shadow-2xl transition-all duration-300"
+        class="bg-white rounded-2xl sm:rounded-3xl shadow-xl border border-gray-200 overflow-hidden hover:shadow-2xl transition-all duration-300"
       >
-        <div class="p-8">
-          <div class="flex items-start justify-between">
+        <div class="p-5 sm:p-6 lg:p-8">
+          <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 sm:gap-6">
             <!-- Info Caja -->
-            <div class="flex items-start gap-4 flex-1">
+            <div class="flex items-start gap-3 sm:gap-4 flex-1">
               <div
-                class="w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg"
+                class="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 rounded-2xl flex items-center justify-center shadow-lg flex-shrink-0"
                 [ngClass]="{
-                  'bg-gradient-to-br from-green-500 to-emerald-600': caja.estado === 'ABIERTA',
-                  'bg-gradient-to-br from-gray-400 to-gray-500': caja.estado === 'CERRADA'
+                  'bg-gradient-to-br from-[#ff7676] to-red-600': caja.estado === 'ABIERTA',
+                  'bg-gradient-to-br from-gray-400 to-gray-600': caja.estado === 'CERRADA'
                 }"
               >
-                <fa-icon
-                  [icon]="faCashRegister"
-                  class=" text-gray-400 text-3xl"
-                ></fa-icon>
+                <fa-icon [icon]="faCashRegister" class="text-white text-2xl sm:text-3xl"></fa-icon>
               </div>
 
-              <div class="flex-1">
-                <div class="flex items-center gap-3 mb-3">
-                  <h3 class="text-2xl font-bold text-gray-900">{{ caja.nombre }}</h3>
+              <div class="flex-1 min-w-0">
+                <div class="flex flex-wrap items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+                  <h3 class="text-xl sm:text-2xl font-bold text-gray-900 truncate">
+                    {{ caja.nombre }}
+                  </h3>
                   <span
-                    class="px-4 py-1.5 rounded-full text-xs font-bold shadow-sm"
+                    class="px-3 sm:px-4 py-1 sm:py-1.5 rounded-full text-xs font-bold shadow-sm whitespace-nowrap"
                     [ngClass]="{
-                      'bg-green-100 text-green-700': caja.estado === 'ABIERTA',
+                      'bg-red-100 text-red-700': caja.estado === 'ABIERTA',
                       'bg-gray-100 text-gray-700': caja.estado === 'CERRADA'
                     }"
                   >
@@ -272,31 +321,35 @@
                   </span>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
+                <!-- Grid de Montos -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+                  <!-- Monto Inicial -->
                   <div
-                    class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 border border-blue-100"
+                    class="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-3 sm:p-4 border border-gray-200"
                   >
-                    <p class="text-xs font-semibold text-blue-700 mb-1">Monto Inicial</p>
-                    <p class="text-2xl font-bold text-blue-900">
-                      {{ caja.montoInicial | number : '1.2-2' }}Bs
+                    <p class="text-xs font-semibold text-gray-600 mb-1">Monto Inicial</p>
+                    <p class="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 truncate">
+                      {{ caja.montoInicial | number : '1.2-2' }} Bs
                     </p>
                   </div>
 
+                  <!-- Saldo Actual -->
                   <div
-                    class="bg-gradient-to-br from-emerald-50 to-green-50 rounded-xl p-4 border border-emerald-100"
+                    class="bg-gradient-to-br from-red-50 to-red-100 rounded-xl p-3 sm:p-4 border border-red-200"
                   >
-                    <p class="text-xs font-semibold text-emerald-700 mb-1">Saldo Actual</p>
-                    <p class="text-2xl font-bold text-emerald-900">
-                      {{ caja.saldoActual | number : '1.2-2' }}Bs
+                    <p class="text-xs font-semibold text-red-700 mb-1">Saldo Actual</p>
+                    <p class="text-lg sm:text-xl lg:text-2xl font-bold text-red-900 truncate">
+                      {{ caja.saldoActual | number : '1.2-2' }} Bs
                     </p>
                   </div>
 
+                  <!-- Diferencia -->
                   <div
-                    class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-4 border border-purple-100"
+                    class="bg-gradient-to-br from-gray-50 to-white rounded-xl p-3 sm:p-4 border border-gray-200"
                   >
-                    <p class="text-xs font-semibold text-purple-700 mb-1">Diferencia</p>
+                    <p class="text-xs font-semibold text-gray-600 mb-1">Diferencia</p>
                     <p
-                      class="text-2xl font-bold"
+                      class="text-lg sm:text-xl lg:text-2xl font-bold truncate"
                       [ngClass]="{
                         'text-green-700': getDiferencia(caja) >= 0,
                         'text-red-700': getDiferencia(caja) < 0
@@ -309,15 +362,52 @@
               </div>
             </div>
 
-            <!-- Acciones -->
-            <div class="flex flex-col gap-3 ml-6">
-              <!-- Botón Ver Movimientos - Siempre visible -->
+            <!-- Botones de Acción -->
+            <div class="flex flex-col gap-2 sm:gap-3 lg:min-w-[200px]">
+              <div class="hidden lg:flex flex-1 justify-end">
+                <button
+                  type="button"
+                  (click)="modal.open()"
+                  class="bg-gradient-to-r from-[#ff7676] to-red-700 hover:from-[#ff5555] hover:to-red-800 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all flex items-center gap-2"
+                >
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M12 4v16m8-8H4"
+                    />
+                  </svg>
+                  Registrar Movimiento
+                </button>
+              </div>
+              <div class="mb-6 sm:mb-8 lg:hidden">
+                <button
+                  (click)="modal.open()"
+                  class="w-full bg-gradient-to-r from-[#ff7676] to-red-700 hover:from-[#ff5555] hover:to-red-800 text-white px-6 py-4 rounded-2xl font-bold shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2"
+                >
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M12 4v16m8-8H4"
+                    />
+                  </svg>
+                  Registrar Movimiento
+                </button>
+              </div>
+              <!-- Ver Movimientos -->
               <button
-                  [routerLink]="['/caja/movimientos', caja.id]"
-   
-                class="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all flex items-center gap-2 whitespace-nowrap"
+                [routerLink]="['/caja/movimientos', caja.id]"
+                class="bg-gradient-to-r from-gray-700 to-gray-900 hover:from-gray-800 hover:to-black text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 text-sm sm:text-base"
               >
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg
+                  class="w-4 h-4 sm:w-5 sm:h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
                   <path
                     stroke-linecap="round"
                     stroke-linejoin="round"
@@ -325,16 +415,21 @@
                     d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"
                   />
                 </svg>
-                Movimientos
+                <span>Movimientos</span>
               </button>
 
               @if (caja.estado === 'ABIERTA') {
-              <!-- Botón Cierre de Caja -->
+              <!-- Cierres de Caja -->
               <button
-                 [routerLink]="['/caja/cierre', caja.id]"
-                class="bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all flex items-center gap-2 whitespace-nowrap"
+                [routerLink]="['/caja/cierre', caja.id]"
+                class="bg-gradient-to-r from-[#ff7676] to-red-700 hover:from-[#ff5555] hover:to-red-800 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 text-sm sm:text-base"
               >
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg
+                  class="w-4 h-4 sm:w-5 sm:h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
                   <path
                     stroke-linecap="round"
                     stroke-linejoin="round"
@@ -342,31 +437,20 @@
                     d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                   />
                 </svg>
-                Cierres de Caja
+                <span>Cierres de Caja</span>
               </button>
-              } @if (caja.estado === 'CERRADA') {
-              <!-- Botón Abrir Caja -->
-              <button
-                (click)="abrir(caja.id)"
-                class="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all flex items-center gap-2 whitespace-nowrap"
-              >
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"
-                  />
-                </svg>
-                Abrir Caja
-              </button>
-              } @else {
-              <!-- Botón Cerrar Caja -->
+
+              <!-- Cerrar Caja -->
               <button
                 (click)="cerrar(caja.id)"
-                class="bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all flex items-center gap-2 whitespace-nowrap"
+                class="bg-white hover:bg-gray-50 text-gray-900 border-2 border-gray-300 hover:border-gray-400 px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 text-sm sm:text-base"
               >
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg
+                  class="w-4 h-4 sm:w-5 sm:h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
                   <path
                     stroke-linecap="round"
                     stroke-linejoin="round"
@@ -374,7 +458,28 @@
                     d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
                   />
                 </svg>
-                Cerrar Caja
+                <span>Cerrar Caja</span>
+              </button>
+              } @else {
+              <!-- Abrir Caja -->
+              <button
+                (click)="abrir(caja.id)"
+                class="bg-gradient-to-r from-[#ff7676] to-red-700 hover:from-[#ff5555] hover:to-red-800 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 text-sm sm:text-base"
+              >
+                <svg
+                  class="w-4 h-4 sm:w-5 sm:h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"
+                  />
+                </svg>
+                <span>Abrir Caja</span>
               </button>
               }
             </div>
@@ -385,3 +490,5 @@
     </div>
   </div>
 </div>
+
+<app-movimiento-modal #modal></app-movimiento-modal>

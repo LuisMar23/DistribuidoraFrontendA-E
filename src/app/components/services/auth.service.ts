@@ -14,12 +14,14 @@ export interface LoginResponse {
   };
 }
 
+// CORRECCIÓN: Actualizar la interfaz para la nueva estructura
 export interface ChangePasswordResponse {
-  message: string;
-  user: {
-    username: string;
-    fullName: string;
-    ci: string;
+  data: {
+    message: string;
+    user: {
+      username: string;
+      role: string;
+    };
   };
 }
 
@@ -35,12 +37,12 @@ export interface ChangePasswordDto {
 export class AuthService {
   private apiUrl = environment.apiUrl;
   private tokenKey = 'access_token';
+  private refreshTokenKey = 'refresh_token';
   private userKey = 'user_data';
 
   constructor(private http: HttpClient, private router: Router) {}
 
   login(data: LoginDto): Observable<LoginResponse> {
-    // CORRECCIÓN: Transformar identifier a username
     const loginData = {
       username: data.identifier,
       password: data.password,
@@ -48,17 +50,28 @@ export class AuthService {
 
     return this.http.post<LoginResponse>(`${this.apiUrl}/auth/login`, loginData).pipe(
       tap((res) => {
-        // SOLUCIÓN: No mostrar datos sensibles en consola
         console.log('Login exitoso - Tokens recibidos');
 
-        localStorage.setItem(this.tokenKey, res.data.accessToken);
-        localStorage.setItem('refresh_token', res.data.refreshToken);
-        localStorage.setItem(this.userKey, JSON.stringify(res.data.user));
+        // CORRECCIÓN COMPLETA: Manejo consistente de tokens según rememberMe
+        if (data.rememberMe) {
+          // Guardar en localStorage (persistente)
+          localStorage.setItem(this.tokenKey, res.data.accessToken);
+          localStorage.setItem(this.refreshTokenKey, res.data.refreshToken);
+          localStorage.setItem(this.userKey, JSON.stringify(res.data.user));
 
-        if (!data.rememberMe) {
+          // Limpiar sessionStorage
+          sessionStorage.removeItem(this.tokenKey);
+          sessionStorage.removeItem(this.refreshTokenKey);
+          sessionStorage.removeItem(this.userKey);
+        } else {
+          // Guardar en sessionStorage (solo para la sesión)
           sessionStorage.setItem(this.tokenKey, res.data.accessToken);
+          sessionStorage.setItem(this.refreshTokenKey, res.data.refreshToken);
           sessionStorage.setItem(this.userKey, JSON.stringify(res.data.user));
+
+          // Limpiar localStorage
           localStorage.removeItem(this.tokenKey);
+          localStorage.removeItem(this.refreshTokenKey);
           localStorage.removeItem(this.userKey);
         }
       })
@@ -66,7 +79,6 @@ export class AuthService {
   }
 
   register(data: RegisterDto): Observable<RegisterDto> {
-    // SOLUCIÓN: Log seguro
     console.log('Registro attempt:', {
       username: data.username,
       fullName: data.fullName,
@@ -102,8 +114,11 @@ export class AuthService {
   }
 
   refreshToken(): Observable<string> {
-    const token = localStorage.getItem('refresh_token');
-    if (!token) throw new Error('No hay refresh token');
+    const token = this.getRefreshToken(); // CORRECCIÓN: Usar método corregido
+    if (!token) {
+      console.error('No hay refresh token disponible');
+      return throwError(() => new Error('No hay refresh token disponible'));
+    }
 
     return this.http
       .post<{ accessToken: string; refreshToken: string }>(`${this.apiUrl}/auth/refresh`, {
@@ -111,21 +126,45 @@ export class AuthService {
       })
       .pipe(
         tap((res) => {
-          localStorage.setItem('access_token', res.accessToken);
-          localStorage.setItem('refresh_token', res.refreshToken);
+          // CORRECCIÓN: Actualizar tokens en el storage correspondiente
+          if (localStorage.getItem(this.tokenKey)) {
+            // Si estaba en localStorage, mantener ahí
+            localStorage.setItem(this.tokenKey, res.accessToken);
+            localStorage.setItem(this.refreshTokenKey, res.refreshToken);
+          } else {
+            // Si estaba en sessionStorage, mantener ahí
+            sessionStorage.setItem(this.tokenKey, res.accessToken);
+            sessionStorage.setItem(this.refreshTokenKey, res.refreshToken);
+          }
         }),
-        map((res) => res.accessToken)
+        map((res) => res.accessToken),
+        catchError((error) => {
+          console.error('Error refreshing token:', error);
+          // Si falla el refresh, hacer logout
+          this.logout();
+          return throwError(() => error);
+        })
       );
   }
 
   private saveTokens(access: string, refresh: string) {
-    localStorage.setItem('access_token', access);
-    localStorage.setItem('refresh_token', refresh);
+    localStorage.setItem(this.tokenKey, access);
+    localStorage.setItem(this.refreshTokenKey, refresh);
   }
 
   getToken(): string | null {
-    if (typeof window !== 'undefined' && localStorage) {
-      return localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem(this.tokenKey) || sessionStorage.getItem(this.tokenKey);
+    }
+    return null;
+  }
+
+  // CORRECCIÓN: Método para obtener el refresh token correctamente
+  getRefreshToken(): string | null {
+    if (typeof window !== 'undefined') {
+      return (
+        localStorage.getItem(this.refreshTokenKey) || sessionStorage.getItem(this.refreshTokenKey)
+      );
     }
     return null;
   }
@@ -135,19 +174,20 @@ export class AuthService {
   }
 
   logout() {
+    // CORRECCIÓN: Limpiar ambos storage completamente
     localStorage.removeItem(this.tokenKey);
-    localStorage.removeItem('refresh_token');
+    localStorage.removeItem(this.refreshTokenKey);
     localStorage.removeItem(this.userKey);
 
     sessionStorage.removeItem(this.tokenKey);
-    sessionStorage.removeItem('refresh_token');
+    sessionStorage.removeItem(this.refreshTokenKey);
     sessionStorage.removeItem(this.userKey);
 
     this.router.navigate(['/login']);
   }
 
   getCurrentUser(): any {
-    if (typeof window !== 'undefined' && localStorage) {
+    if (typeof window !== 'undefined') {
       const userData = localStorage.getItem(this.userKey) || sessionStorage.getItem(this.userKey);
 
       if (userData) {
@@ -160,5 +200,10 @@ export class AuthService {
       }
     }
     return null;
+  }
+
+  // CORRECCIÓN: Método para verificar si hay refresh token disponible
+  hasRefreshToken(): boolean {
+    return !!this.getRefreshToken();
   }
 }

@@ -70,6 +70,10 @@ export const routes: Routes = [
         path: 'pagos',
         loadChildren: () => import('./features/pagos/pago.routes').then((r) => r.PagoRoutingModule),
       },
+      {
+        path:'mataderos',
+        loadChildren:()=>import('./features/matadero/matadero.routes').then((r)=>r.MataderoRoutingModule)
+      }
     ],
   },
   { path: '**', redirectTo: '/login' },

@@ -6,4 +6,11 @@ export interface ProductDto {
   observacion?: string;
   fecha_llegada: string;
   creado_en: string;
+
+  compraGanadoId: number;
+  compraGanado?: {
+    id: number;
+    codigo: string;
+    fechaCompra: string;
+  };
 }

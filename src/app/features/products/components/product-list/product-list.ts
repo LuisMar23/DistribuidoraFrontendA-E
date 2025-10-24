@@ -47,7 +47,7 @@ export class ProductList implements OnInit {
         this.cargando.set(false);
       },
       error: (err) => {
-        console.error('Error al cargar productos:', err);
+
         this.error.set('No se pudieron cargar los productos');
         this.cargando.set(false);
       },

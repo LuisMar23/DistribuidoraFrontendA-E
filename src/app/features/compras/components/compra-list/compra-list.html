@@ -215,6 +215,8 @@
             <p class="text-xl font-bold text-red-600">
               Bs {{ compra.detalles[0].precioTotal | number : '1.2-2' }}
             </p>
+
+            Bs {{ getGananciaCompraCached(compra.id) | async | number : '1.2-2' }}
           </div>
         </div>
 
@@ -275,7 +277,7 @@
 
           <!-- Agregar Matadero -->
           <button
-               [routerLink]="['/mataderos', compra.id]"
+            [routerLink]="['/mataderos', compra.id]"
             class="flex-1 p-2.5 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition flex items-center justify-center gap-2 text-sm font-semibold"
           >
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -288,7 +290,6 @@
             </svg>
             Agregar Matadero
           </button>
-
         </div>
       </div>
       }
@@ -392,6 +393,8 @@
               </td>
               <td class="px-6 py-4 whitespace-nowrap font-bold text-red-600">
                 Bs {{ compra.detalles[0].precioTotal | number : '1.2-2' }}
+                <p> Ganancia   Bs {{ getGananciaCompraCached(compra.id) | async | number : '1.2-2' }}</p>
+                   
               </td>
 
               <td class="px-6 py-4 whitespace-nowrap">

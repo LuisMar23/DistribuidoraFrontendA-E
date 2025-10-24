@@ -1,0 +1,61 @@
+<div class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6">
+    
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-6 border-b border-gray-200 pb-3">
+      <h2 class="text-2xl font-bold text-[#ff7676]">Registrar Pago</h2>
+      <button (click)="close()" class="text-gray-400 hover:text-gray-600 text-xl font-bold">&times;</button>
+    </div>
+    
+    <!-- Form -->
+    <form [formGroup]="form" class="space-y-4">
+      
+      <div>
+        <label class="block text-gray-700 font-medium mb-1">Fecha de Pago</label>
+        <input type="date" formControlName="fechaPago"
+               class="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-[#ff7676] focus:border-[#ff7676]"/>
+      </div>
+
+      <div>
+        <label class="block text-gray-700 font-medium mb-1">Forma de Pago</label>
+        <select formControlName="formaPago"
+                class="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-[#ff7676] focus:border-[#ff7676]">
+          <option value="efectivo">EFECTIVO</option>
+          <option value="transferencia">TRANSFERENCIA</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-gray-700 font-medium mb-1">Referencia (opcional)</label>
+        <input type="text" formControlName="referencia"
+               class="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-[#ff7676] focus:border-[#ff7676]"/>
+      </div>
+
+      <div>
+        <label class="block text-gray-700 font-medium mb-1">Observaciones (opcional)</label>
+        <textarea formControlName="observaciones"
+                  class="w-full border border-gray-300 rounded-lg p-2 h-20 focus:outline-none focus:ring-2 focus:ring-[#ff7676] focus:border-[#ff7676]"></textarea>
+      </div>
+
+      <div>
+        <label class="block text-gray-700 font-medium mb-1">Comprobante (opcional)</label>
+        <input type="file" (change)="onFileSelected($event)"
+               class="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-[#ff7676] focus:border-[#ff7676]"/>
+      </div>
+
+      <!-- Buttons -->
+      <div class="flex justify-end gap-3 mt-4">
+        <button type="button"
+                (click)="close()"
+                class="px-5 py-2 rounded-lg bg-gray-200 text-gray-700 font-medium hover:bg-gray-300 transition">
+          Cancelar
+        </button>
+        <button type="button"
+                (click)="registrarPago()"
+                class="px-5 py-2 rounded-lg bg-[#ff7676] text-white font-medium hover:bg-red-500 transition">
+          Registrar
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

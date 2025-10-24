@@ -76,7 +76,7 @@ export class MataderoComponent {
   constructor() {
     this.loadMataderos();
     effect(() => {
-      console.log('ID cambió:', this.compraId());
+     this.compraId()
     });
   }
 

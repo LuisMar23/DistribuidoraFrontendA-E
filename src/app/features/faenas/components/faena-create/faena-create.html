@@ -1,12 +1,62 @@
 <div class="max-w-5xl mx-auto bg-white rounded-2xl shadow-lg p-6 md:p-8 mt-6">
+  <a [routerLink]="['/faenas']" class="flex items-center py-2 text-black">
+    <svg
+      class="w-5 h-5 mr-2 transform group-hover:-translate-x-1 transition-transform duration-200"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="M15 19l-7-7 7-7"
+      ></path>
+    </svg>
+    <span class="text-sm font-medium">Regresar</span>
+  </a>
   <h2 class="text-2xl font-semibold text-gray-800 mb-6">
-    {{ isEditing() ? 'Editar Detalle de Faena' : 'Crear Detalle de Faena' }}
+    {{ isEditing() ? 'Editar' : 'Crear' }} detalle de Faena
   </h2>
 
   <form [formGroup]="form" (ngSubmit)="submit()" class="space-y-5">
+    <!-- Buscador de compra -->
+    <div class="relative">
+      <label class="block text-sm font-medium text-gray-700 mb-1"
+        >Compra (buscar por código o fecha)</label
+      >
+      <input
+        type="text"
+        [value]="searchCompra()"
+        (input)="searchCompra.set($any($event.target).value); compraSelected.set(false)"
+        placeholder="Ingrese código o fecha de compra"
+        class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none"
+      />
+      <!-- Resultados -->
+      @if (filteredCompras().length > 0) {
+      <ul
+        class="absolute z-10 bg-white border rounded-lg mt-1 w-full shadow-lg max-h-48 overflow-y-auto"
+      >
+        @for (compra of filteredCompras(); track $index) {
+        <li
+          (click)="selectCompra(compra)"
+          class="px-3 py-2 hover:bg-blue-100 cursor-pointer text-sm"
+        >
+          <div class="font-medium">{{ compra.codigo }}</div>
+          <div class="text-xs text-gray-600">
+            {{ compra.proveedor?.nombre }} • {{ compra.fechaCompra | date : 'dd/MM/yyyy' }}
+          </div>
+        </li>
+        }
+      </ul>
+      }
+    </div>
+
     <!-- Fecha -->
     <div>
-      <label class="block text-sm font-medium text-gray-700 mb-1">Fecha</label>
+      <label class="block text-sm font-medium text-gray-700 mb-1"
+        >Fecha(Se asignara la fecha de la compra seleccionada)</label
+      >
       <input
         type="date"
         formControlName="fecha"
@@ -22,33 +72,6 @@
         formControlName="propiedad"
         class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#ff7676] outline-none"
       />
-    </div>
-
-    <!-- Buscador de compra -->
-    <div class="relative">
-      <label class="block text-sm font-medium text-gray-700 mb-1">Compra (buscar por código)</label>
-      <input
-        type="text"
-        [value]="searchCompra()"
-        (input)="searchCompra.set($any($event.target).value)"
-        placeholder="Ingrese código de compra"
-        class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none"
-      />
-      <!-- Resultados -->
-      @if (filteredCompras().length > 0) {
-      <ul
-        class="absolute z-10 bg-white border rounded-lg mt-1 w-full shadow-lg max-h-48 overflow-y-auto"
-      >
-        @for (compra of filteredCompras(); track $index) {
-        <li
-          (click)="selectCompra(compra)"
-          class="px-3 py-2 hover:bg-blue-100 cursor-pointer text-sm"
-        >
-          {{ compra.codigo }} — {{ compra.proveedor?.nombre }}
-        </li>
-        }
-      </ul>
-      }
     </div>
 
     <!-- N° Reses -->
@@ -95,22 +118,32 @@
         <input
           type="number"
           formControlName="otrosGastos"
-          class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#ff7676]outline-none"
+          class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#ff7676] outline-none"
         />
       </div>
     </div>
 
     <div>
-      <label class="block text-sm font-medium text-gray-700 mb-1">Saldo a Depositar</label>
+      <label class="block text-sm font-medium text-gray-700 mb-1"
+        >Saldo a Depositar (Calculado)</label
+      >
       <input
         type="number"
         formControlName="saldoDepositar"
-        class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#ff7676] outline-none"
+        readonly
+        class="w-full border rounded-lg px-3 py-2 bg-gray-100 text-gray-700 cursor-not-allowed outline-none"
       />
     </div>
 
     <!-- Botón -->
-    <div class="pt-4 flex justify-end">
+    <div class="pt-4 flex justify-end gap-3">
+      <button
+        type="button"
+        [routerLink]="['/faenas']"
+        class="flex items-center justify-center gap-2 bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-xl shadow-md transition-all duration-200 transform hover:scale-105 order-2 sm:order-1"
+      >
+        <i class="fas fa-times"></i> Cancelar
+      </button>
       <button
         type="submit"
         class="bg-[#ff7676] text-white px-6 py-2 rounded-lg hover:bg-red-500 transition"
